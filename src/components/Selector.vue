@@ -47,7 +47,7 @@
 <script>
 	import Vue from 'vue'
 	import { DatetimePicker } from 'vant';
-	import store from '../store/store'
+	import store from '../store'
 	Vue.use(DatetimePicker)
 	export default {
 		props: {
