@@ -3,8 +3,7 @@ import Vue from 'vue'
 import router from './router'
 import axios from 'axios'
 import http from './http'
-import store from './store/store'
-import * as types from './store/types'
+import store from './store'
 
 import App from './App'
 import MuseUI from 'muse-ui'
@@ -14,7 +13,7 @@ import BaiduMap from 'vue-baidu-map'
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
-Vue.prototype.$types = types
+// Vue.prototype.$types = types
 Vue.use(MuseUI)
 Vue.use(BaiduMap, {
 	ak: 'HxUj76nECj5KXXIaNjSo7juXodilpfAX'
