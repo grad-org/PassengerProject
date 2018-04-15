@@ -8,7 +8,11 @@ import Login from '@/components/login/Login'
 import LoginNext from '@/components/login/LoginNext'
 import Register from '@/components/login/Register'
 import CitySelector from '@/components/city/CitySelector'
+<<<<<<< HEAD
 import User from '@/components/user/User'
+=======
+import UserInfo from '@/components/user/UserInfo'
+>>>>>>> develop
 
 Vue.use(VueRouter)
 
@@ -17,7 +21,11 @@ const routes = [
 		path: '/',
 		name: 'Home',
 		meta: {
+<<<<<<< HEAD
 			requireAuth: true,	// 添加这个字段，表示进入该路由是需要登录的
+=======
+			requireAuth: true	// 添加这个字段，表示进入该路由是需要登录的
+>>>>>>> develop
 		},
 		component: Home
 	},
@@ -25,9 +33,15 @@ const routes = [
 		path: '/user',
 		name: 'User',
 		meta: {
+<<<<<<< HEAD
 			requireAuth: true,
 		},
 		component: User
+=======
+			requireAuth: true
+		},
+		component: UserInfo
+>>>>>>> develop
 	},
 	{
 		path: '/login',
@@ -53,12 +67,19 @@ const routes = [
 
 // 页面刷新时，重新赋值token
 if (window.localStorage.getItem('token')) {
+<<<<<<< HEAD
 	// store.commit(types.LOGIN, window.localStorage.getItem('token'))
+=======
+	console.log("刷新页面调用")
+>>>>>>> develop
 	store.dispatch('login', window.localStorage.getItem('token'))
 }
 
 if (window.localStorage.getItem('city') == '' || window.localStorage.getItem('city') == null || window.localStorage.getItem('city') == undefined) {
+<<<<<<< HEAD
 	// store.commit(types.City, '广州市')
+=======
+>>>>>>> develop
 	store.dispatch('city', '广州市')
 	console.log(window.localStorage.getItem('city'))
 } else {

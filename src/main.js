@@ -13,6 +13,10 @@ import BaiduMap from 'vue-baidu-map'
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
+<<<<<<< HEAD
+=======
+// Vue.prototype.$types = types
+>>>>>>> develop
 Vue.use(MuseUI)
 Vue.use(BaiduMap, {
 	ak: 'HxUj76nECj5KXXIaNjSo7juXodilpfAX'

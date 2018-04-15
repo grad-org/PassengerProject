@@ -1,8 +1,14 @@
 <template>
 	<!-- ready是组件加载完之后才能执行的代码 -->
+<<<<<<< HEAD
 	<baidu-map class="map" :center="center" :zoom="zoom" @ready="handler" @load="loadding" :scroll-wheel-zoom="true"
 		:mapStyle="{styleJson: styleJson}">
 		<bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="false" :autoLocation="false"
+=======
+	<baidu-map class="map" :center="center" :zoom="zoom" @ready="handler" @load="loadding" 
+		:mapStyle="{styleJson: styleJson}">
+		<bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="false" :autoLocation="false" :scroll-wheel-zoom="true"
+>>>>>>> develop
 			@locationSuccess="getLoctionSuccess" @locationError="getLocationError">
 		</bm-geolocation>
 	</baidu-map>

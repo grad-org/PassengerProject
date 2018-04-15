@@ -1,7 +1,10 @@
 
 import Vue from 'vue'
 import Vuex from 'vuex'
+<<<<<<< HEAD
 
+=======
+>>>>>>> develop
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
@@ -23,19 +26,27 @@ const store = new Vuex.Store({
 		},
 		logout: (state) => {
 			window.localStorage.removeItem('token');
+<<<<<<< HEAD
 			window.localStorage.removeItem('userId');
+=======
+>>>>>>> develop
 			state.token = null;
 		},
 		city: (state, payload) => {
 			window.localStorage.city = payload;
 			state.localCity = payload;
 		},
+<<<<<<< HEAD
 		getUserId: (state, payload) => {
+=======
+		userId: (state, payload) => {
+>>>>>>> develop
 			window.localStorage.userId = payload;
 			state.userId = payload;
 		}
 	},
 	actions: {
+<<<<<<< HEAD
 		// context
 		login: (context, token) => {
 			context.commit('login', token)
@@ -48,6 +59,19 @@ const store = new Vuex.Store({
 		},
 		getUserId: (context, userId) => {
 			context.commit('getUserId', userId)
+=======
+		login: (context, token) => {
+			context.commit('login', token);
+		},
+		logout: (context) => {
+			context.commit('logout');
+		},
+		city: (context, city) => {
+			context.commit('city', city);
+		},
+		userId: (context, userId) => {
+			context.commit('userId', userId);
+>>>>>>> develop
 		}
 	}
 })

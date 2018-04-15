@@ -88,6 +88,44 @@ const checkFormat = {
 			errorText_password_verify: t_v,
 		}
 	}
+<<<<<<< HEAD
+=======
+				// this.errorText_username =  checkFormat.checkUsername(this.value_username)
+				// this.errorText_nickname = checkFormat.checkNickname(this.value_nickname)
+				// // 判断password是否符合格式，并返回password的errorText
+				// let temp_p = checkFormat.checkPassword(this.value_password)
+				// if (temp_p == '' || temp_p == null || temp_p == undefined) {
+				// 	// 当第一次输入密码无误后，才对 “确认密码” 进行判断
+				// 	// 判断是两次输入是否一致，并返回password_verify的errorText
+				// 	let temp_p_v  = checkFormat.passwordVerify(this.value_password_verify)
+				// 	if (temp_p_v == '' || temp_p_v == null || temp_p_v == undefined) {
+				// 		console.log("信息正确，提交注册")
+				// 		// let that = this;
+				// 		// this.$axios.post("/auth/register",
+				// 		// 	{
+				// 		// 		username: this.value_username,
+				// 		// 		password: this.value_password,
+				// 		// 		nickname: this.value_nickname
+				// 		// 	},
+				// 		// 	{
+				// 		// 		headers: {'Content-Type': 'application/json'}
+				// 		// 	}
+				// 		// )
+				// 		// .then(function (response) {
+				// 		// 	console.log(response);
+				// 		// })
+				// 		// .catch(function (error) {
+				// 		// 	console.log(error)
+				// 		// })	//axios结束
+				// 	} else {
+				// 		this.errorText_password_verify = temp_p_v
+				// 	}
+				// } else {
+				// 	// 当第一次输入密码不符合格式，就“确认密码”置空和去除错误提示
+				// 	this.errorText_password = temp_p
+				// 	this.value_password_verify = ''
+				// }
+>>>>>>> develop
 }
 
 export default checkFormat
