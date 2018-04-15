@@ -26,14 +26,14 @@ const checkFormat = {
 	// 检查用户名
 	checkUsername (username) {
 		let errorText = '';
-		// let reg = 11 && /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
-		// if(username == '' || username == null || username == undefined){
-		// 	errorText = '请填入手机号码！';
-		// } else if (!reg.test(username)) {
-		// 	errorText = '请输入正确的手机号码！';
-		// } else {
-		// 	errorText = '';
-		// }
+		let reg = 11 && /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
+		if(username == '' || username == null || username == undefined){
+			errorText = '请填入手机号码！';
+		} else if (!reg.test(username)) {
+			errorText = '请输入正确的手机号码！';
+		} else {
+			errorText = '';
+		}
 		return errorText;
 	},
 
@@ -41,17 +41,17 @@ const checkFormat = {
 	checkPassword (password) {
 		let errorText = '';
 		// 这个包含特殊字符：/^.*(?=.{6,})(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*? ])./
-		// let reg = /^[a-zA-Z]\w{5,11}$/;
-		// if(password == '' || password == null || password == undefined){
-		// 	errorText = '请输入密码！';
-		// 	temp_pwd = '';
-		// } else if (!reg.test(password)) {
-		// 	errorText = '以字母开头，长度在6~12之间，仅含字母、数字和下划线！';
-		// 	temp_pwd = password;
-		// } else {
-		// 	errorText = '';
-		// 	temp_pwd = password;
-		// }
+		let reg = /^[a-zA-Z]\w{5,11}$/;
+		if(password == '' || password == null || password == undefined){
+			errorText = '请输入密码！';
+			temp_pwd = '';
+		} else if (!reg.test(password)) {
+			errorText = '以字母开头，长度在6~12之间，仅含字母、数字和下划线！';
+			temp_pwd = password;
+		} else {
+			errorText = '';
+			temp_pwd = password;
+		}
 		return errorText;
 	},
 
