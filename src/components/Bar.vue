@@ -1,13 +1,16 @@
 
 <template>
-	<!-- 侧栏 -->
 	<div>
 		<mu-drawer :width="width" :zDepth="zDepth" :open="open_drawer" :docked="docked" @close="toggle()">
-			<router-link to="login">
-				<mu-list-item @itemClick="docked ? '' : toggle()" class="user-info" title="越前君" >
-						<mu-avatar slot="left" :src="avater" :size="30" />
+
+			<div class="user-info" :style="userBackground">
+				<mu-paper class="paper" circle :zDepth="2" >
+					<img :src="avater" style="width: 100%; height: 100%"/>
+				</mu-paper>
+				<mu-list-item :title="nickname" :describeText="username" @click="goUserInfo">
+					<mu-icon value="info" slot="right" color="#333"/>
 				</mu-list-item>
-			</router-link>
+			</div>
 			<mu-list>
 				<mu-list-item title="行程" rightIcon="keyboard_arrow_right">
 					<mu-icon slot="left" value="local_taxi" />
@@ -28,7 +31,7 @@
 		</mu-drawer>
 		<!-- 顶栏区域 -->
 		<mu-appbar ref="barDiv" title="蔚蓝出行">
-			<mu-icon-button icon="menu" slot="left" v-on:click="toggle(true)"/>
+			<mu-icon-button icon="menu" slot="left" @click="toggle(true)"/>
 			<mu-flat-button color="#fff" :label="selectedCity" slot="right" @click="toCitySelector"/>
 			<mu-icon-button icon="notifications" slot="right">
 			</mu-icon-button>
@@ -37,8 +40,10 @@
 </template>
 
 <script>
-
-	import avater from "../assets/image/avater.jpg";
+	/**
+	 * 设置背景图片，参考：https://blog.csdn.net/woyidingshijingcheng/article/details/72903800
+	 */
+	import avater from '../assets/image/avater.jpg'
 
 	export default {
 		data() {
@@ -49,8 +54,48 @@
 				zDepth: 0,
 				width: "60%",
 				// avater
-				avater: avater,
+				avater: null,
+				nickname: '',
+				username: '',
+				userBackground: {
+					backgroundImage: 'url(' + require('../assets/image/bg.jpg') + ')',
+					backgroundRepeat: "no-repeat",
+					backgroundSize: "100% auto",
+				}
 			}
+		},
+		created () {
+			let _this = this;
+			// 带上token，发送http请求，获得用户信息（包括ID、nickname、username等）
+			_this.$axios.get('/api/auth/user')
+			.then( (response) => {
+				console.log(response);
+				if (response.status == 200) {
+					console.log('获取用户成功');
+					_this.$store.dispatch('userId', response.data.data.id)
+					_this.nickname = response.data.data.nickname
+					_this.username = response.data.data.username
+					window.localStorage.nickname = response.data.data.nickname
+				}
+			})
+			.catch ( (error) => {
+				console.log(error);
+			})
+			// 根据用户ID获取用户头像
+			_this.$axios.get('/images/user/' + _this.$store.state.userId + '.jpg')
+			.then( (response) => {
+				console.log(response)
+				if (response.status == 200) {
+					this.avater = 'http://forcar.vip:8080/images/user/' + _this.$store.state.userId + '.jpg'
+					_this.avater = 'http://forcar.vip:8080/images/user/2.jpg'
+					// _this.avater = avater
+				}
+			})
+			.catch( (error) => {
+				console.log(error)
+				_this.avater = avater
+			})
+
 		},
 		mounted() {
 			
@@ -66,12 +111,15 @@
 				this.docked = !flag;
 			},
 			logout() {
-				this.$store.commit(this.$types.LOGOUT);
-				let redirect = decodeURIComponent(this.$route.query.redirect || "/login");
-				this.$router.push({ path: redirect });
+				// this.$store.commit(this.$types.LOGOUT);
+				this.$store.dispatch('logout')
+				this.$router.push({name: 'Login'});
 			},
 			toCitySelector: function() {
 				this.$router.push({ name: "CitySelect" });
+			},
+			goUserInfo () {
+				this.$router.push({name: 'User'})
 			}
 		}
 	}
@@ -79,13 +127,23 @@
 
 <style scoped>
 	.user-info {
-		height: 30%;
+		width: 100%; 
+		height: auto;
 		background: #e0e0e0;
 	}
 	.mu-list {
 		/* 默认padding为8px */
 		padding: 0;
 	}
+	.paper {
+		display: inline-block;
+		height: 60px;
+		width: 60px;
+		margin: 16px 0 2px 16px;
+		text-align: center;
+		overflow: hidden;
+	}
+
 </style>
 
 
