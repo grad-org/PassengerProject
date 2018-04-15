@@ -1,14 +1,14 @@
 
 import Vue from 'vue'
 import VueRouter from 'vue-router';
-import store from './store/store'
-import * as types from './store/types'
+import store from './store'
 
 import Home from '@/components/Home'
 import Login from '@/components/login/Login'
 import LoginNext from '@/components/login/LoginNext'
 import Register from '@/components/login/Register'
 import CitySelector from '@/components/city/CitySelector'
+import User from '@/components/user/User'
 
 Vue.use(VueRouter)
 
@@ -20,6 +20,14 @@ const routes = [
 			requireAuth: true,	// 添加这个字段，表示进入该路由是需要登录的
 		},
 		component: Home
+	},
+	{
+		path: '/user',
+		name: 'User',
+		meta: {
+			requireAuth: true,
+		},
+		component: User
 	},
 	{
 		path: '/login',
@@ -45,16 +53,17 @@ const routes = [
 
 // 页面刷新时，重新赋值token
 if (window.localStorage.getItem('token')) {
-	console.log("刷新页面调用")
-	store.commit(types.LOGIN, window.localStorage.getItem('token'))
+	// store.commit(types.LOGIN, window.localStorage.getItem('token'))
+	store.dispatch('login', window.localStorage.getItem('token'))
 }
-// window.localStorage.setItem('city', '')
+
 if (window.localStorage.getItem('city') == '' || window.localStorage.getItem('city') == null || window.localStorage.getItem('city') == undefined) {
-	store.commit(types.City, '广州市')
+	// store.commit(types.City, '广州市')
+	store.dispatch('city', '广州市')
 	console.log(window.localStorage.getItem('city'))
 } else {
 	console.log(window.localStorage.getItem('city'))
-	store.commit(types.City, window.localStorage.getItem('city'))
+	store.dispatch('city', window.localStorage.getItem('city'))
 }
 
 const router = new VueRouter({

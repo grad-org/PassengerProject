@@ -36,6 +36,7 @@
 
 	import Logo from '../../assets/Logo'
 	import checkFormat from './js/CheckFormat.js'
+	import { Toast } from 'vant'
 
 	export default {
 		name: 'Register',
@@ -72,32 +73,40 @@
 				this.errorText_password_verify = obj.errorText_password_verify;
 			},
 			haveDone () {
+				let _this = this;
 				this.check();
 				if (this.errorText_nickname == '' && this.errorText_username == '' && this.errorText_password == '' && this.errorText_password_verify == '' ){
 					console.log("信息正确，提交注册")
-					let that = this;
-					this.$axios.post("/auth/register",
-						{
-							username: this.value_username,
-							password: this.value_password,
-							nickname: this.value_nickname
-						},
-						{
-							headers: {'Content-Type': 'application/json'}
-						}
-					)
+					_this.$store.dispatch('logout')
+					this.$axios.post("/api/auth/register", {
+						username: this.value_username,
+						password: this.value_password,
+						nickname: this.value_nickname
+					})
 					.then(function (response) {
 						console.log(response);
 						if (response.status == 200) {
-							that.$store.commit(this.$types.LOGOUT)
-							that.$router.push({name: 'Login'})
-						} else {
-							alert("注册失败")
+							const toast = Toast.loading('注册成功…')
+							let second = 2;
+							const timer = setInterval(() => {
+								second--;
+								if (second == 1) {
+									toast.message = '前往登录页面…';
+								} else {
+									clearInterval(timer);
+									Toast.clear();
+									let redirect = decodeURIComponent(_this.$route.query.redirect || "/login");
+									_this.$router.push({ path: redirect });
+								}
+							}, 1000);
 						}
 					})
 					.catch(function (error) {
-						console.log(error)
-						// alert("注册出错！")
+						console.log(error);
+						if (error.status == 400) {
+								alert("该用户已存在！")
+								// console.log("该用户已存在！")
+							}
 					})	//axios结束
 				} else {
 					this.check();

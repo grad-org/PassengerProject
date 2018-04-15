@@ -26,14 +26,14 @@ const checkFormat = {
 	// 检查用户名
 	checkUsername (username) {
 		let errorText = '';
-		// let reg = 11 && /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
-		// if(username == '' || username == null || username == undefined){
-		// 	errorText = '请填入手机号码！';
-		// } else if (!reg.test(username)) {
-		// 	errorText = '请输入正确的手机号码！';
-		// } else {
-		// 	errorText = '';
-		// }
+		let reg = 11 && /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
+		if(username == '' || username == null || username == undefined){
+			errorText = '请填入手机号码！';
+		} else if (!reg.test(username)) {
+			errorText = '请输入正确的手机号码！';
+		} else {
+			errorText = '';
+		}
 		return errorText;
 	},
 
@@ -41,17 +41,17 @@ const checkFormat = {
 	checkPassword (password) {
 		let errorText = '';
 		// 这个包含特殊字符：/^.*(?=.{6,})(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*? ])./
-		// let reg = /^[a-zA-Z]\w{5,11}$/;
-		// if(password == '' || password == null || password == undefined){
-		// 	errorText = '请输入密码！';
-		// 	temp_pwd = '';
-		// } else if (!reg.test(password)) {
-		// 	errorText = '以字母开头，长度在6~12之间，仅含字母、数字和下划线！';
-		// 	temp_pwd = password;
-		// } else {
-		// 	errorText = '';
-		// 	temp_pwd = password;
-		// }
+		let reg = /^[a-zA-Z]\w{5,11}$/;
+		if(password == '' || password == null || password == undefined){
+			errorText = '请输入密码！';
+			temp_pwd = '';
+		} else if (!reg.test(password)) {
+			errorText = '以字母开头，长度在6~12之间，仅含字母、数字和下划线！';
+			temp_pwd = password;
+		} else {
+			errorText = '';
+			temp_pwd = password;
+		}
 		return errorText;
 	},
 
@@ -88,41 +88,6 @@ const checkFormat = {
 			errorText_password_verify: t_v,
 		}
 	}
-				// this.errorText_username =  checkFormat.checkUsername(this.value_username)
-				// this.errorText_nickname = checkFormat.checkNickname(this.value_nickname)
-				// // 判断password是否符合格式，并返回password的errorText
-				// let temp_p = checkFormat.checkPassword(this.value_password)
-				// if (temp_p == '' || temp_p == null || temp_p == undefined) {
-				// 	// 当第一次输入密码无误后，才对 “确认密码” 进行判断
-				// 	// 判断是两次输入是否一致，并返回password_verify的errorText
-				// 	let temp_p_v  = checkFormat.passwordVerify(this.value_password_verify)
-				// 	if (temp_p_v == '' || temp_p_v == null || temp_p_v == undefined) {
-				// 		console.log("信息正确，提交注册")
-				// 		// let that = this;
-				// 		// this.$axios.post("/auth/register",
-				// 		// 	{
-				// 		// 		username: this.value_username,
-				// 		// 		password: this.value_password,
-				// 		// 		nickname: this.value_nickname
-				// 		// 	},
-				// 		// 	{
-				// 		// 		headers: {'Content-Type': 'application/json'}
-				// 		// 	}
-				// 		// )
-				// 		// .then(function (response) {
-				// 		// 	console.log(response);
-				// 		// })
-				// 		// .catch(function (error) {
-				// 		// 	console.log(error)
-				// 		// })	//axios结束
-				// 	} else {
-				// 		this.errorText_password_verify = temp_p_v
-				// 	}
-				// } else {
-				// 	// 当第一次输入密码不符合格式，就“确认密码”置空和去除错误提示
-				// 	this.errorText_password = temp_p
-				// 	this.value_password_verify = ''
-				// }
 }
 
 export default checkFormat

@@ -38,7 +38,7 @@
 			}
 		},
 		created () {
-			// console.log('读取Login的token：' + this.$store.state.token)
+			
 		},
 		methods: {
 			goHome () {
@@ -51,13 +51,33 @@
 				this.errorText_username = ''
 			},
 			loginNext () {
+				// 验证用户是否存在前，先把token和userId删掉。
+				// 如果不删除token，发送http请求会出现500错误
 				this.errorText_username = checkFormat.checkUsername(this.value_username);
 				if (this.errorText_username == '') {
-					this.$router.push({path: '/login/2', name: 'LoginNext', params: { username: this.value_username }});
+					this.$store.dispatch('logout')
+					this.$axios.get('/api/auth/verify?username=' + this.value_username)
+						.then((response) => {
+							console.log(response)
+							if (response.data.status == 200) {
+								this.$router.push({path: '/login/2', name: 'LoginNext', params: { username: this.value_username }});
+							}
+						}).catch((error) => {
+							console.log(error)
+							if (error.status == 400) {
+								alert("用户不存在！")
+							}
+							if (error.status == 500) {
+								alert("服务器内部错误（" + error.status + "）")
+							}
+						})
+					
 				} else {
 					this.errorText_username = checkFormat.checkUsername(this.value_username);
 				}
 				
+				// 测试用
+				// this.$router.push({path: '/login/2', name: 'LoginNext', params: { username: this.value_username }});
 			}
 		}
 	}

@@ -1,7 +1,6 @@
 
 import Vue from 'vue'
 import Vuex from 'vuex'
-import * as types from './types'
 
 Vue.use(Vuex)
 
@@ -13,23 +12,44 @@ const store = new Vuex.Store({
 	// 定义状态
 	state: {
 		token: null,
-		localCity: null
+		localCity: null,
+		userId: null
 	},
 	mutations: {
 		// 其中第一个参数 state 就是 $store.state，第二个参数 payload 需要另外传入
-		[types.LOGIN]: (state, payload) => {
+		login: (state, payload) => {
 			window.localStorage.token = payload;
 			state.token = payload;
 		},
-		[types.LOGOUT]: (state) => {
+		logout: (state) => {
 			window.localStorage.removeItem('token');
+			window.localStorage.removeItem('userId');
 			state.token = null;
 		},
-		[types.City]:(state, payload) => {
+		city: (state, payload) => {
 			window.localStorage.city = payload;
 			state.localCity = payload;
+		},
+		getUserId: (state, payload) => {
+			window.localStorage.userId = payload;
+			state.userId = payload;
 		}
 	},
+	actions: {
+		// context
+		login: (context, token) => {
+			context.commit('login', token)
+		},
+		logout: (context) => {
+			context.commit('logout')
+		},
+		city: (context, city) => {
+			context.commit('city', city)
+		},
+		getUserId: (context, userId) => {
+			context.commit('getUserId', userId)
+		}
+	}
 })
 
 export default store

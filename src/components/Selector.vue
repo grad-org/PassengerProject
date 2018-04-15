@@ -47,8 +47,8 @@
 <script>
 	import Vue from 'vue'
 	import { DatetimePicker } from 'vant';
-	import store from '../store/store'
 	Vue.use(DatetimePicker)
+
 	export default {
 		props: {
 			yourOutset: {
@@ -88,7 +88,7 @@
 		},
 		methods: {
 			GetUser () {
-				this.$axios.get('/user',
+				this.$axios.get('/api/user',
 				).then(function(response) {
 					console.log(response)
 				})
@@ -102,7 +102,7 @@
 			},
 			havaDone () {
 				// console.log(this.yourOutset);
-				this.$axios.get('/user')
+				this.$axios.get('/api/user')
 					.then( (response) => {
 						console.log(response)
 					})
