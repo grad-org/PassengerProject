@@ -46,7 +46,7 @@
 				console.log(res);
 				that.city.isShow = false;
 				that.youChoiceCityName = '你选的城市是：' + res.cityName;
-				this.$store.commit(this.$types.City, res.cityName)
+				this.$store.dispatch('city', res.cityName)
 				this.$router.push({name: 'Home'});
 				
 			}
