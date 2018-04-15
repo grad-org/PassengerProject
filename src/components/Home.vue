@@ -102,7 +102,7 @@ export default {
 		},
 	},
 	watch: {
-		// 如果 `fullHeight` 发生改变，这个函数就会运行
+		// 如果 fullHeight 发生改变，这个函数就会运行
 		fullHeight (val) {
 			if(!this.timer) {
 				this.fullHeight = val
@@ -112,7 +112,7 @@ export default {
 					that.timer = false
 				}, 1000)
 			}
-			console.log("触发watch的fullHeight")
+			// console.log("触发watch的fullHeight")
 		}
 	}
 }
