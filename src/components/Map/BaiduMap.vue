@@ -2,7 +2,7 @@
 	<!-- ready是组件加载完之后才能执行的代码 -->
 	<baidu-map class="map" :center="center" :zoom="zoom" @ready="handler" @load="loadding" 
 		:mapStyle="{styleJson: styleJson}">
-		<bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="false" :autoLocation="false"
+		<bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="false" :autoLocation="false" :scroll-wheel-zoom="true"
 			@locationSuccess="getLoctionSuccess" @locationError="getLocationError">
 		</bm-geolocation>
 	</baidu-map>
@@ -123,8 +123,7 @@
 			},
 			getLoctionSuccess (data) {
 				console.log(data)
-				this.$store.commit(this.$types.City, data.addressComponent.city)
-				// this.$emit('update', data.addressComponent.city)
+				this.$store.dispatch('city', data.addressComponent.city)
 			},
 			getLocationError () {
 				alert("获取位置失败，请重试！")
