@@ -88,8 +88,6 @@ const checkFormat = {
 			errorText_password_verify: t_v,
 		}
 	}
-<<<<<<< HEAD
-=======
 				// this.errorText_username =  checkFormat.checkUsername(this.value_username)
 				// this.errorText_nickname = checkFormat.checkNickname(this.value_nickname)
 				// // 判断password是否符合格式，并返回password的errorText
@@ -125,7 +123,6 @@ const checkFormat = {
 				// 	this.errorText_password = temp_p
 				// 	this.value_password_verify = ''
 				// }
->>>>>>> develop
 }
 
 export default checkFormat
