@@ -84,11 +84,10 @@
 			// 根据用户ID获取用户头像
 			_this.$axios.get('/images/user/' + _this.$store.state.userId + '.jpg')
 			.then( (response) => {
-				console.log(response)
+				console.log(response);
 				if (response.status == 200) {
-					this.avater = 'http://forcar.vip:8080/images/user/' + _this.$store.state.userId + '.jpg'
-					_this.avater = 'http://forcar.vip:8080/images/user/2.jpg'
-					// _this.avater = avater
+					this.avater = 'http://forcar.vip:8080/images/user/' + _this.$store.state.userId + '.jpg';
+					// _this.avater = avater;
 				}
 			})
 			.catch( (error) => {
