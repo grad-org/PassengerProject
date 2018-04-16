@@ -1,6 +1,6 @@
 # my-project
 
-> A Vue.js project
+> for the passenger
 
 ## Build Setup
 
