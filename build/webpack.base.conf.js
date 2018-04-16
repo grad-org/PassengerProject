@@ -15,6 +15,7 @@ module.exports = {
   entry: {
     app: './src/main.js'
   },
+  // 在引入百度地图api时需要用到
   // 在webpack.base.conf.js配置文件中配置BMap,(创建BMap对象)
   // externals: {
   //   'BMap': 'BMap'
