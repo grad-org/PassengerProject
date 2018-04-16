@@ -67,8 +67,6 @@
 				console.log(response)
 				if (response.status == 200) {
 					this.avater = 'http://forcar.vip:8080/images/user/' + _this.$store.state.userId + '.jpg'
-					_this.avater = 'http://forcar.vip:8080/images/user/2.jpg'
-					// _this.avater = avater
 				}
 			})
 			.catch( (error) => {
