@@ -25,31 +25,19 @@
 				<label id="btn_left" @click="goLogin">已有账号，立即登录！</label>
 				<mu-raised-button label="注册" @click="haveDone" />
 			</mu-col>
-<<<<<<< HEAD
-=======
 			<mu-dialog :open="dialog" title="错误提示">
 				{{errorTips}}
 				<mu-flat-button label="确定" slot="actions" primary @click="closeDialog"/>
 			</mu-dialog>
->>>>>>> develop
 		</div>
 	</div>
 </template>
 
 <script>
 
-<<<<<<< HEAD
-	// 注册字段：username、password、nickname
-	// post方法，接口：/api/auth/register
-
-	import Logo from '../../assets/Logo'
-	import checkFormat from './js/CheckFormat.js'
-	import { Toast } from 'vant'
-=======
 	import { Toast } from 'vant'
 	import Logo from '../../assets/Logo'
 	import checkFormat from './js/CheckFormat.js'
->>>>>>> develop
 
 	export default {
 		name: 'Register',
@@ -59,11 +47,8 @@
 		data () {
 			return {
 				fullWidth: true,
-<<<<<<< HEAD
-=======
 				dialog: false,
 				errorTips: '',
->>>>>>> develop
 
 				value_nickname: '',
 				value_username: '',
@@ -84,52 +69,12 @@
 			},
 			check () {
 				let obj = checkFormat.registerVerify(this.value_nickname, this.value_username, this.value_password, this.value_password_verify)
-<<<<<<< HEAD
-				// console.log(obj)
-=======
->>>>>>> develop
 				this.errorText_nickname = obj.errorText_nickname;
 				this.errorText_username = obj.errorText_username;
 				this.errorText_password = obj.errorText_password;
 				this.errorText_password_verify = obj.errorText_password_verify;
 			},
 			haveDone () {
-<<<<<<< HEAD
-				let _this = this;
-				this.check();
-				if (this.errorText_nickname == '' && this.errorText_username == '' && this.errorText_password == '' && this.errorText_password_verify == '' ){
-					console.log("信息正确，提交注册")
-					_this.$store.dispatch('logout')
-					this.$axios.post("/api/auth/register", {
-						username: this.value_username,
-						password: this.value_password,
-						nickname: this.value_nickname
-					})
-					.then(function (response) {
-						console.log(response);
-						if (response.status == 200) {
-							const toast = Toast.loading('注册成功…')
-							let second = 2;
-							const timer = setInterval(() => {
-								second--;
-								if (second == 1) {
-									toast.message = '前往登录页面…';
-								} else {
-									clearInterval(timer);
-									Toast.clear();
-									let redirect = decodeURIComponent(_this.$route.query.redirect || "/login");
-									_this.$router.push({ path: redirect });
-								}
-							}, 1000);
-						}
-					})
-					.catch(function (error) {
-						console.log(error);
-						if (error.status == 400) {
-								alert("该用户已存在！")
-								// console.log("该用户已存在！")
-							}
-=======
 				this.check();
 				if (this.errorText_nickname == '' && this.errorText_username == '' && this.errorText_password == '' && this.errorText_password_verify == '' ){
 					let _this = this;
@@ -171,7 +116,6 @@
 							_this.dialog = true;
 						}
 						// alert("注册出错！")
->>>>>>> develop
 					})	//axios结束
 				} else {
 					this.check();
@@ -196,12 +140,9 @@
 			onFocusPasswordVerify () {
 				this.errorText_password_verify = ''
 			},
-<<<<<<< HEAD
-=======
 			closeDialog () {
 				this.dialog = false
 			}
->>>>>>> develop
 		}
 	}
 </script>
