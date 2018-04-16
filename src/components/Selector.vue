@@ -47,13 +47,8 @@
 <script>
 	import Vue from 'vue'
 	import { DatetimePicker } from 'vant';
-<<<<<<< HEAD
-	Vue.use(DatetimePicker)
-
-=======
 	import store from '../store'
 	Vue.use(DatetimePicker)
->>>>>>> develop
 	export default {
 		props: {
 			yourOutset: {
@@ -93,11 +88,7 @@
 		},
 		methods: {
 			GetUser () {
-<<<<<<< HEAD
 				this.$axios.get('/api/user',
-=======
-				this.$axios.get('/user',
->>>>>>> develop
 				).then(function(response) {
 					console.log(response)
 				})
@@ -111,11 +102,7 @@
 			},
 			havaDone () {
 				// console.log(this.yourOutset);
-<<<<<<< HEAD
 				this.$axios.get('/api/user')
-=======
-				this.$axios.get('/user')
->>>>>>> develop
 					.then( (response) => {
 						console.log(response)
 					})
