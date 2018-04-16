@@ -12,7 +12,7 @@
 <script>
 
 import Bar from './Bar'
-import BaiduMap from './Map/BaiduMap'
+import BaiduMap from './map/BaiduMap'
 import Selector from './Selector'
 
 export default {
