@@ -3,7 +3,7 @@
 	<div>
 		<mu-appbar ref="barDiv" title="返回">
 			<mu-icon-button icon="keyboard_arrow_left" slot="left" @click="goBack"/>
-			<mu-flat-button label="编辑资料" slot="right"/> 
+			<mu-flat-button label="编辑资料" slot="right" @click="goEdit"/> 
 		</mu-appbar>
 		<div style="margin-bottom: 12px; text-align: center">
 			<mu-paper class="paper" circle :zDepth="1" >
@@ -45,6 +45,7 @@
 			}
 		},
 		created () {
+			console.log(this.$route.path)
 			let _this = this;
 			// 带上token，发送http请求，获得用户信息（包括ID、nickname、username等）
 			_this.$axios.get('/api/auth/user')
@@ -82,6 +83,9 @@
 		methods: {
 			goBack () {
 				this.$router.go(-1);
+			},
+			goEdit () {
+				this.$router.push({name: 'Edit'})
 			}
 		}
 	}
