@@ -3,7 +3,7 @@
 	<div>
 		<mu-appbar ref="barDiv" title="取消">
 			<mu-icon-button icon="keyboard_arrow_left" slot="left" @click="goBack"/>
-			<mu-flat-button label="完成" slot="right" @click="goEdit"/> 
+			<mu-flat-button label="完成" slot="right" @click="updateProfiles"/> 
 		</mu-appbar>
 		<div style="margin-bottom: 12px; text-align: center">
 			<mu-paper class="paper" circle :zDepth="1" >
@@ -83,8 +83,8 @@
 			goBack () {
 				this.$router.go(-1);
 			},
-			goEdit () {
-				this.$router.push({name: 'Edit'})
+			updateProfiles () {
+				console.log()
 			}
 		}
 	}
