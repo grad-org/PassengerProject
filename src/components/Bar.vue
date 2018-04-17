@@ -118,7 +118,9 @@
 				this.$router.push({ name: "CitySelect" });
 			},
 			goUserInfo () {
-				this.$router.push({name: 'User'})
+				let _this = this
+				// this.$router.push({name: 'User',})
+				_this.$router.push({ name: 'User', params: { id: _this.$store.state.userId} })
 			}
 		}
 	}
