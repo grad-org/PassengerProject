@@ -9,6 +9,7 @@ import LoginNext from '@/components/login/LoginNext'
 import Register from '@/components/login/Register'
 import CitySelector from '@/components/city/CitySelector'
 import UserInfo from '@/components/user/UserInfo'
+import Edit from '@/components/user/Edit'
 
 Vue.use(VueRouter)
 
@@ -22,12 +23,20 @@ const routes = [
 		component: Home
 	},
 	{
-		path: '/user',
+		path: '/user/',
 		name: 'User',
 		meta: {
 			requireAuth: true
 		},
 		component: UserInfo
+	},
+	{
+		path: '/user/edit',
+		name: 'Edit',
+		meta: {
+			requireAuth: true
+		},
+		component: Edit
 	},
 	{
 		path: '/login',
