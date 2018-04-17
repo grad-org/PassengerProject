@@ -86,8 +86,8 @@
 			.then( (response) => {
 				console.log(response);
 				if (response.status == 200) {
-					this.avater = 'http://forcar.vip:8080/images/user/' + _this.$store.state.userId + '.jpg';
-					// _this.avater = avater;
+					this.avater = 'http://forcar.vip:8080/images/user/' + _this.$store.state.userId + '.jpg'
+					// _this.avater = 'http://forcar.vip:8080/images/user/2.jpg'
 				}
 			})
 			.catch( (error) => {
@@ -130,8 +130,9 @@
 				this.$router.push({ name: "CitySelect" });
 			},
 			goUserInfo () {
-				this.open_drawer = false
-				this.$router.push({name: 'User'})
+				let _this = this
+				// this.$router.push({name: 'User',})
+				_this.$router.push({ name: 'User', params: { id: _this.$store.state.userId} })
 			}
 		}
 	}
