@@ -22,6 +22,8 @@ const store = new Vuex.Store({
 		},
 		logout: (state) => {
 			window.localStorage.removeItem('token');
+			window.localStorage.removeItem('userId');
+			window.localStorage.removeItem('nickname');
 			state.token = null;
 		},
 		city: (state, payload) => {
