@@ -58,27 +58,28 @@
 				this.errorText_username = ''
 			},
 			loginNext () {
-				this.errorText_username = checkFormat.checkUsername(this.value_username);
-				if (this.errorText_username == '') {
+				let _this = this;
+				_this.errorText_username = checkFormat.checkUsername(_this.value_username);
+				if (_this.errorText_username == '') {
 					// 验证用户是否存在前，需要将token删除，否则会出现500错误！
-					this.$store.dispatch('logout')
-					this.$axios.get('/api/auth/verify?username=' + this.value_username)
+					_this.$store.dispatch('logout')
+					_this.$axios.get('/api/auth/verify?username=' + _this.value_username)
 					.then((response) => {
 						console.log(response)
 						if (response.status == 200) {
-							this.$router.push({path: '/login/2', name: 'LoginNext', params: { username: this.value_username }});
+							_this.$router.push({path: '/login/2', name: 'LoginNext', params: { username: _this.value_username }});
 						}
 					})
 					.catch((error) => {
 						console.log(error)
 						if (error.status == 400) {
-							this.errorTips = '用户不存在！';
-							this.dialog = true;
+							_this.errorTips = '用户不存在！';
+							_this.dialog = true;
 							console.log("用户不存在");
 						}
 						if (error.status == 500) {
-							this.errorTips = '服务器内部错误！';
-							this.dialog = true;
+							_this.errorTips = '服务器内部错误！';
+							_this.dialog = true;
 							console.log('服务器内部错误（' + error.status +'）');
 						}
 					})
