@@ -25,15 +25,22 @@
 					/>
 				</mu-bottom-sheet>
 				<mu-bottom-sheet :open="bottomSheet_Outset" @close="closeBottomSheet_Outset">
-					<mu-content-block style="height: 100%">
-						散落在指尖的阳光，我试着轻轻抓住光影的踪迹，它却在眉宇间投下一片淡淡的阴影。调皮的阳光掀动了四月的心帘，温暖如约的歌声渐起。似乎在诉说着，我也可以在漆黑的角落里，找到阴影背后的阳光，找到阳光与阴影奏出和谐的旋律。我要用一颗敏感赤诚的心迎接每一缕滑过指尖的阳光！
+					<mu-content-block style="height: 300px">
+						<br>
+						<label>关键词：<input v-model="keyword"></label>
+						<br>
+						<br>
+						<label>地区：<input v-model="location"></label>
+						<br>
+						<br>
+						<bm-local-search :keyword="keyword" :auto-viewport="true" :location="location"></bm-local-search>
 					</mu-content-block>
 				</mu-bottom-sheet>
 			</div>
 			<!-- <mu-text-field class="outset" hintText="你在哪儿" type="text" icon="lens" v-model="yourOutset" @focus="openBottomSheet_Outset"/>
 			<mu-text-field class="destination" hintText="你要去哪儿" type="text" icon="lens"/>
 			<mu-raised-button style="margin: 0 16px 0 16px; padding: 0; float:right" label="确定" class="raised-button" @click="havaDone"/> -->
-			<mu-list-item class="outset" :title="outsetTips" style="margin-left: -16px" @click="openBottomSheet_Outset">
+			<mu-list-item class="outset" :title="outsetTips" style="margin-left: -16px" @click="goSearch">
 				<mu-icon slot="left" value="lens" color="#009688" style="margin-left: 16px; font-size: 18px"/>
 			</mu-list-item>
 			<mu-divider shallowInset/>
@@ -80,11 +87,17 @@
 				isActiveA: false,
 				showTimePicker: false,
 
-				selectorHeight: ''
+				selectorHeight: '',
+				keyword: ''
 			}
 		},
 		mounted () {
 			
+		},
+		computed: {
+			location () {
+				return this.$store.state.localCity
+			}
 		},
 		methods: {
 			GetUser () {
@@ -126,6 +139,9 @@
 					console.log('预约出行，高度：' + this.$refs.selectorDiv.clientHeight)
 					this.$emit('heightChanged', this.$refs.selectorDiv.clientHeight)
 				})
+			},
+			goSearch () {
+				this.$router.push({path: '/search', name: 'LocalSearch', params: {outset: 'outset'}})
 			},
 			closeBottomSheet () {
 				this.bottomSheet = false
