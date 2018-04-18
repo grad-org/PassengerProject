@@ -3,6 +3,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router';
 import store from './store'
 
+import NotFoundComponent from '@/components/NotFoundComponent'
 import Home from '@/components/Home'
 import Login from '@/components/login/Login'
 import LoginNext from '@/components/login/LoginNext'
@@ -14,6 +15,10 @@ import Edit from '@/components/user/Edit'
 Vue.use(VueRouter)
 
 const routes = [
+	{
+		path: '*',
+		component: NotFoundComponent
+	},
 	{
 		path: '/',
 		name: 'Home',
@@ -60,6 +65,14 @@ const routes = [
 	},
 ]
 
+
+const router = new VueRouter({
+	routes,
+	// 使用 HTML5 history 模式，该模式下没有 # 前缀，而且可以使用 pushState 和 replaceState 来管理记录。
+	// 否则就会使用默认的 hash 模式
+	mode: 'history'
+})
+
 // 页面刷新时，重新赋值token
 if (window.localStorage.getItem('token')) {
 	console.log("刷新页面调用")
@@ -73,13 +86,6 @@ if (window.localStorage.getItem('city') == '' || window.localStorage.getItem('ci
 	console.log(window.localStorage.getItem('city'))
 	store.dispatch('city', window.localStorage.getItem('city'))
 }
-
-const router = new VueRouter({
-	routes,
-	// 使用 HTML5 history 模式，该模式下没有 # 前缀，而且可以使用 pushState 和 replaceState 来管理记录。
-	// 否则就会使用默认的 hash 模式
-	mode: 'history'
-})
 
 /**
  * 定义完路由后，我们主要是利用vue-router提供的钩子函数beforeEach()对路由进行判断。
