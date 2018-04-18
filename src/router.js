@@ -75,7 +75,6 @@ const router = new VueRouter({
 
 // 页面刷新时，重新赋值token
 if (window.localStorage.getItem('token')) {
-	console.log("刷新页面调用")
 	store.dispatch('login', window.localStorage.getItem('token'))
 }
 
