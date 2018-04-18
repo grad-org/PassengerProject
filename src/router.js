@@ -11,6 +11,7 @@ import Register from '@/components/login/Register'
 import CitySelector from '@/components/city/CitySelector'
 import UserInfo from '@/components/user/UserInfo'
 import Edit from '@/components/user/Edit'
+import LocalSearch from '@/components/map/LocalSearch'
 
 Vue.use(VueRouter)
 
@@ -62,6 +63,11 @@ const routes = [
 		path: '/city',
 		name: 'CitySelect',
 		component: CitySelector
+	},
+	{
+		path: '/search',
+		name: 'LocalSearch',
+		component: LocalSearch
 	},
 ]
 
