@@ -9,15 +9,15 @@ import App from './App'
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
 import 'muse-ui/dist/theme-light.css'
-import BaiduMap from 'vue-baidu-map'
+// import BaiduMap from 'vue-baidu-map'
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
 // Vue.prototype.$types = types
 Vue.use(MuseUI)
-Vue.use(BaiduMap, {
-	ak: 'HxUj76nECj5KXXIaNjSo7juXodilpfAX'
-})
+// Vue.use(BaiduMap, {
+// 	ak: 'HxUj76nECj5KXXIaNjSo7juXodilpfAX'
+// })
 
 /* eslint-disable no-new */
 new Vue({
