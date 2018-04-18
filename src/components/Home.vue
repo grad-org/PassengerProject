@@ -34,11 +34,7 @@ export default {
 		}
 	},
 	created() {
-		// console.log('读取Home的token：'+ localStorage.getItem('token'))
-		const str1 = '1'
-		const str2 = '2'
-		console.log(str1, str2)
-		console.log('Home路由参数：', this.$route.params)
+		
 	},
 	mounted () {
 		this.$nextTick (() =>{
@@ -74,15 +70,13 @@ export default {
 		},
 		setMapHeight () {
 			this.$nextTick (() => {
-				console.log("调用$nextTick函数");
 				this.barHeight = this.$refs.barDiv.$el.clientHeight
 				this.selectHeight = this.$refs.selectDiv.$el.clientHeight
 				
 				// 页面加载后，对地图高度进行设置
 				let h = this.fullHeight - this.barHeight - this.selectHeight
-				console.log('地图高度：' +h)
+				// console.log('地图高度：' +h)
 				this.mapHeight = h + 'px'
-				console.log(this.mapHeight)
 			})
 		},
 		logout () {
