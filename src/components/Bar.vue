@@ -43,6 +43,7 @@
 	/**
 	 * 设置背景图片，参考：https://blog.csdn.net/woyidingshijingcheng/article/details/72903800
 	 */
+	import { Toast } from 'vant'
 	import avater from '../assets/image/avater.jpg'
 
 	export default {
@@ -110,17 +111,32 @@
 				this.docked = !flag;
 			},
 			logout() {
-				// this.$store.commit(this.$types.LOGOUT);
-				this.$store.dispatch('logout')
-				this.$router.push({name: 'Login'});
+				this.open_drawer = false;
+				this.$store.dispatch('logout');
+				const toast = Toast.loading({
+					duration: 0,
+					forbidClick: true,
+					message: '退出登录…'
+				});
+					let second = 2;
+					const timer = setInterval(() => {
+						second--;
+						if (second == 1) {
+							toast.message = '退出登录…';
+						} else {
+							clearInterval(timer);
+							Toast.clear();
+							this.$router.push({name: 'Login'});
+						}
+				}, 1000);
 			},
 			toCitySelector: function() {
 				this.$router.push({ name: "CitySelect" });
 			},
 			goUserInfo () {
-				let _this = this
-				// this.$router.push({name: 'User',})
-				_this.$router.push({ name: 'User', params: { id: _this.$store.state.userId} })
+				let _this = this;
+				// this.$router.push({name: 'User',});
+				_this.$router.push({ name: 'User', params: { id: _this.$store.state.userId} });
 			}
 		}
 	}
