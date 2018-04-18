@@ -70,9 +70,8 @@
 			// 带上token，发送http请求，获得用户信息（包括ID、nickname、username等）
 			_this.$axios.get('/api/auth/user')
 			.then( (response) => {
-				console.log(response);
+				// console.log(response);
 				if (response.status == 200) {
-					console.log('获取用户成功');
 					_this.$store.dispatch('userId', response.data.data.id)
 					_this.nickname = response.data.data.nickname
 					_this.username = response.data.data.username
@@ -85,14 +84,14 @@
 			// 根据用户ID获取用户头像
 			_this.$axios.get('/images/user/' + _this.$store.state.userId + '.jpg')
 			.then( (response) => {
-				console.log(response)
+				// console.log(response)
 				if (response.status == 200) {
 					this.avater = 'http://forcar.vip:8080/images/user/' + _this.$store.state.userId + '.jpg'
 					// _this.avater = 'http://forcar.vip:8080/images/user/2.jpg'
 				}
 			})
 			.catch( (error) => {
-				console.log(error)
+				// console.log(error)
 				_this.avater = avater
 			})
 
