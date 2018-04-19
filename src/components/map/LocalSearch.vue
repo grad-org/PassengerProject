@@ -2,7 +2,7 @@
 <template>
 	<div>
 		<mu-appbar >
-			<mu-text-field icon="search" class="appbar-search-field" v-model="keyword" slot="left" hintText="请输入搜索内容"/>
+			<mu-text-field icon="search" class="appbar-search-field" v-model="keyword" slot="left" hintText="请输入搜索关键词"/>
 			<mu-flat-button label="取消" slot="right" @click="cancal"/>
 		</mu-appbar>
 		<ul>
