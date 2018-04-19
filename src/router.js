@@ -67,6 +67,9 @@ const routes = [
 	{
 		path: '/search',
 		name: 'LocalSearch',
+		meta: {
+			requireAuth: true
+		},
 		component: LocalSearch
 	},
 ]
@@ -86,10 +89,10 @@ if (window.localStorage.getItem('token')) {
 
 if (window.localStorage.getItem('city') == '' || window.localStorage.getItem('city') == null || window.localStorage.getItem('city') == undefined) {
 	store.dispatch('city', '广州市')
-	console.log(window.localStorage.getItem('city'))
+	// console.log(window.localStorage.getItem('city'))
 } else {
-	console.log(window.localStorage.getItem('city'))
 	store.dispatch('city', window.localStorage.getItem('city'))
+	// console.log(window.localStorage.getItem('city'))
 }
 
 /**
