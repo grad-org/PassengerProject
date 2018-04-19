@@ -46,7 +46,7 @@ export default {
 	},
 	methods: {
 		initHeight () {
-			let that = this
+			let _this = this
 			// 注：window.onresize只能在项目内触发1次
 			// 通过捕获系统的onresize事件触发我们需要执行的事件
 			// 参考：https://blog.csdn.net/bai_riqiang/article/details/78749667
@@ -54,15 +54,15 @@ export default {
 				return (()=> {
 					// 浏览器内容可视高度
 					window.fullHeight = document.documentElement.clientHeight
-					that.fullHeight = window.fullHeight
-					that.selectHeight = that.$refs.selectDiv.$el.clientHeight
+					_this.fullHeight = window.fullHeight
+					_this.selectHeight = _this.$refs.selectDiv.$el.clientHeight
 					// console.log('触发onresize事件，此时地图高度为：' + this.fullHeight)
-					that.mapHeight = (that.fullHeight - that.barHeight - that.selectHeight) + 'px'
+					_this.mapHeight = (_this.fullHeight - _this.barHeight - _this.selectHeight) + 'px'
 				}) ()
 			}
 		},
 		updateSelectorHeight(event) {
-			console.log("updateSelectorHeight事件")
+			// console.log("updateSelectorHeight事件")
 			this.setMapHeight()
 			this.$nextTick (() =>{
 				this.selectedCity = this.$store.state.localCity
