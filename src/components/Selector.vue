@@ -24,27 +24,15 @@
 						@confirm="confirm()"
 					/>
 				</mu-bottom-sheet>
-				<mu-bottom-sheet :open="bottomSheet_Outset" @close="closeBottomSheet_Outset">
-					<mu-content-block style="height: 300px">
-						<br>
-						<label>关键词：<input v-model="keyword"></label>
-						<br>
-						<br>
-						<label>地区：<input v-model="location"></label>
-						<br>
-						<br>
-						<bm-local-search :keyword="keyword" :auto-viewport="true" :location="location"></bm-local-search>
-					</mu-content-block>
-				</mu-bottom-sheet>
 			</div>
 			<!-- <mu-text-field class="outset" hintText="你在哪儿" type="text" icon="lens" v-model="yourOutset" @focus="openBottomSheet_Outset"/>
 			<mu-text-field class="destination" hintText="你要去哪儿" type="text" icon="lens"/>
 			<mu-raised-button style="margin: 0 16px 0 16px; padding: 0; float:right" label="确定" class="raised-button" @click="havaDone"/> -->
-			<mu-list-item class="outset" :title="outsetTips" style="margin-left: -16px" @click="goSearch">
+			<mu-list-item class="outset" :title="outsetTips" style="margin-left: -16px" @click="goSearchOutset">
 				<mu-icon slot="left" value="lens" color="#009688" style="margin-left: 16px; font-size: 18px"/>
 			</mu-list-item>
 			<mu-divider shallowInset/>
-			<mu-list-item class="destination" :title="destinationTips" style="margin-left: -16px" @click="openBottomSheet_Outset">
+			<mu-list-item class="destination" :title="destinationTips" style="margin-left: -16px" @click="goSearchDestination">
 				<mu-icon slot="left" value="lens" color="#ffc107" style="margin-left: 16px; font-size: 18px"/>
 			</mu-list-item>
 			<mu-raised-button style="margin: 6px 16px 6px 16px; padding: 0; float:right" label="确定" class="raised-button" :disabled="disable" @click="havaDone" />
@@ -67,8 +55,6 @@
 		},
 		data () {
 			return {
-				outsetTips: '您在哪儿',
-				destinationTips: '您要去哪儿',
 				
 				disable: false,
 
@@ -88,7 +74,6 @@
 				showTimePicker: false,
 
 				selectorHeight: '',
-				keyword: ''
 			}
 		},
 		mounted () {
@@ -97,6 +82,24 @@
 		computed: {
 			location () {
 				return this.$store.state.localCity
+			},
+			outsetTips () {
+				let _outset = this.$store.state.outset
+				console.log(_outset)
+				if (_outset == '' || _outset == null || _outset == undefined) {
+					return '您在哪儿'
+				} else {
+					return this.$store.state.outset.title
+				}
+			},
+			destinationTips () {
+				let _destination = this.$store.state.destination
+				console.log(_destination)
+				if (_destination == '' || _destination == null || _destination == undefined) {
+					return '您要去哪儿'
+				} else {
+					return this.$store.state.destination.title
+				}
 			}
 		},
 		methods: {
@@ -114,11 +117,7 @@
 				console.log("搜索位置")
 			},
 			havaDone () {
-				// console.log(this.yourOutset);
-				this.$axios.get('/user')
-					.then( (response) => {
-						console.log(response)
-					})
+				
 			},
 			// 选择出行方式
 			selectNow () {
@@ -126,7 +125,7 @@
 				this.isActiveA = false
 				this.showTimePicker = false
 				this.$nextTick (() => {
-					console.log('即时出行，高度：' + this.$refs.selectorDiv.clientHeight)
+					// console.log('即时出行，高度：' + this.$refs.selectorDiv.clientHeight)
 					this.$emit('heightChanged', this.$refs.selectorDiv.clientHeight)
 				})
 			},
@@ -136,24 +135,21 @@
 				this.showTimePicker = true
 				// console.log(this.$refs.selectorDiv.clientHeight)
 				this.$nextTick (() => {
-					console.log('预约出行，高度：' + this.$refs.selectorDiv.clientHeight)
+					// console.log('预约出行，高度：' + this.$refs.selectorDiv.clientHeight)
 					this.$emit('heightChanged', this.$refs.selectorDiv.clientHeight)
 				})
 			},
-			goSearch () {
-				this.$router.push({path: '/search', name: 'LocalSearch', params: {outset: 'outset'}})
+			goSearchOutset () {
+				this.$router.push({path: '/search', name: 'LocalSearch', params: {style: 0}})
+			},
+			goSearchDestination () {
+				this.$router.push({path: '/search', name: 'LocalSearch', params: {style: 1}})
 			},
 			closeBottomSheet () {
 				this.bottomSheet = false
 			},
-			closeBottomSheet_Outset () {
-				this.bottomSheet_Outset = false
-			},
 			openBottomSheet () {
 				this.bottomSheet = true
-			},
-			openBottomSheet_Outset () {
-				this.bottomSheet_Outset = true
 			},
 			confirm (val) {
 				console.log(val)
@@ -177,17 +173,10 @@
 	.mu-divider {
 		margin: 0 
 	}
-	.outset {
-		/* font-size: 18px; */
-		/* margin-left: 16px */
-	}
 	.destination {
 		/* color: #ffc107; 只能改变按下时的背景颜色 */
 		display: inline-block;
 		width: 65%;
-	}
-	.mu-item-title {
-		
 	}
 	.picker-container{
 		width: 256px;
