@@ -12,7 +12,9 @@ const store = new Vuex.Store({
 	state: {
 		token: null,
 		localCity: null,
-		userId: null
+		userId: null,
+		outset: null,
+		destination: null
 	},
 	mutations: {
 		// 其中第一个参数 state 就是 $store.state，第二个参数 payload 需要另外传入
@@ -25,6 +27,8 @@ const store = new Vuex.Store({
 			window.localStorage.removeItem('userId');
 			window.localStorage.removeItem('nickname');
 			state.token = null;
+			state.outset = null;
+			state.destination = null
 		},
 		city: (state, payload) => {
 			window.localStorage.city = payload;
@@ -33,6 +37,12 @@ const store = new Vuex.Store({
 		userId: (state, payload) => {
 			window.localStorage.userId = payload;
 			state.userId = payload;
+		},
+		setOutset: (state, payload) => {
+			state.outset = payload
+		},
+		setDestination: (state, payload) => {
+			state.destination = payload
 		}
 	},
 	actions: {
@@ -47,6 +57,12 @@ const store = new Vuex.Store({
 		},
 		userId: (context, userId) => {
 			context.commit('userId', userId);
+		},
+		setOutset: (context, outset) => {
+			context.commit('setOutset', outset)
+		},
+		setDestination: (context, destination) => {
+			context.commit('setDestination', destination)
 		}
 	}
 })
