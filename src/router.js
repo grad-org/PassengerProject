@@ -12,6 +12,7 @@ import CitySelector from '@/components/city/CitySelector'
 import UserInfo from '@/components/user/UserInfo'
 import Edit from '@/components/user/Edit'
 import LocalSearch from '@/components/map/LocalSearch'
+import Confirm from '@/components/Confirm'
 
 Vue.use(VueRouter)
 
@@ -71,6 +72,14 @@ const routes = [
 			requireAuth: true
 		},
 		component: LocalSearch
+	},
+	{
+		path: '/confirm',
+		name: 'ConfirmCalling',
+		meta: {
+			requireAuth: true
+		},
+		component: Confirm
 	},
 ]
 
