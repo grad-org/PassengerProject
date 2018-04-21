@@ -55,7 +55,7 @@ build: {
 	// Paths
 	assetsRoot: path.resolve(__dirname, '../dist'),
 	assetsSubDirectory: 'static',
-	assetsPublicPath: '/',		// 原来是/ 
+	assetsPublicPath: './',		// 原来是 /
 
 	/**
 	 * Source Maps
