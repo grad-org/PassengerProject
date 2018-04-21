@@ -22,13 +22,16 @@
 			</div>
 			<!-- panel="false"将搜索返回结果隐藏 -->
 			<baidu-map>
-				<bm-local-search :keyword="keyword" :auto-viewport="true" :panel="false" :location="location" :forceLocal="true" :pageCapacity="30" @searchcomplete="searchResult" ></bm-local-search>
+				<bm-local-search :keyword="keyword" :auto-viewport="true" :panel="true" :location="location" :forceLocal="true" :pageCapacity="30" @searchcomplete="searchResult" ></bm-local-search>
 			</baidu-map>
 		</div>
 	</div>
 </template>
 
 <script>
+
+	// 还需要考虑的问题，选择的地点是存在store.state还是localStorage
+
 	export default {
 		data() {
 			return {
@@ -63,13 +66,14 @@
 				this.$router.go(-1);
 			},
 			searchResult (result) {
+				console.log(result)
 				if (result == null || result == undefined || result == '') {
 					console.log('无搜索结果')
 					this.arr = null
 				} else {
 
-				console.log(result.tr)
-				this.arr = result.tr
+				console.log(result.Br)
+				this.arr = result.Br
 				}
 			},
 			itemClick (index) {
