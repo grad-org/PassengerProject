@@ -7,106 +7,51 @@
 			:locationIcon="{url: require('../../svg/location.svg'), size: {width: 18, height: 18}}" 
 			@locationSuccess="getLoctionSuccess" @locationError="getLocationError">
 		</bm-geolocation>
+		<bm-marker :position="enableSelectPoint"
+			:icon="{url: require('../../svg/enableselect.svg'), size: {width: 14, height: 14}}">
+			<!-- <bm-label content="广东海洋大学" :labelStyle="{color: '#00bcd4', fontSize : '12px'}" :offset="{width: 15, height: 0}"/> -->
+			<my-label :position="{lng: 110.307236, lat: 21.157355}" :text="selectAddress" :active="active"
+				@mouseover.native="active = true" @mouseleave.native="active = false">
+			</my-label>
+		</bm-marker>
+		<bm-marker :position="outsetPoint" 
+			:icon="{url: require('../../svg/outset.svg'), size: {width: 20, height: 20}}">
+			<!-- <my-label :position="outsetPoint" text="起点" ></my-label> -->
+		</bm-marker>
+		<bm-marker :position="destinationPoint" 
+			:icon="{url: require('../../svg/destination.svg'), size: {width: 20, height: 20}}">
+			<!-- <my-label :position="outsetPoint" text="终点" ></my-label> -->
+		</bm-marker>
 	</baidu-map>
 	
 </template>
 
 <script>
 
+	import MapStyle from './js/map-style.js'
+	import MyLabel from './overlay/Label.vue'
+
 	export default {
+		components: {
+			MyLabel
+		},
 		data () {
 			return {
 				center: null,
 				zoom: 15,
+				styleJson: null,
+				enableSelectPoint: {lng: 110.307236, lat: 21.157355},
+				active: false,
+				selectAddress: '广东海洋大学',
 
-				// 自定义主题，顺序：背景、水系、国道、陆地、边界线、建筑物、人造区域、铁路、地铁
-				styleJson: [
-					{
-						"featureType": "background",
-						"elementType": "all",
-						"stylers": {
-								"color": "#eef1f5ff",
-								// "weight": "0.1",
-								"visibility": "on"
-						}
-					},
-					{
-						"featureType": "water",
-						"elementType": "geometry.fill",
-						"stylers": {
-								"color": "#c2def4ff",
-						}
-					},
-					{
-						"featureType": "green",
-						"elementType": "geometry.fill",
-						"stylers": {
-								"color": "#dcefe8ff",
-								"visibility": "on"
-						}
-					},
-					// {
-					// 	"featureType": "highway",
-					// 	"elementType": "geometry.stroke",
-					// 	"stylers": {
-					// 			"color": "#ffd966ff",
-					// 			"weight": "0.2",
-					// 			"visibility": "on"
-					// 	}
-					// },
-					// {
-					// 	"featureType": "highway",
-					// 	"elementType": "geometry.fill",
-					// 	"stylers": {
-					// 			"color": "#fff2ccff",
-					// 			"weight": "1.3",
-					// 			"visibility": "on"
-					// 	}
-					// },
-					{
-						"featureType": "boundary",
-						"elementType": "all",
-						"stylers": {
-								"hue": "#c05965",
-								"weight": "0.1",
-								"visibility": "on"
-						}
-					},
-					{
-						"featureType": "building",
-						"elementType": "all",
-						"stylers": {
-								"visibility": "off"
-						}
-					},
-					{
-						"featureType": "manmade",
-						"elementType": "all",
-						"stylers": {
-								"visibility": "off"
-						}
-					},
-					// {
-					// 	"featureType": "railway",
-					// 	"elementType": "all",
-					// 	"stylers": {
-					// 			"weight": "0.3",
-					// 			"visibility": "on"
-					// 	}
-					// },
-					{
-						"featureType": "subway",
-						"elementType": "all",
-						"stylers": {
-								"weight": "0.1",
-								"visibility": "on"
-						}
-					}
-				]
+				// 调试用，海大餐厅 => 湖光镇派出所
+				outsetPoint: {lng: 110.308994, lat: 21.15026},
+				destinationPoint: {lng: 110.318268, lat: 21.12831}
 			}
 		},
 		created () {
 			this.center = this.$store.state.localCity
+			this.styleJson = MapStyle.style();
 		},
 		mounted () {
 			// this.lng = 113.271431
@@ -123,6 +68,19 @@
 				console.log(data)
 				this.zoom = 15
 				this.$store.dispatch('city', data.addressComponent.city)
+				var geocoder = new BMap.Geocoder();
+				geocoder.getLocation(new BMap.Point(data.point.lng, data.point.lat), function(rs) {
+					var lbs_point = '';
+					var address = '';
+					if (rs.surroundingPois.length > 0) {
+						lbs_point = rs.surroundingPois[0].point.lng+","+rs.surroundingPois[0].point.lat;
+						address =  rs.surroundingPois[0].title;
+					} else {
+						lbs_point = rs.point.lng+","+rs.point.lat;
+						address = rs.address;
+					}
+					console.log(rs.surroundingPois)
+				})
 			},
 			getLocationError () {
 				alert("获取位置失败，请重试！")
