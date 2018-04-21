@@ -25,9 +25,6 @@
 					/>
 				</mu-bottom-sheet>
 			</div>
-			<!-- <mu-text-field class="outset" hintText="你在哪儿" type="text" icon="lens" v-model="yourOutset" @focus="openBottomSheet_Outset"/>
-			<mu-text-field class="destination" hintText="你要去哪儿" type="text" icon="lens"/>
-			<mu-raised-button style="margin: 0 16px 0 16px; padding: 0; float:right" label="确定" class="raised-button" @click="havaDone"/> -->
 			<mu-list-item class="outset" :title="outsetTips" style="margin-left: -16px" @click="goSearchOutset">
 				<mu-icon slot="left" value="lens" color="#009688" style="margin-left: 16px; font-size: 18px"/>
 			</mu-list-item>
@@ -103,21 +100,9 @@
 			}
 		},
 		methods: {
-			GetUser () {
-				this.$axios.get('/user',
-				).then(function(response) {
-					console.log(response)
-				})
-				.catch(function(response) {
-					console.log("请求出错")
-					console.log(response)
-				})
-			},
-			searchLocation () {
-				console.log("搜索位置")
-			},
 			havaDone () {
-				
+				// 后期需要判断是否存在outset、destination才会进行跳转
+				this.$router.push({name: 'ConfirmCalling'})
 			},
 			// 选择出行方式
 			selectNow () {
