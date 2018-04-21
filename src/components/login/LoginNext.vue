@@ -80,8 +80,8 @@
 				if (_this.errorText_password == '') {
 					_this.$axios.post("/api/auth/login",
 						{
-							// username: "ppp", 
-							// password: "a123456"
+							// username: "d1", 
+							// password: "d1"
 							// username: "admin", 
 							// password: "admin"
 							username: _this.$route.params.username,
