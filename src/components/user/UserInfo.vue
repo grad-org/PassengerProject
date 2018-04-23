@@ -17,12 +17,14 @@
 			<mu-divider/>
 			<mu-list-item title="实名认证" >
 				<mu-avatar icon="folder" slot="leftAvatar"/>
-				<mu-icon value="keyboard_arrow_right" slot="right"/>
+				<mu-badge content="未认证" slot="after" v-if="true"/>
+				<mu-badge content="已认证" primary slot="after" v-else/>
 			</mu-list-item>
 			<mu-divider/>
 			<mu-list-item title="车主认证" >
 				<mu-avatar icon="folder" slot="leftAvatar"/>
-				<mu-icon value="keyboard_arrow_right" slot="right"/>
+				<mu-badge content="未认证" slot="after" v-if="isDriver"/>
+				<mu-badge content="已认证" primary slot="after" v-else/>
 			</mu-list-item>
 			<mu-divider/>
 		</mu-list>
@@ -32,6 +34,9 @@
 <script>
 	/**
 	 * 设置背景图片，参考：https://blog.csdn.net/woyidingshijingcheng/article/details/72903800
+	 * 
+	 * 仍需解决问题： 本地获取头像，设置头像
+	 * 如果认证回来，应该重新获取一次用户信息，用来覆盖localstorage信息，否则认证信息可能未更新！
 	 */
 	import avater from '../../assets/image/avater.jpg'
 
@@ -41,41 +46,16 @@
 				avater: null,
 				nickname: '',
 				username: '',
-				
+				ls_userinfo: ''
 			}
 		},
 		created () {
-			console.log(this.$route.path)
+			// 用户数据直接在本地获取
 			let _this = this;
-			// 带上token，发送http请求，获得用户信息（包括ID、nickname、username等）
-			_this.$axios.get('/api/auth/user')
-			.then( (response) => {
-				console.log(response);
-				if (response.status == 200) {
-					console.log('获取用户成功');
-					_this.$store.dispatch('userId', response.data.data.id)
-					_this.nickname = response.data.data.nickname
-					_this.username = response.data.data.username
-					window.localStorage.nickname = response.data.data.nickname
-				}
-			})
-			.catch ( (error) => {
-				console.log(error);
-			})
-			// 根据用户ID获取用户头像
-			_this.$axios.get('/images/user/' + _this.$store.state.userId + '.jpg')
-			.then( (response) => {
-				console.log(response)
-				if (response.status == 200) {
-					this.avater = 'http://forcar.vip:8080/images/user/' + _this.$store.state.userId + '.jpg'
-					// _this.avater = 'http://forcar.vip:8080/images/user/2.jpg'
-					// _this.avater = avater
-				}
-			})
-			.catch( (error) => {
-				console.log(error)
-				_this.avater = avater
-			})			
+			_this.ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'))
+			_this.nickname = _this.ls_userinfo.nickname;
+			_this.avater = avater;
+			_this.isDriver();
 		},
 		mounted() {
 			
@@ -86,6 +66,14 @@
 			},
 			goEdit () {
 				this.$router.push({name: 'Edit'})
+			},
+			isDriver () {
+				let di = this.ls_userinfo.driverId;
+				if ( di == '' || di == undefined || di == undefined) {
+					return true;
+				} else {
+					return false;
+				}
 			}
 		}
 	}
