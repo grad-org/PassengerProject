@@ -46,16 +46,20 @@
 
 				// 调试用，海大餐厅 => 湖光镇派出所
 				outsetPoint: {lng: 110.308994, lat: 21.15026},
-				destinationPoint: {lng: 110.318268, lat: 21.12831}
+				destinationPoint: {lng: 110.318268, lat: 21.12831},
+
+				// 建立连接用
+				stompClient: null,
+
+
 			}
 		},
 		created () {
-			this.center = this.$store.state.localCity
+			this.center = this.$store.state.currentCity
 			this.styleJson = MapStyle.style();
 		},
 		mounted () {
-			// this.lng = 113.271431
-			// this.lat = 23.135336	
+			this.getCarLocation();
 		},
 		methods: {
 			handler (data) {
@@ -65,7 +69,7 @@
 				// console.log("load组件加载时执行的抽象方法")
 			},
 			getLoctionSuccess (data) {
-				console.log(data)
+				console.log('定位信息返回',data)
 				this.zoom = 15
 				this.$store.dispatch('city', data.addressComponent.city)
 				var geocoder = new BMap.Geocoder();
@@ -79,11 +83,39 @@
 						lbs_point = rs.point.lng+","+rs.point.lat;
 						address = rs.address;
 					}
-					console.log(rs.surroundingPois)
+					console.log('定位附近的地点',rs.surroundingPois)
 				})
 			},
 			getLocationError () {
 				alert("获取位置失败，请重试！")
+			},
+
+			// 用来订阅司机
+			getCarLocation () {
+				// 变量
+				let _this = this
+
+				// 建立连接对象（还没发起连接）
+				let socket = new SockJS('http://forcar.vip:8080/orh');
+				_this.stompClient = Stomp.over(socket);
+
+				// 创建连接
+				_this.stompClient.connect(
+					// headers
+					{},
+					// 连接成功的回调函数
+					function connectCallback (frame) {
+						// 需要将订阅的对象传给一个变量，否则取消订阅时会找不到订阅id
+						_this.listenOrderSubscription = _this.stompClient.subscribe('/topic/hailingService/car/uploadCarLocation', function (carLocation) {
+							console.log('附近车辆返回信息',carLocation.body)
+						})
+					},
+					// 连接失败的回调函数
+					function errorCallback (error) {
+						console.log(error);
+						console.log('失败回调',error);
+					}
+				)
 			}
 		}
 	}
