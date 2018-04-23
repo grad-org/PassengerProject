@@ -22,7 +22,7 @@
 			</div>
 			<!-- panel="false"将搜索返回结果隐藏 -->
 			<baidu-map>
-				<bm-local-search :keyword="keyword" :auto-viewport="true" :panel="true" :location="location" :forceLocal="true" :pageCapacity="30" @searchcomplete="searchResult" ></bm-local-search>
+				<bm-local-search :keyword="keyword" :auto-viewport="true" :panel="false" :location="location" :forceLocal="true" :pageCapacity="30" @searchcomplete="searchResult" ></bm-local-search>
 			</baidu-map>
 		</div>
 	</div>
@@ -58,7 +58,7 @@
 		},
 		computed: {
 			location () {
-				return this.$store.state.localCity
+				return this.$store.state.currentCity
 			}
 		},
 		methods: {
