@@ -13,6 +13,9 @@
 </template>
 
 <script>
+	/**
+	 * 城市数据，上海、北京暂时没有，需要加上去
+	 */
 
 	import City from 'vue-city'
 	import cityList from './city.js'
@@ -75,7 +78,7 @@
 					
 				this.city.localCity = {
 					cityId: "",
-					cityName: this.$store.state.localCity,
+					cityName: this.$store.state.currentCity,
 					citySpell: "",
 					cityFirstLetter: "",
 				}
