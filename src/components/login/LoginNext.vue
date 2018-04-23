@@ -78,19 +78,14 @@
 				let _this = this;
 				_this.errorText_password = checkFormat.checkPassword(_this.value_password)
 				if (_this.errorText_password == '') {
-					_this.$axios.post("/api/auth/login",
-						{
-							// username: "d1", 
-							// password: "d1"
-							// username: "admin", 
-							// password: "admin"
-							username: _this.$route.params.username,
-							password: _this.value_password
-						},
-						{
-							headers: {'Content-Type': 'application/json'}
-						}
-					)
+					_this.$axios.post("/api/auth/login",{
+						// username: "d1", 
+						// password: "d1"
+						// username: "admin", 
+						// password: "admin"
+						username: _this.$route.params.username,
+						password: _this.value_password
+					})
 					.then( (response) => {
 						console.log(response);
 						if (response.status == 200) {
