@@ -25,7 +25,7 @@
 
 	import Vue from 'vue'
 	import { DatetimePicker } from 'vant';
-	import store from '../store'
+
 	Vue.use(DatetimePicker)
 
 	export default {
@@ -36,7 +36,7 @@
 			}
 		},
 		created () {
-			
+			console.log('userId:',this.$store.state.userId);
 		},
 		mounted () {
 			
@@ -44,15 +44,9 @@
 		methods: {
 			havaDone () {
 				// 变量
+				let _this = this;
 				let token = window.localStorage.getItem('token');
-				let trip = {
-					// "departure": {lng: 110.308994, lat: 21.15026},
-					"departure": '广东海洋大学',
-					"destination": '湖光岩',
-					"departureTime": null,
-					"tripType": 'REAL_TIME',
-					"passengerId": 1
-				}
+				let userId = 7
 
 				// 建立连接对象（还没发起连接）
 				let socket = new SockJS('http://forcar.vip:8080/orh');
@@ -73,8 +67,21 @@
 					}
 				)
 				
-				// 发布行程：client.send(destination url[, headers[, body]]);
-				// stompClient.send('/api/hailingService/trip/publishTrip', {}, JSON.stringify(trip))
+				// 发布行程
+				// 时间格式：yyyy-MM-dd HH:mm:ss
+				_this.$axios.post('/api/hailingService/trip/publishTrip', {
+					"departure": '广东海洋大学',
+					"destination": '湖光岩',
+					"departureTime": null,
+					"tripType": 'REAL_TIME',
+					"passengerId": 3
+				}).then((respones) => {
+					// 成功返回
+					console.log(respones)
+				}).catch((error) => {
+					// post失败
+					console.log(error)
+				})
 			}
 		}
 	}
