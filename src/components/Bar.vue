@@ -66,42 +66,55 @@
 			}
 		},
 		created () {
+			// 在页面加载之前，先请求user的数据，并将数据存到本地的localstorage中，
+			// 二次刷新页面时，根据localstorage是否存在UserInfo，来判断是否发起请求，以减少http的请求次数
 			let _this = this;
-			// 带上token，发送http请求，获得用户信息（包括ID、nickname、username等）
-			_this.$axios.get('/api/auth/user')
-			.then( (response) => {
-				// console.log(response);
-				if (response.status == 200) {
-					_this.$store.dispatch('userId', response.data.data.id)
-					_this.nickname = response.data.data.nickname
-					_this.username = response.data.data.username
-					window.localStorage.nickname = response.data.data.nickname
-				}
-			})
-			.catch ( (error) => {
-				console.log(error);
-			})
-			// 根据用户ID获取用户头像
-			_this.$axios.get('/images/user/' + _this.$store.state.userId + '.jpg')
-			.then( (response) => {
-				// console.log(response)
-				if (response.status == 200) {
-					this.avater = 'http://forcar.vip:8080/images/user/' + _this.$store.state.userId + '.jpg'
-					// _this.avater = 'http://forcar.vip:8080/images/user/2.jpg'
-				}
-			})
-			.catch( (error) => {
-				// console.log(error)
-				_this.avater = avater
-			})
-
+			let ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'))
+			if (ls_userinfo == null || ls_userinfo == undefined || ls_userinfo == '') {
+				// 本地没有数据时发起get请求，获取数据
+				_this.$axios.get('/api/auth/user')
+				.then( (response) => {
+					console.log(response);
+					if (response.status == 200) {
+						_this.$store.dispatch('userId', response.data.data.id);
+						_this.nickname = response.data.data.nickname;
+						_this.username = response.data.data.username;
+						// JSON.stringify() 将JSON对象转化成字符串  
+						window.localStorage.setItem('UserInfo' ,JSON.stringify(response.data.data));
+					}
+				})
+				.catch ( (error) => {
+					console.log(error);
+				})
+				// 根据用户ID获取用户头像
+				_this.$axios.get('/images/user/' + _this.$store.state.userId + '.jpg')
+				.then( (response) => {
+					// console.log(response)
+					if (response.status == 200) {
+						this.avater = 'http://forcar.vip:8080/images/user/' + _this.$store.state.userId + '.jpg'
+						// _this.avater = 'http://forcar.vip:8080/images/user/2.jpg'
+					}
+				})
+				.catch( (error) => {
+					// console.log(error)
+					_this.avater = avater
+				})
+			} else {
+				// localstorage已存在本地信息，不需要再发起http请求
+				// 本地缓存图片的方法还没实现，暂时头像统一采用默认头像
+				_this.nickname = ls_userinfo.nickname;
+				_this.username = ls_userinfo.username;
+				_this.avater = avater;
+			}
 		},
 		mounted() {
-			
+			let user_info = window.localStorage.getItem('UserInfo')
+			user_info = JSON.parse(user_info)
+			console.log('乘客ID：'+ user_info.passengerId)
 		},
 		computed: {
 			selectedCity () {
-				return this.$store.state.localCity
+				return this.$store.state.currentCity
 			}
 		},
 		methods: {
