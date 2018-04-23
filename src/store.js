@@ -11,7 +11,7 @@ const store = new Vuex.Store({
 	// 定义状态
 	state: {
 		token: null,
-		localCity: null,
+		currentCity: null,
 		userId: null,
 		outset: null,
 		destination: null
@@ -19,23 +19,25 @@ const store = new Vuex.Store({
 	mutations: {
 		// 其中第一个参数 state 就是 $store.state，第二个参数 payload 需要另外传入
 		login: (state, payload) => {
-			window.localStorage.token = payload;
+			window.localStorage.Token = payload;
 			state.token = payload;
 		},
 		logout: (state) => {
-			window.localStorage.removeItem('token');
-			window.localStorage.removeItem('userId');
-			window.localStorage.removeItem('nickname');
+			window.localStorage.removeItem('Token');
+			window.localStorage.removeItem('UserId');
+			window.localStorage.removeItem('Nickname');
+			window.localStorage.removeItem('UserInfo')
 			state.token = null;
+			state.userId = null;
 			state.outset = null;
 			state.destination = null
 		},
 		city: (state, payload) => {
-			window.localStorage.city = payload;
-			state.localCity = payload;
+			window.localStorage.CurrentCity = payload;
+			state.currentCity = payload;
 		},
 		userId: (state, payload) => {
-			window.localStorage.userId = payload;
+			window.localStorage.UserId = payload;
 			state.userId = payload;
 		},
 		setOutset: (state, payload) => {
