@@ -92,16 +92,18 @@ const router = new VueRouter({
 })
 
 // 页面刷新时，重新赋值token
-if (window.localStorage.getItem('token')) {
-	store.dispatch('login', window.localStorage.getItem('token'))
+if (window.localStorage.getItem('Token')) {
+	let ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'))
+	store.dispatch('login', window.localStorage.getItem('Token'));
+	store.dispatch('userId', ls_userinfo.userId);
 }
 
-if (window.localStorage.getItem('city') == '' || window.localStorage.getItem('city') == null || window.localStorage.getItem('city') == undefined) {
-	store.dispatch('city', '广州市')
-	// console.log(window.localStorage.getItem('city'))
+if (window.localStorage.getItem('CurrentCity') == '' || window.localStorage.getItem('CurrentCity') == null || window.localStorage.getItem('CurrentCity') == undefined) {
+	store.dispatch('city', '广州市');
+	// console.log(window.localStorage.getItem('city'));
 } else {
-	store.dispatch('city', window.localStorage.getItem('city'))
-	// console.log(window.localStorage.getItem('city'))
+	store.dispatch('city', window.localStorage.getItem('CurrentCity'));
+	// console.log(window.localStorage.getItem('city'));
 }
 
 /**
