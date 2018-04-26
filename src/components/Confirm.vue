@@ -10,6 +10,9 @@
 </template>
 
 <script>
+	/**
+	 * 取消行程：需要删除一些东西：localstorage中的outset、destination、tripType，并且返回操作是不可逆的
+	 */
 
 	import BaiduMap from './map/BaiduMap'
 	import ConfirmSelector from './ConfirmSelector'
@@ -24,12 +27,19 @@
 				fullHeight: document.documentElement.clientHeight,
 				barHeight: '',
 				selectHeight: '',
-				mapHeight: ''
+				mapHeight: '',
+
+				// ls_outset: '',	// 本地localstorage中Outset
+				// outsetPoint: this.$store.state.currentCity,
+				// zoom: 15
 			}
 		},
 		created () {
 			// 后期需要作一个判断，如果outset、destination不存在，则会返回首页！
 			// 还要考虑刷新页面，store.state会消失导致的问题！
+			// this.ls_outset = JSON.parse(window.localStorage.getItem('Outset'));
+			// this.outsetPoint = this.ls_outset.point;
+			// this.zoom = 12
 		},
 		mounted () {
 			this.initHeight()
@@ -38,6 +48,8 @@
 		methods: {
 			goBack () {
 				this.$router.go(-1)
+				// 返回上一页需要删除的东西
+				window.localStorage.removeItem('ReservedTime');
 			},
 			initHeight () {
 				let _this = this
