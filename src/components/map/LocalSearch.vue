@@ -32,6 +32,8 @@
 
 	// 还需要考虑的问题，选择的地点是存在store.state还是localStorage
 
+	import { Toast } from 'vant'
+
 	export default {
 		data() {
 			return {
@@ -43,13 +45,44 @@
 				marginTop: '',
 				listStyle: {
 					marginTop: ''
-				}
+				},
+				// 用来判断是终点还是起点
+				placeStyle: ''
 			}
 		},
 		created () {
 			// 当placeStyle为0时，表示起点；若为1，则为终点
-			console.log(this.$route.params.style)
-			window.localStorage.placeStyle = this.$route.params.style
+			// 加载页面先判断style是否为空？如果为空，则读取本地的PlaceStyle；若不空则读取参数
+			let s = this.$route.params.style;
+			if ( s == undefined || s == null || s =='') {
+				// 判断localstorage中是否存在PlaceStyle字段，
+				// 若不存在，则表示第一次直接输入路由进入该页面，这种情况会出错，返回首页！
+				// 若存在，则可以解决刷新页面导致的问题
+				let ls_ps = window.localStorage.getItem('PlaceStyle');
+				if (ls_ps == undefined || ls_ps == null || ls_ps == '') {
+					const toast = Toast.loading({
+						duration: 0,
+						forbidClick: true,
+						message: '操作有误！'
+					});
+					let second = 2;
+					const timer = setInterval( () => {
+						second--;
+						if (second == 1) {
+							toast.message = '返回首页…';
+						} else {
+							clearInterval(timer);
+							Toast.clear();
+							this.$router.push({name: 'Home'});
+						}
+					})
+				} else {
+					this.placeStyle = window.localStorage.getItem('PlaceStyle')
+				}
+			} else {
+				this.placeStyle = this.$route.params.style;
+				window.localStorage.PlaceStyle = this.$route.params.style
+			}
 		},
 		mounted() {
 			var temp = this.$refs.barDiv.$el.clientHeight
@@ -87,16 +120,14 @@
 				this.items.point = this.arr[index].point
 
 				// 当placeStyle为0时，表示起点；若为1，则为终点
-				let _style = window.localStorage.getItem('placeStyle');
-				console.log(_style);
-				if ( _style == 0 ) {
+				if ( this.placeStyle == 'outset' ) {
 					this.$store.dispatch('setOutset', {title: this.items.title, address: this.items.address, point: this.items.point});
-					console.log('state', this.$store.state.outset);
+					window.localStorage.setItem('Outset', JSON.stringify(this.$store.state.outset));
 					this.$router.replace({name: 'Home'});
 				}
-				if ( _style == 1 ) {
+				if ( this.placeStyle == 'destination' ) {
 					this.$store.dispatch('setDestination', {title: this.items.title, address: this.items.address, point: this.items.point});
-					console.log('state', this.$store.state.destination);
+					window.localStorage.setItem('Destination', JSON.stringify(this.$store.state.destination));
 					this.$router.replace({name: 'Home'});
 				}
 			}
