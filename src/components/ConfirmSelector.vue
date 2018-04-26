@@ -1,16 +1,23 @@
 <template>
 		<div ref="selectorDiv" class="container">
-			<mu-list-item class="outset" title="捎句话" style="margin-left: -16px" >
-				<mu-icon slot="left" value="lens" color="#009688" style="margin-left: 16px; font-size: 18px"/>
-			</mu-list-item>
-			<mu-divider shallowInset/>
-			<mu-list-item title="车费：¥10" style="margin-left: -16px" >
+			<div style="padding: 10px 0 10px 0; text-align: center; font-size: 14px; color: rgb(177, 177, 177);" v-show="showTimePicker">
+				<span style="font-weight: bold">出行时间：{{selectTime}}</span>
+			</div>
+			<mu-divider shallowInset v-show="showTimePicker"/>
+			<div style="padding: 18px 0 15px 0; text-align: center; font-size: 14px;">
+				<img :src="carIcon" width="84px"/>
+				<span style="display: block">车费：xxx元</span>
+			</div>
+			<!-- <mu-divider shallowInset/> -->
+			<!-- <mu-list-item  title="呼叫快车" style="margin-left: -16px" @click="havaDone">
 				<mu-icon slot="left" value="lens" color="#ffc107" style="margin-left: 16px; font-size: 18px"/>
-			</mu-list-item>
-			<mu-divider shallowInset/>
-			<mu-list-item  title="呼叫快车" style="margin-left: -16px" @click="havaDone">
-				<mu-icon slot="left" value="lens" color="#ffc107" style="margin-left: 16px; font-size: 18px"/>
-			</mu-list-item>
+			</mu-list-item> -->
+			<!-- <div class="call" @click="havaDone">
+				呼叫快车
+			</div> -->
+			<div style="text-align: center">
+				<mu-raised-button label="呼叫快车" class="raised-button" :backgroundColor="backgroundColor" :rippleOpacity="rippleOpacity" @click="havaDone"/>
+			</div>
 		</div>
 </template>
 
@@ -25,6 +32,7 @@
 
 	import Vue from 'vue'
 	import { DatetimePicker } from 'vant';
+	import car from '../svg/car.svg'
 
 	Vue.use(DatetimePicker)
 
@@ -33,19 +41,45 @@
 			return {
 				disable: false,
 				selectorHeight: '',
+				// localStorage信息
+				ls_userinfo: null,
+				ls_trip_outset: null,
+				ls_trip_destination: null,
+				selectTime: '',
+				showTimePicker: true,
+				carIcon: car,
+
+				backgroundColor: '#4a4d5b',	// 按钮波纹效果的颜色
+				rippleOpacity: 0.1			// 按钮波纹效果的透明度
 			}
 		},
 		created () {
-			console.log('userId:',this.$store.state.userId);
+			this.ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'));
+			this.ls_trip_outset = JSON.parse(window.localStorage.getItem('Outset'));
+			this.ls_trip_destination = JSON.parse(window.localStorage.getItem('Destination'));
+			console.log('起点：',this.ls_trip_outset);
+			console.log('终点：',this.ls_trip_destination);
+			if (window.localStorage.getItem('TripType') == 'REAL_TIME') {
+				this.showTimePicker = false
+			} else {
+				let ls_rt = window.localStorage.getItem('ReserveTime');
+				let date = new Date(ls_rt).toISOString().slice(0, 10);
+				let dateTime = new Date(ls_rt).toISOString().slice(11, 16);
+				this.isSelectTime = true;
+				this.selectTime = date + ' ' + dateTime;
+			}
 		},
 		mounted () {
 			
 		},
 		methods: {
+			test () {
+				alert('测试')
+			},
 			havaDone () {
 				// 变量
 				let _this = this;
-				let token = window.localStorage.getItem('token');
+				let token = window.localStorage.getItem('Token');
 				let userId = 7
 
 				// 建立连接对象（还没发起连接）
@@ -66,15 +100,28 @@
 						console.log('失败回调',error);
 					}
 				)
-				
+
 				// 发布行程
+				// 判断出行方式
+				let dt = null;
+				let tmp = window.localStorage.getItem('TripType');
+				if (tmp == 'RESERVED') {
+					let ls_rt = window.localStorage.getItem('ReserveTime');
+					let date = new Date(ls_rt).toISOString().slice(0, 10);
+					let dateTime = new Date(ls_rt).toISOString().slice(11, 19);
+					dt = date + ' ' + dateTime;
+				} else {
+					dt = null;
+				}
 				// 时间格式：yyyy-MM-dd HH:mm:ss
 				_this.$axios.post('/api/hailingService/trip/publishTrip', {
-					"departure": '广东海洋大学',
-					"destination": '湖光岩',
-					"departureTime": null,
-					"tripType": 'REAL_TIME',
-					"passengerId": 3
+					"departure": this.ls_trip_outset.title,
+					"departureLocation": {lng: JSON.stringify(this.ls_trip_outset.point.lng), lat: JSON.stringify(this.ls_trip_outset.point.lat)},
+					"destination": this.ls_trip_destination.title,
+					"destinationLocation": {lng: JSON.stringify(this.ls_trip_destination.point.lng), lat: JSON.stringify(this.ls_trip_destination.point.lat)},
+					"departureTime": dt,
+					"tripType": window.localStorage.getItem('TripType'),
+					"passengerId": _this.ls_userinfo.passengerId
 				}).then((respones) => {
 					// 成功返回
 					console.log(respones)
@@ -93,8 +140,13 @@
 		flex-wrap: wrap;
 		margin: 0 auto;
 	}
+	.demo-flat-button {
+		padding: 24px;
+		width: 100%
+	}
 	.raised-button {
-		margin: 12px;
+		margin: 6px 0 12px 0;
+		width: 72%;
 	}·
 	* {
 		z-index: 2;
@@ -123,5 +175,15 @@
 		/* border: rgb(230, 230, 230) solid 0.5px;
 		border-radius: 16px; */
 		background-color: #fff
+	}
+	.call {
+		background: #4a4d5b;
+		color: #fff;
+		width: 100%;
+		height: 56px;
+		text-align: center;
+		line-height: 56px;
+		font-size: 15px;
+		font-weight: bold;
 	}
 </style>
