@@ -110,7 +110,6 @@
 		mounted() {
 			let user_info = window.localStorage.getItem('UserInfo')
 			user_info = JSON.parse(user_info)
-			console.log('乘客ID：'+ user_info.passengerId)
 		},
 		computed: {
 			selectedCity () {
