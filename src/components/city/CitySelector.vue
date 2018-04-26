@@ -50,8 +50,7 @@
 				that.city.isShow = false;
 				that.youChoiceCityName = '你选的城市是：' + res.cityName;
 				this.$store.dispatch('city', res.cityName)
-				this.$router.push({name: 'Home'});
-				
+				this.$router.push({path:'/', name: 'Home', params: {selectStatus: true}});
 			}
 			
 		},
@@ -89,7 +88,7 @@
 			// 点击取消
 			close(){
 				this.city.isShow = false;
-				this.$router.go(-1);
+				this.$router.push({path:'/', name: 'Home', params: {selectStatus: true}});
 			}
 		}
 	}
