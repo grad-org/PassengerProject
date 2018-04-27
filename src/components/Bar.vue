@@ -72,10 +72,8 @@
 			let ls_userinfo = null;
 			if (typeof window.localStorage.getItem('UserInfo') === 'string') {
 				ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'));
-				console.log('这里吧')
 			} else {
 				ls_userinfo = window.localStorage.getItem('UserInfo');
-				console.log('不对，是这里')
 			}
 			if (ls_userinfo == null || ls_userinfo == undefined || ls_userinfo == '') {
 				// 本地没有数据时发起get请求，获取数据
