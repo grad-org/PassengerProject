@@ -123,6 +123,8 @@
 				let _outset = this.$store.state.outset;
 				if (_outset == '' || _outset == null || _outset == undefined) {
 					return '您在哪儿'
+				} else if (_outset === '正在获取上车地点…') {
+					return '正在获取上车地点…'
 				} else {
 					return this.$store.state.outset.title;
 				}
