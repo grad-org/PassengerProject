@@ -68,9 +68,12 @@
 		},
 		methods: {
 			handler ({BMap, map}) {
+				console.log('BMap',BMap);
+				console.log('map',map);
 				let _this = this;	// 设置一个临时变量指向vue实例，因为在百度地图回调里使用this，指向的不是vue实例；
 				let rs = this.$route.params.selectStatus;	// 当选择城市，返回首页是不进行定位
-				if (!rs) {
+				let rs1 = this.$route.params.searchStatus;	// 当用户搜索起点或终点时，不对其自动获取当前位置
+				if (!rs && !rs1) {
 					var geolocation = new BMap.Geolocation();
 					geolocation.getCurrentPosition(function(r) {
 						_this.center = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 设置center属性值
@@ -91,13 +94,38 @@
 						})
 					}, {enableHighAccuracy: true})
 					
-				}
+				};
+				if (rs1) {
+					// 搜索起（终）点返回首页时，自动定位到起点
+					let tmp1 = null;
+					if (typeof window.localStorage.getItem('Outset') === 'string') {
+						tmp1 = JSON.parse(window.localStorage.getItem('Outset'));
+					} else {
+						tmp1 = window.localStorage.getItem('Outset');
+					}
+					if (tmp1 != null) {
+						_this.center = {lng: tmp1.point.lng, lat: tmp1.point.lat};
+						// _this.center = {lng: 110.396533, lat: 21.197716};
+						let p1 = new BMap.Point(tmp1.point.lng, tmp1.point.lat)
+						console.log(p1);
+						map.centerAndZoom(p1, 8)
+						console.log('bbbbbbbb');
+					} else {
+						console.log('aaaaaa');
+					}
+				} 
 			},
 			loadding () {
 				// console.log("load组件加载时执行的抽象方法")
 			},
-			getLoctionSuccess (data) {
-				console.log('定位信息返回',data)
+			getLoctionSuccess (result) {
+				let data = null;
+				console.log(result)
+				if (typeof result === 'string') {
+					data = JSON.parse(result)
+				} else {
+					data = result
+				}
 				let _this = this;
 				_this.zoom = 15
 				_this.initLocation = false;
