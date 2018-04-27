@@ -96,7 +96,7 @@
 		},
 		methods: {
 			cancal () {
-				this.$router.go(-1);
+				this.$router.replace({path: '/', name: 'Home', params: {searchStatus: true}});
 			},
 			searchResult (result) {
 				console.log(result)
@@ -123,12 +123,12 @@
 				if ( this.placeStyle == 'outset' ) {
 					this.$store.dispatch('setOutset', {title: this.items.title, address: this.items.address, point: this.items.point});
 					window.localStorage.setItem('Outset', JSON.stringify(this.$store.state.outset));
-					this.$router.replace({name: 'Home'});
+					this.$router.replace({path: '/', name: 'Home', params: {searchStatus: true}});
 				}
 				if ( this.placeStyle == 'destination' ) {
 					this.$store.dispatch('setDestination', {title: this.items.title, address: this.items.address, point: this.items.point});
 					window.localStorage.setItem('Destination', JSON.stringify(this.$store.state.destination));
-					this.$router.replace({name: 'Home'});
+					this.$router.replace({path: '/', name: 'Home', params: {searchStatus: true}});
 				}
 			}
 		}
