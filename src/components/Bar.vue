@@ -69,7 +69,14 @@
 			// 在页面加载之前，先请求user的数据，并将数据存到本地的localstorage中，
 			// 二次刷新页面时，根据localstorage是否存在UserInfo，来判断是否发起请求，以减少http的请求次数
 			let _this = this;
-			let ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'))
+			let ls_userinfo = null;
+			if (typeof window.localStorage.getItem('UserInfo') === 'string') {
+				ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'));
+				console.log('这里吧')
+			} else {
+				ls_userinfo = window.localStorage.getItem('UserInfo');
+				console.log('不对，是这里')
+			}
 			if (ls_userinfo == null || ls_userinfo == undefined || ls_userinfo == '') {
 				// 本地没有数据时发起get请求，获取数据
 				_this.$axios.get('/api/auth/user')
@@ -108,8 +115,7 @@
 			}
 		},
 		mounted() {
-			let user_info = window.localStorage.getItem('UserInfo')
-			user_info = JSON.parse(user_info)
+
 		},
 		computed: {
 			selectedCity () {
