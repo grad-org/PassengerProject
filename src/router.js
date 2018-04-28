@@ -14,6 +14,7 @@ import Edit from '@/components/user/Edit'
 import LocalSearch from '@/components/map/LocalSearch'
 import Confirm from '@/components/Confirm'
 import Waiting from '@/components/trip/Waiting'
+import HistoryTrip from '@/components/trip/HistoryTrip'
 
 Vue.use(VueRouter)
 
@@ -89,6 +90,14 @@ const routes = [
 			requireAuth: true
 		},
 		component: Waiting
+	},
+	{
+		path: '/trip/history',
+		name: 'HistoryTrip',
+		meta: {
+			requireAuth: true
+		},
+		component: HistoryTrip
 	},
 ]
 
