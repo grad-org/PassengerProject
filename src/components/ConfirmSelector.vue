@@ -8,13 +8,6 @@
 				<img :src="carIcon" width="84px"/>
 				<span style="display: block">车费：xxx元</span>
 			</div>
-			<!-- <mu-divider shallowInset/> -->
-			<!-- <mu-list-item  title="呼叫快车" style="margin-left: -16px" @click="havaDone">
-				<mu-icon slot="left" value="lens" color="#ffc107" style="margin-left: 16px; font-size: 18px"/>
-			</mu-list-item> -->
-			<!-- <div class="call" @click="havaDone">
-				呼叫快车
-			</div> -->
 			<div style="text-align: center">
 				<mu-raised-button label="呼叫快车" class="raised-button" :backgroundColor="backgroundColor" :rippleOpacity="rippleOpacity" @click="havaDone"/>
 			</div>
@@ -102,7 +95,7 @@
 				)
 
 				// 发布行程
-				// 判断出行方式
+				// 判断出行方式，进而决定出行时间是否为null
 				let dt = null;
 				let tmp = window.localStorage.getItem('TripType');
 				if (tmp == 'RESERVED') {
@@ -122,12 +115,19 @@
 					"departureTime": dt,
 					"tripType": window.localStorage.getItem('TripType'),
 					"passengerId": _this.ls_userinfo.passengerId
-				}).then((respones) => {
+				}).then((response) => {
 					// 成功返回
-					console.log(respones)
+					console.log(response)
+					window.localStorage.setItem('TripDetail', JSON.stringify(response.data.data));
+					window.localStorage.removeItem('Outset')	// 删除起点
+					window.localStorage.removeItem('Destination')	// 删除终点
+					_this.$store.dispatch('outset', null);		// 将状态改成null，下同
+					_this.$store.dispatch('destination', null);
+					_this.$router.push({path: '/trip/waiting', name: 'Waiting', params: {published: true}})
 				}).catch((error) => {
 					// post失败
 					console.log(error)
+					alert('出错！')
 				})
 			}
 		}
