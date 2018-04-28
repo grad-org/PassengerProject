@@ -68,7 +68,6 @@
 			}
 		},
 		created () {
-			console.log('当前时间：',new Date());
 			// 进入首页，默认选择【即时】叫车，接下来是判断刷新情况
 			let ls_tripType = window.localStorage.getItem('TripType')
 			if ( ls_tripType == null || ls_tripType == undefined || ls_tripType == '' ) {
@@ -141,8 +140,6 @@
 		},
 		methods: {
 			havaDone () {
-				// 后期需要判断是否存在outset、destination才会进行跳转
-				// this.$router.push({path: '/confirm', name: 'ConfirmCalling'});
 				let condition1 = this.$store.state.outset;
 				let condition2 = this.$store.state.destination;
 				if (condition1 == null) {
@@ -161,6 +158,7 @@
 							console.log('预约时间未选');
 						} else {
 							this.$router.push({path: '/confirm', name: 'ConfirmCalling'});
+							window.localStorage.removeItem('PlaceStyle');	// 删除localstorage中的搜索地点判断状态
 							console.log('预约时间已选');
 						}
 					}
