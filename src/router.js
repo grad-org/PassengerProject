@@ -13,6 +13,7 @@ import UserInfo from '@/components/user/UserInfo'
 import Edit from '@/components/user/Edit'
 import LocalSearch from '@/components/map/LocalSearch'
 import Confirm from '@/components/Confirm'
+import Waiting from '@/components/trip/Waiting'
 
 Vue.use(VueRouter)
 
@@ -80,6 +81,14 @@ const routes = [
 			requireAuth: true
 		},
 		component: Confirm
+	},
+	{
+		path: '/trip/waiting',
+		name: 'Waiting',
+		meta: {
+			requireAuth: true
+		},
+		component: Waiting
 	},
 ]
 
