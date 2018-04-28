@@ -34,7 +34,9 @@
 </template>
 
 <script>
-
+	/**
+	 * 需要完善：定位后选起点的问题！
+	 */
 	import MapStyle from './js/map-style.js'
 	import MyLabel from './overlay/Label.vue'
 
@@ -146,15 +148,15 @@
 				_this.centerIconPoint = {lng: data.point.lng, lat: data.point.lat};
 				var geocoder = new BMap.Geocoder();
 				geocoder.getLocation(new BMap.Point(data.point.lng, data.point.lat), function(rs) {
-					var lbs_point = '';
-					var address = '';
+					console.log('定位附近的地点',rs.surroundingPois)
+					// 后续需要完善，定位后若无具体地址，需要判断选择弄个点
 					if (rs.surroundingPois.length > 0) {
 						_this.$store.dispatch('setOutset', {title: rs.surroundingPois[0].title, address: rs.surroundingPois[0].address, point: rs.surroundingPois[0].point});
 						window.localStorage.setItem('Outset', JSON.stringify(_this.$store.state.outset));
 					} else {
-						
+						_this.$store.dispatch('setOutset', {title: '当前位置', address: '未知', point: {lng: data.point.lng, lat: data.point.lng}});
+						window.localStorage.setItem('Outset', JSON.stringify({title: '当前位置', address: '未知', point: {lng: data.point.lng, lat: data.point.lng}}));
 					}
-					console.log('定位附近的地点',rs.surroundingPois)
 				})
 			},
 			getLocationError () {
