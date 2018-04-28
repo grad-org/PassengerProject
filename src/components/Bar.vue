@@ -12,7 +12,7 @@
 				</mu-list-item>
 			</div>
 			<mu-list>
-				<mu-list-item title="行程" rightIcon="keyboard_arrow_right">
+				<mu-list-item title="行程" rightIcon="keyboard_arrow_right" @click="goHistoryTrip">
 					<mu-icon slot="left" value="local_taxi" />
 				</mu-list-item>
 				<mu-list-item title="钱包">
@@ -152,6 +152,10 @@
 				let _this = this;
 				// this.$router.push({name: 'User',});
 				_this.$router.push({ name: 'User', params: { id: _this.$store.state.userId} });
+			},
+			goHistoryTrip () {
+				this.open_drawer = false;
+				this.$router.push({name: 'HistoryTrip'})
 			}
 		}
 	}
