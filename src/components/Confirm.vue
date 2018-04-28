@@ -4,7 +4,7 @@
 			<mu-icon-button icon="keyboard_arrow_left" slot="left" @click="goBack"/>
 			<mu-icon-button icon="notifications" slot="right"/>
 		</mu-appbar>
-		<baidu-map ref="mapDiv" :style="{height: mapHeight}"></baidu-map>
+		<baidu-map-confirm ref="mapDiv" :style="{height: mapHeight}"></baidu-map-confirm>
 		<confirm-selector ref="selectDiv"></confirm-selector>
 	</div>
 </template>
@@ -14,12 +14,12 @@
 	 * 取消行程：需要删除一些东西：localstorage中的outset、destination、tripType，并且返回操作是不可逆的
 	 */
 
-	import BaiduMap from './map/BaiduMap'
+	import BaiduMapConfirm from './map/BaiduMapConfirm'
 	import ConfirmSelector from './ConfirmSelector'
 
 	export default {
 		components: {
-			BaiduMap, ConfirmSelector
+			BaiduMapConfirm, ConfirmSelector
 		},
 		data () {
 			return {
@@ -28,10 +28,6 @@
 				barHeight: '',
 				selectHeight: '',
 				mapHeight: '',
-
-				// ls_outset: '',	// 本地localstorage中Outset
-				// outsetPoint: this.$store.state.currentCity,
-				// zoom: 15
 			}
 		},
 		created () {
