@@ -18,12 +18,6 @@
 			<my-label :position="{lng: 110.307236, lat: 21.157355}" :text="selectAddress" :active="active"
 				@mouseover.native="active = true" @mouseleave.native="active = false">
 			</my-label>
-		</bm-marker>
-		<bm-marker :position="outsetPoint" 
-			:icon="{url: require('../../svg/outset.svg'), size: {width: 20, height: 20}}">
-		</bm-marker>
-		<bm-marker :position="destinationPoint" 
-			:icon="{url: require('../../svg/destination.svg'), size: {width: 20, height: 20}}">
 		</bm-marker> -->
 		<bm-marker :position="centerIconPoint" 
 			:icon="{url: require('../../svg/centericon.svg'), size: {width: 20, height: 31}}"
@@ -36,9 +30,13 @@
 <script>
 	/**
 	 * 需要完善：定位后选起点的问题！
+	 * 安装stompjs: https://www.cnblogs.com/liemei/p/7064386.html
 	 */
 	import MapStyle from './js/map-style.js'
 	import MyLabel from './overlay/Label.vue'
+	import SockJS from '../../../static/utils/sockjs.js'
+	// import Stomp from '../../../static/utils/stomp.js'
+	import Stomp from 'stompjs'
 
 	export default {
 		components: {
@@ -46,19 +44,15 @@
 		},
 		data () {
 			return {
-				center: null,
+				center: this.$store.state.currentCity,
 				zoom: 15,
 				styleJson: null,
 				enableSelectPoint: {lng: 110.307236, lat: 21.157355},
 				active: false,
 				selectAddress: '广东海洋大学',
 
-				// 调试用，海大餐厅 => 湖光镇派出所
-				outsetPoint: {lng: 110.308994, lat: 21.15026},
-				destinationPoint: {lng: 110.318268, lat: 21.12831},
-
 				// 建立连接用
-				stompClient: null,
+				stompClient: Stomp.over(new SockJS('http://forcar.vip:8080/orh')),
 
 				map: null,	// 指定map对象
 				BMap: null,	// 指定BMap对象
@@ -68,18 +62,18 @@
 			}
 		},
 		created () {
-			this.center = this.$store.state.currentCity
-			this.styleJson = MapStyle.style();
+
 		},
 		mounted () {
-			this.getCarLocation();
+			// 发现附近已上线的司机
+			this.findOnlineCar();
 		},
 		methods: {
 			handler ({BMap, map}) {
 				console.log('BMap',BMap);
 				console.log('map',map);
+				this.styleJson = MapStyle.style();
 				let _this = this;	// 设置一个临时变量指向vue实例，因为在百度地图回调里使用this，指向的不是vue实例；
-				let _map = map;
 				_this.map = map;	// 创建map对象，然后赋给map属性，以方便在别的方法使用，下同
 				_this.BMap = BMap;
 				let rs = this.$route.params.selectStatus;	// 当选择城市，返回首页是不进行定位
@@ -164,13 +158,13 @@
 			},
 
 			// 用来订阅司机
-			getCarLocation () {
+			findOnlineCar () {
 				// 变量
 				let _this = this
 
 				// 建立连接对象（还没发起连接）
-				let socket = new SockJS('http://forcar.vip:8080/orh');
-				_this.stompClient = Stomp.over(socket);
+				// let socket = new SockJS('http://forcar.vip:8080/orh');
+				// _this.stompClient = Stomp.over(socket);
 
 				// 创建连接
 				_this.stompClient.connect(
