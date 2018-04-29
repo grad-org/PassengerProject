@@ -15,6 +15,7 @@ import LocalSearch from '@/components/map/LocalSearch'
 import Confirm from '@/components/Confirm'
 import Waiting from '@/components/trip/Waiting'
 import HistoryTrip from '@/components/trip/HistoryTrip'
+import TripDetail from '@/components/trip/TripDetail'
 
 Vue.use(VueRouter)
 
@@ -98,6 +99,14 @@ const routes = [
 			requireAuth: true
 		},
 		component: HistoryTrip
+	},
+	{
+		path: '/trip/history/detail',
+		name: 'TripDetail',
+		meta: {
+			requireAuth: true
+		},
+		component: TripDetail
 	},
 ]
 
