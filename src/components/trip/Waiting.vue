@@ -34,6 +34,8 @@
 				.then((response) => {
 					console.log(response);
 					window.localStorage.removeItem('TripDetail');
+					_this.$store.state.outset = null;
+					_this.$store.state.destination = null;
 					_this.$router.replace({name: 'Home'});
 				})
 				.catch((error) => {
