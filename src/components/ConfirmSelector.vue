@@ -26,6 +26,7 @@
 	import Vue from 'vue'
 	import { DatetimePicker } from 'vant';
 	import car from '../svg/car.svg'
+	import SockJS from '../../static/utils/sockjs.js'
 
 	Vue.use(DatetimePicker)
 
