@@ -83,7 +83,7 @@
 					geolocation.getCurrentPosition(function(r) {
 						_this.center = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 设置center属性值
 						_this.autoLocationPoint = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 自定义覆盖物
-						setTimeout(function() {
+						const timer = setTimeout(function() {
 							_this.centerIconPoint = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 地图中心覆盖物
 						}, 500);
 						_this.initLocation = true;
@@ -98,6 +98,7 @@
 							} else {
 								
 							}
+							clearTimeout(timer)		// 清除定时器
 							console.log('定位附近的地点',rs.surroundingPois)
 						})
 					}, {enableHighAccuracy: true})
@@ -173,7 +174,7 @@
 					// 连接成功的回调函数
 					function connectCallback (frame) {
 						// 需要将订阅的对象传给一个变量，否则取消订阅时会找不到订阅id
-						_this.listenOrderSubscription = _this.stompClient.subscribe('/topic/hailingService/car/uploadCarLocation', function (carLocation) {
+						_this.listenCarSubscription = _this.stompClient.subscribe('/topic/hailingService/car/uploadCarLocation', function (carLocation) {
 							console.log('附近车辆返回信息',carLocation.body)
 						})
 					},
@@ -184,7 +185,19 @@
 					}
 				)
 			},
-			// 
+			// 取消订阅
+			closeSubscribe () {
+				let _this = this
+				if (_this.listenCarSubscription != null) {
+					_this.listenCarSubscription.unsubscribe();
+				}
+			},
+			// 关闭连接
+			disconnect () {
+				let _this = this
+				_this.stompClient.disconnect()
+			},
+			// 地图移动开始时触发此事件
 			movestart ({type, target}) {
 				let _this = this;
 				_this.$store.dispatch('setOutset', '正在获取上车地点…');
@@ -212,6 +225,10 @@
 				})
 			
 			},
+		},
+		destroyed () {
+			this.closeSubscribe();
+			this.disconnect();
 		}
 	}
 </script>
