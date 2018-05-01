@@ -3,7 +3,7 @@
 		<!-- 顶栏 -->
 		<bar ref="barDiv" ></bar>
 		<!-- 地图区域 -->
-		<baidu-map ref="mapDiv" :style="{height: mapHeight}" @getOutset="getOutset($event)" ></baidu-map>
+		<baidu-map ref="mapDiv" :style="{height: mapHeight}"></baidu-map>
 		<!-- 选择区域 -->
 		<selector ref="selectDiv" @heightChanged="updateSelectorHeight($event)"></selector>
 	</div>
@@ -22,8 +22,6 @@ export default {
 	},
 	data () {
 		return {
-			yourOutset: "",
-			yourDestination: "",
 
 			// 首页组件高度控制
 			fullHeight: document.documentElement.clientHeight,
@@ -87,9 +85,6 @@ export default {
 		toggle(flag) {
 			this.open_drawer = !this.open_drawer;
 			this.docked = !flag;
-		},
-		getOutset: function(outset) {
-			this.yourOutset = outset
 		},
 		toCitySelector: function () {
 			this.$router.push({name:'CitySelect'})
