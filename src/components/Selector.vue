@@ -30,7 +30,7 @@
 			<mu-list-item class="destination" :titleClass="{titleclass_destination: notActive_d}" :title="destinationTips" style="margin-left: -16px" @click="goSearchDestination">
 				<mu-icon slot="left" value="lens" color="#ffc107" style="margin-left: 16px; font-size: 18px"/>
 			</mu-list-item>
-			<mu-raised-button style="margin: 6px 16px 6px 16px; padding: 0; float:right" label="确定" class="raised-button" :disabled="disable" @click="havaDone" />
+			<mu-raised-button style="margin: 6px 16px 6px 16px; padding: 0; float:right" label="确定" class="raised-button" :disabled="btn_disabled" @click="havaDone" />
 		</div>
 </template>
 
@@ -49,7 +49,7 @@
 	export default {
 		data () {
 			return {
-				disable: false,		// 确定按钮，是否可见
+				btn_disabled: true,		// 确定按钮，是否可见
 				bottomSheet: false,		// 控制弹出，是否可见
 
 				// TimePicker选择器属性值
@@ -62,7 +62,7 @@
 				showTimePicker: false,	// 控制预约时间弹出框
 				isSelectTime: false,	// 用来判断是否已选择预约时间，来控制页面显示
 				selectTime: null,		// 预约时间
-				tripType: 'REAL_TIME',	// 出行方式，默认即时
+				tripType: null,	// 出行方式，默认即时
 
 				selectorHeight: '',		// 组件高度
 			}
@@ -71,6 +71,7 @@
 			// 进入首页，默认选择【即时】叫车，接下来是判断刷新情况
 			let ls_tripType = window.localStorage.getItem('TripType')
 			if ( ls_tripType == null || ls_tripType == undefined || ls_tripType == '' ) {
+				this.tripType = 'REAL_TIME'
 				window.localStorage.setItem('TripType', 'REAL_TIME');
 			} else if ( ls_tripType == 'REAL_TIME' ) {
 				this.selectNow();
@@ -96,7 +97,18 @@
 			}
 		},
 		mounted () {
-			
+			let condition1 = this.$store.state.outset;
+			let condition2 = this.$store.state.destination;
+			if (condition1 == null) {
+				console.log('未选起点');
+				this.btn_disabled = true
+			} else if (condition2 == null) {
+				console.log('未选终点');
+				this.btn_disabled = true
+			} else {
+				this.btn_disabled = false
+				console.log('已选起点终点')
+			}
 		},
 		computed: {
 			location () {
@@ -140,27 +152,18 @@
 		},
 		methods: {
 			havaDone () {
-				let condition1 = this.$store.state.outset;
-				let condition2 = this.$store.state.destination;
-				if (condition1 == null) {
-					console.log('未选起点');
-				} else if (condition2 == null) {
-					console.log('未选终点');
+				// 判断出行类型
+				if ( window.localStorage.getItem('TripType') == 'REAL_TIME') {
+					// 即时出行
+					this.$router.push({path: '/confirm', name: 'ConfirmCalling'});
 				} else {
-					console.log('已选起点终点')
-					// 判断出行类型
-					if ( window.localStorage.getItem('TripType') == 'REAL_TIME') {
-						// 即时出行
-						this.$router.push({path: '/confirm', name: 'ConfirmCalling'});
+					// 预约出行
+					if (window.localStorage.getItem('ReserveTime') == undefined || window.localStorage.getItem('ReserveTime') == null) {
+						console.log('预约时间未选');
 					} else {
-						// 预约出行
-						if (window.localStorage.getItem('ReserveTime') == undefined || window.localStorage.getItem('ReserveTime') == null) {
-							console.log('预约时间未选');
-						} else {
-							this.$router.push({path: '/confirm', name: 'ConfirmCalling'});
-							window.localStorage.removeItem('PlaceStyle');	// 删除localstorage中的搜索地点判断状态
-							console.log('预约时间已选');
-						}
+						this.$router.push({path: '/confirm', name: 'ConfirmCalling'});
+						window.localStorage.removeItem('PlaceStyle');	// 删除localstorage中的搜索地点判断状态
+						console.log('预约时间已选');
 					}
 				}
 			},
@@ -169,6 +172,7 @@
 				this.isActiveN = true;
 				this.isActiveR = false;
 				this.showTimePicker = false;
+				this.tripType = 'REAL_TIME'
 				this.$nextTick (() => {
 					// console.log('即时出行，高度：' + this.$refs.selectorDiv.clientHeight);
 					this.$emit('heightChanged', this.$refs.selectorDiv.clientHeight)
@@ -179,6 +183,7 @@
 				this.isActiveN = false;
 				this.isActiveR = true;
 				this.showTimePicker = true;
+				this.tripType = 'RESERVED';
 				// console.log(this.$refs.selectorDiv.clientHeight);
 				this.$nextTick (() => {
 					// console.log('预约出行，高度：' + this.$refs.selectorDiv.clientHeight);
