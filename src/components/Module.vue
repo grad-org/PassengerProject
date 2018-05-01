@@ -29,5 +29,3 @@
 <style scoped>
 	
 </style>
-
-
