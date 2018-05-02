@@ -13,12 +13,12 @@
 		<bm-marker :position="autoLocationPoint"
 			:icon="{url: require('../../svg/location.svg'), size: {width: 18, height: 18}}" v-if="initLocation">
 		</bm-marker>
-		<!-- <bm-marker :position="enableSelectPoint"
+		<bm-marker :position="enableSelectPoint"
 			:icon="{url: require('../../svg/enableselect.svg'), size: {width: 14, height: 14}}">
 			<my-label :position="{lng: 110.307236, lat: 21.157355}" :text="selectAddress" :active="active"
 				@mouseover.native="active = true" @mouseleave.native="active = false">
 			</my-label>
-		</bm-marker> -->
+		</bm-marker>
 		<bm-marker :position="centerIconPoint" 
 			:icon="{url: require('../../svg/centericon.svg'), size: {width: 20, height: 31}}"
 			:offset="{width: 0, height: -14}">
@@ -52,13 +52,15 @@
 				selectAddress: '广东海洋大学',
 
 				// 建立连接用
-				stompClient: Stomp.over(new SockJS('http://forcar.vip:8080/orh')),
+				stompClient: Stomp.over(new SockJS('http://online-ride-hailing.herokuapp.com/orh')),
 
 				map: null,	// 指定map对象
 				BMap: null,	// 指定BMap对象
 				autoLocationPoint: {lng: 0, lat: 0},
 				centerIconPoint: {lng: 0, lat: 0},
 				initLocation: false,
+
+				carLists: [],
 			}
 		},
 		created () {
@@ -70,8 +72,6 @@
 		},
 		methods: {
 			handler ({BMap, map}) {
-				console.log('BMap',BMap);
-				console.log('map',map);
 				this.styleJson = MapStyle.style();
 				let _this = this;	// 设置一个临时变量指向vue实例，因为在百度地图回调里使用this，指向的不是vue实例；
 				_this.map = map;	// 创建map对象，然后赋给map属性，以方便在别的方法使用，下同
@@ -129,13 +129,8 @@
 				// console.log("load组件加载时执行的抽象方法")
 			},
 			getLoctionSuccess (result) {
-				let data = null;
-				console.log(result)
-				if (typeof result === 'string') {
-					data = JSON.parse(result)
-				} else {
-					data = result
-				}
+				let data = result;
+				// console.log(result)
 				let _this = this;
 				_this.zoom = 15
 				_this.initLocation = false;
@@ -162,26 +157,23 @@
 			findOnlineCar () {
 				// 变量
 				let _this = this
-
-				// 建立连接对象（还没发起连接）
-				// let socket = new SockJS('http://forcar.vip:8080/orh');
-				// _this.stompClient = Stomp.over(socket);
+				let token = window.localStorage.getItem('Token');
 
 				// 创建连接
 				_this.stompClient.connect(
 					// headers
-					{},
+					{'Auth-Token': token},
 					// 连接成功的回调函数
 					function connectCallback (frame) {
 						// 需要将订阅的对象传给一个变量，否则取消订阅时会找不到订阅id
 						_this.listenCarSubscription = _this.stompClient.subscribe('/topic/hailingService/car/uploadCarLocation', function (carLocation) {
-							console.log('附近车辆返回信息',carLocation.body)
+							console.log('附近车辆返回信息',JSON.parse(carLocation.body));
+							_this.carLists.push(carLocation.body)
 						})
 					},
 					// 连接失败的回调函数
 					function errorCallback (error) {
-						console.log(error);
-						console.log('失败回调',error);
+						console.log('连接失败回调',error);
 					}
 				)
 			},
@@ -215,12 +207,10 @@
 					if (rs.surroundingPois.length > 0) {
 						_this.$store.dispatch('setOutset', {title: rs.surroundingPois[0].title, address: rs.surroundingPois[0].address, point: rs.surroundingPois[0].point});
 						window.localStorage.setItem('Outset', JSON.stringify(_this.$store.state.outset));
-						// console.log('执行到这来了')
 					} else {
 						// let lc = {title: '当前位置', address: '未知', point: {lng: lng_t, lat: lat_t}};
 						_this.$store.dispatch('setOutset', {title: '当前位置', address: '未知', point: {lng: lng_t, lat: lat_t}});
-						window.localStorage.setItem('Outset', JSON.stringify({title: '当前位置', address: '未知', point: {lng: lng_t, lat: lat_t}}));
-						// console.log('到这里了已经');
+						window.localStorage.setItem('Outset', JSON.stringify({title: '当前位置', address: '未知', point: {lng: lng_t, lat: lat_t}}))
 					}
 				})
 			
