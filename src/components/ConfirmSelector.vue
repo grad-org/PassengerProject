@@ -27,6 +27,7 @@
 	import { DatetimePicker } from 'vant';
 	import car from '../svg/car.svg'
 	import SockJS from '../../static/utils/sockjs.js'
+	import Stomp from 'stompjs'
 
 	Vue.use(DatetimePicker)
 
@@ -34,7 +35,6 @@
 		data () {
 			return {
 				disable: false,
-				selectorHeight: '',
 				// localStorage信息
 				ls_userinfo: null,
 				ls_trip_outset: null,
@@ -75,25 +75,6 @@
 				let _this = this;
 				let token = window.localStorage.getItem('Token');
 				let userId = 7
-
-				// 建立连接对象（还没发起连接）
-				let socket = new SockJS('http://forcar.vip:8080/orh');
-				let stompClient = Stomp.over(socket);
-
-				// 创建连接
-				stompClient.connect(
-					// headers
-					{'Auth-Token': token},
-					// 连接成功的回调函数
-					function connectCallback (frame) {
-						console.log('已连接【' + frame + '】');
-					},
-					// 连接失败的回调函数
-					function errorCallback (error) {
-						console.log(error);
-						console.log('失败回调',error);
-					}
-				)
 
 				// 发布行程
 				// 判断出行方式，进而决定出行时间是否为null
@@ -154,28 +135,6 @@
 	}
 	.mu-divider {
 		margin: 0 
-	}
-	.destination {
-		/* color: #ffc107; 只能改变按下时的背景颜色 */
-		display: inline-block;
-		width: 65%;
-	}
-	.picker-container{
-		width: 256px;
-	}
-	.active {
-		color: rgb(0, 0, 0);
-		border: rgb(33, 150, 243) solid 0.5px;
-		/* 2196f3 */
-		border-radius: 16px;
-	}
-	.timeStyle button {
-		margin: 6px 12px;
-		padding: 4px 16px;
-		color: rgb(70, 70, 70);
-		/* border: rgb(230, 230, 230) solid 0.5px;
-		border-radius: 16px; */
-		background-color: #fff
 	}
 	.call {
 		background: #4a4d5b;
