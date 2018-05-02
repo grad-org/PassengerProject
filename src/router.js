@@ -16,6 +16,7 @@ import Confirm from '@/components/Confirm'
 import Waiting from '@/components/trip/Waiting'
 import HistoryTrip from '@/components/trip/HistoryTrip'
 import TripDetail from '@/components/trip/TripDetail'
+import Progressing from '@/components/trip/Progressing'
 
 Vue.use(VueRouter)
 
@@ -91,6 +92,14 @@ const routes = [
 			requireAuth: true
 		},
 		component: Waiting
+	},
+	{
+		path: '/trip/progressing',
+		name: 'Progressing',
+		meta: {
+			requireAuth: true
+		},
+		component: Progressing
 	},
 	{
 		path: '/trip/history',
