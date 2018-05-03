@@ -86,7 +86,6 @@
 		},
 		mounted() {
 			var temp = this.$refs.barDiv.$el.clientHeight
-			console.log(temp)
 			this.listStyle.marginTop = this.$refs.barDiv.$el.clientHeight + 'px'
 		},
 		computed: {
@@ -99,13 +98,10 @@
 				this.$router.replace({path: '/', name: 'Home', params: {searchStatus: true}});
 			},
 			searchResult (result) {
-				console.log(result)
 				if (result == null || result == undefined || result == '') {
 					console.log('无搜索结果')
 					this.arr = null
 				} else {
-
-				console.log(result.Br)
 				this.arr = result.Br
 				}
 			},
