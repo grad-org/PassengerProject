@@ -6,11 +6,32 @@
 			<mu-divider shallowInset v-show="showTimePicker"/>
 			<div style="padding: 18px 0 15px 0; text-align: center; font-size: 14px;">
 				<img :src="carIcon" width="84px"/>
-				<span style="display: block">车费：xxx元</span>
+				<div style="margin-top: 6px">
+					<span class="span1">{{farePrediction}}</span>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<span class="span1" @click="openBottomSheet">计费规则 ＞</span>
+				</div>
 			</div>
 			<div style="text-align: center">
 				<mu-raised-button label="呼叫快车" class="raised-button" :backgroundColor="backgroundColor" :rippleOpacity="rippleOpacity" @click="havaDone"/>
 			</div>
+			<mu-bottom-sheet :open="bottomSheet" @close="closeBottomSheet" @click="openBottomSheet">
+				<div style="background: #fff; padding: 16px">
+					<span class="span-rule">计费规则</span>
+					<span class="span-rule-header">起步范围：</span>
+					ーーー起步价：{{initialPrice}} 公里<br>
+					ーーー起步里程：{{initialMileage}} 元
+					<hr>
+					<span class="span-rule-header">超出起步范围，按照计价规则收取：</span>
+					ーーー总费用 = 起步价 + 里程费 + 时长费<br>
+					ーーー里程费：{{unitPricePerKilometer}} 元/公里<br>
+					ーーー时长费：{{unitPricePerMinute}} 元/分钟
+					<hr>
+					<span class="span-rule-header">关于本次行程：</span>
+					ーーー预估里程：{{predictMileage}} 公里<br>
+					ーーー预估时长：{{predictDuration}} 分钟
+				</div>
+			</mu-bottom-sheet>
 		</div>
 </template>
 
@@ -35,6 +56,8 @@
 		data () {
 			return {
 				disable: false,
+				bottomSheet: false,
+
 				// localStorage信息
 				ls_userinfo: null,
 				ls_trip_outset: null,
@@ -44,15 +67,40 @@
 				carIcon: car,
 
 				backgroundColor: '#4a4d5b',	// 按钮波纹效果的颜色
-				rippleOpacity: 0.1			// 按钮波纹效果的透明度
+				rippleOpacity: 0.1,		// 按钮波纹效果的透明度
+
+				timer: null,	// 定时器
+
+				// 车费计费规则
+				setupTime: null,		// 规则设定时间
+				initialPrice: null,		// 起步价
+				initialMileage: null,	// 起步里程
+				unitPricePerKilometer: null,	// 里程费
+				unitPricePerMinute: null,		// 时长费
+				// predictMileage: null,	// 本次行程预估里程
+				// predictDuration: null,	// 本次行程预估时长
+			}
+		},
+		computed: {
+			farePrediction () {
+				let store1 = this.$store.state.predictFare;
+				if (store1 == null) {
+					return '车费预估中...';
+				} else {
+					return '车费预估：' + store1.totalCost + '元';
+				}
+			},
+			predictMileage () {
+				return this.$store.state.predictFare.duration;
+			},
+			predictDuration () {
+				return this.$store.state.predictFare.mileage;
 			}
 		},
 		created () {
 			this.ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'));
 			this.ls_trip_outset = JSON.parse(window.localStorage.getItem('Outset'));
 			this.ls_trip_destination = JSON.parse(window.localStorage.getItem('Destination'));
-			console.log('起点：',this.ls_trip_outset);
-			console.log('终点：',this.ls_trip_destination);
 			if (window.localStorage.getItem('TripType') == 'REAL_TIME') {
 				this.showTimePicker = false
 			} else {
@@ -64,12 +112,14 @@
 			}
 		},
 		mounted () {
-			
+			// 预估车费
+			let _this = this;
+			let ls_tripduration = window.localStorage.getItem('TripDuration');
+			let ls_tripdistance = window.localStorage.getItem('TripDistance');
+			console.log(ls_tripduration);
+			console.log(ls_tripdistance);
 		},
 		methods: {
-			test () {
-				alert('测试')
-			},
 			havaDone () {
 				// 变量
 				let _this = this;
@@ -111,7 +161,28 @@
 					console.log(error)
 					alert('出错！')
 				})
+			},
+			closeBottomSheet () {
+				this.bottomSheet = false;
+			},
+			openBottomSheet () {
+				this.bottomSheet = true;
+				this.$axios.get('/api/fareRule/' + this.$store.state.predictFare.fareRuleId)
+				.then((response) => {
+					console.log(response);
+					this.initialPrice = response.data.data.initialPrice;
+					this.initialMileage = response.data.data.initialMileage;
+					this.setupTime = response.data.data.selectTime;
+					this.unitPricePerKilometer = response.data.data.unitPricePerKilometer;
+					this.unitPricePerMinute = response.data.data.unitPricePerMinute;
+				})
+				.catch((error) => {
+					console.log(error)
+				})
 			}
+		},
+		destroyed () {
+			clearTimeout(this.timer)
 		}
 	}
 </script>
@@ -145,5 +216,24 @@
 		line-height: 56px;
 		font-size: 15px;
 		font-weight: bold;
+	}
+	.span1 {
+		display: inline-block;
+		font-size: 14px;
+		color: #757575
+	}
+	.span-rule {
+		display: block;
+		text-align: center;
+		font-size: 18px;
+		font-weight: bold;
+		color: #424242
+	}
+	.span-rule-header {
+		display: block;
+		font-size: 15px;
+		font-weight: bold;
+		color: #616161;
+		margin-bottom: 6px;
 	}
 </style>
