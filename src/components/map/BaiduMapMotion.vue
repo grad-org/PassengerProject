@@ -38,17 +38,15 @@
 				BMap: null,	// 指定BMap对象
 				autoLocationPoint: {lng: 0, lat: 0},
 				initLocation: false,
-				ls_outset: null,
+				ls_triping: null,
 			}
 		},
 		created () {
-			// this.center = this.$store.state.currentCity
 			this.styleJson = MapStyle.style();
-			this.ls_outset = JSON.parse(window.localStorage.getItem('Outset'))
-			this.ls_destination = JSON.parse(window.localStorage.getItem('Destination'))
-			this.center = this.ls_outset.point;
-			this.outsetPoint = this.ls_outset.point;
-			this.destinationPoint = this.ls_destination.point;
+			this.ls_triping = JSON.parse(window.localStorage.getItem('T1'))
+			this.center = this.ls_triping.departureLocation;
+			this.outsetPoint = this.ls_triping.departureLocation;
+			this.destinationPoint = this.ls_triping.destinationLocation;
 		},
 		mounted () {
 			
@@ -68,6 +66,7 @@
 				}, {enableHighAccuracy: true})
 			},
 			getLoctionSuccess (result) {
+				let _this = this;
 				_this.initLocation = false;		// 关闭自定义定位图标
 				console.log('result');
 			},
