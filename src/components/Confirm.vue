@@ -38,8 +38,13 @@
 			// this.zoom = 12
 		},
 		mounted () {
-			this.initHeight()
-			this.setMapHeight()
+			this.initHeight();
+			this.setMapHeight();
+		},
+		destroyed () {
+			window.localStorage.removeItem('TripDistance');
+			window.localStorage.removeItem('TripDuration');
+			this.$store.dispatch('predictFare', null);
 		},
 		methods: {
 			goBack () {
