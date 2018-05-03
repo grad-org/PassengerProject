@@ -53,6 +53,52 @@
 				let _map = map;
 				_this.map = map;	// 创建map对象，然后赋给map属性，以方便在别的方法使用，下同
 				_this.BMap = BMap;
+
+				// 驾车线路类：http://lbsyun.baidu.com/cms/jsapi/reference/jsapi_reference.html#a7b16
+				let outset1 = new BMap.Point(_this.outsetPoint.lng, _this.outsetPoint.lat);
+				let destination1 = new BMap.Point(_this.destinationPoint.lng, _this.destinationPoint.lat);
+				console.log(outset1)
+				console.log(destination1)
+				//三种驾车策略：最少时间，最短距离，避开高速，而采用的默认策略是：最少时间
+				var routePolicy = [BMAP_DRIVING_POLICY_LEAST_TIME, BMAP_DRIVING_POLICY_LEAST_DISTANCE, BMAP_DRIVING_POLICY_AVOID_HIGHWAYS];
+				var searchComplete = function (results) {
+					console.log('驾车路线返回', results)
+					let plan = results.getPlan(0);
+					console.log('里程：', plan.getDistance(false), '米')	// false返回数值，单位米；true返回字符串
+					console.log('用时：', plan.getDuration(false), '秒')	// false返回数值，单位秒；true返回字符串
+					let distance = (plan.getDistance(false)/1000).toFixed(1);
+					let duration = (plan.getDuration(false)/60).toFixed(0);
+					window.localStorage.setItem('TripDistance', distance);
+					window.localStorage.setItem('TripDuration', duration);
+					_this.$axios.get('/api/fare/predictFare?lengthOfMileage=' + distance + '&lengthOfTime=' + duration)
+					.then((response) => {
+						console.log(response)
+						// window.localStorage.setItem('TripPredictFare', JSON.stringify(response.data.data.totalCost));
+						let d1 = response.data.data;
+						_this.$store.dispatch('predictFare', {fareRuleId: d1.fareRuleDTO.fareRuleId, mileage: d1.lengthOfMileage, duration: d1.lengthOfTime, totalCost: d1.totalCost})
+					})
+					.catch((error) => {
+						console.log(error)
+						if (error.status == 400) {
+							_this.tripFare = false;
+						}
+					})
+				}
+				var transit = new BMap.DrivingRoute(
+					map,
+					{
+						renderOptions: {map: map},	// 结果呈现设置，当前地图实例
+						onSearchComplete: searchComplete,	// 检索完成后的回调函数。参数result
+						onPolylinesSet: function () {	// 折线添加完成后的回调函数。参数： routes: Array
+							setTimeout(function () {
+								// alert('abcd')
+								console.log('折线添加完成')
+							}, 1000)
+						}
+					}
+				);
+				transit.setPolicy(routePolicy[0]);	// 设置线路搜索策略，时间最少
+				transit.search(outset1,destination1);
 			},
 			getLoctionSuccess (result) {
 				console.log('result');
