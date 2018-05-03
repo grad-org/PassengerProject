@@ -119,7 +119,6 @@
 							map.panTo(p1);
 							_this.centerIconPoint = {lng: tmp1.point.lng, lat: tmp1.point.lat}
 						}, 500)
-						console.log('执行到这来了！');
 					} else {
 						console.log('aaaaaa');
 					}
