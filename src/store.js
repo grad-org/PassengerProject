@@ -11,10 +11,15 @@ const store = new Vuex.Store({
 	// 定义状态
 	state: {
 		token: null,
-		currentCity: null,
 		userId: null,
+		currentCity: null,
+
+		// 起点、终点
 		outset: null,
-		destination: null
+		destination: null,
+
+		// 车费预估
+		predictFare: null
 	},
 	mutations: {
 		// 其中第一个参数 state 就是 $store.state，第二个参数 payload 需要另外传入
@@ -26,7 +31,7 @@ const store = new Vuex.Store({
 			window.localStorage.removeItem('Token');
 			window.localStorage.removeItem('UserId');
 			window.localStorage.removeItem('Nickname');
-			window.localStorage.removeItem('UserInfo')
+			window.localStorage.removeItem('UserInfo');
 			state.token = null;
 			state.userId = null;
 			state.outset = null;
@@ -45,6 +50,9 @@ const store = new Vuex.Store({
 		},
 		setDestination: (state, payload) => {
 			state.destination = payload
+		},
+		predictFare: (state, payload) => {
+			state.predictFare = payload
 		}
 	},
 	actions: {
@@ -65,6 +73,9 @@ const store = new Vuex.Store({
 		},
 		setDestination: (context, destination) => {
 			context.commit('setDestination', destination)
+		},
+		predictFare: (context, fare) => {
+			context.commit('predictFare', fare)
 		}
 	}
 })
