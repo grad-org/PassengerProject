@@ -57,8 +57,6 @@
 				// 驾车线路类：http://lbsyun.baidu.com/cms/jsapi/reference/jsapi_reference.html#a7b16
 				let outset1 = new BMap.Point(_this.outsetPoint.lng, _this.outsetPoint.lat);
 				let destination1 = new BMap.Point(_this.destinationPoint.lng, _this.destinationPoint.lat);
-				console.log(outset1)
-				console.log(destination1)
 				//三种驾车策略：最少时间，最短距离，避开高速，而采用的默认策略是：最少时间
 				var routePolicy = [BMAP_DRIVING_POLICY_LEAST_TIME, BMAP_DRIVING_POLICY_LEAST_DISTANCE, BMAP_DRIVING_POLICY_AVOID_HIGHWAYS];
 				var searchComplete = function (results) {
