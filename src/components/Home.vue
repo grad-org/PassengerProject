@@ -13,7 +13,7 @@
 
 import Bar from './Bar'
 import BaiduMap from './map/BaiduMap'
-import Selector from './Selector'
+import Selector from './selector/Selector'
 
 export default {
 	name: 'Home',
