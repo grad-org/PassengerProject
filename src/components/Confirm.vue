@@ -15,7 +15,7 @@
 	 */
 
 	import BaiduMapConfirm from './map/BaiduMapConfirm'
-	import ConfirmSelector from './ConfirmSelector'
+	import ConfirmSelector from './selector/ConfirmSelector'
 
 	export default {
 		components: {
@@ -67,13 +67,12 @@
 			},
 			setMapHeight () {
 				this.$nextTick (() => {
-					this.barHeight = this.$refs.barDiv.$el.clientHeight
-					this.selectHeight = this.$refs.selectDiv.$el.clientHeight
-					
+					this.barHeight = this.$refs.barDiv.$el.clientHeight;
+					this.selectHeight = this.$refs.selectDiv.$el.clientHeight;
 					// 页面加载后，对地图高度进行设置
-					let h = this.fullHeight - this.barHeight - this.selectHeight
+					let h = this.fullHeight - this.barHeight - this.selectHeight;
 					// console.log('地图高度：' +h)
-					this.mapHeight = h + 'px'
+					this.mapHeight = h + 'px';
 				})
 			},
 		},
