@@ -37,7 +37,6 @@
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					<span class="span1">计费规则 ＞</span>
 				</div>
-					
 			</div>
 			<div style="text-align: center">
 				<mu-raised-button label="评价本次服务" class="raised-button" :backgroundColor="backgroundColor" :rippleOpacity="rippleOpacity" @click="evaluateTrip"/>
@@ -142,7 +141,7 @@
 		width: 72%;
 	}
 	.mu-divider {
-		margin: 0 
+		margin: 0
 	}
 	.call {
 		background: #4a4d5b;
