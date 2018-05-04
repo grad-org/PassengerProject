@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<mu-appbar ref="barDiv" title="行车中..." titleClass="AppBar" style="text-align: center" />
+		<mu-appbar ref="barDiv" title="等待接驾" titleClass="AppBar" style="text-align: center" />
 		<baidu-map-motion ref="mapDiv" :style="{height: mapHeight}"></baidu-map-motion>
 		<motion-selector ref="selectDiv"></motion-selector>
 	</div>
