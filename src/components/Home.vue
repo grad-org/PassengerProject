@@ -36,11 +36,10 @@ export default {
 	},
 	mounted () {
 		this.$nextTick (() =>{
-			this.selectedCity = this.$store.state.localCity
-		})
-
-		this.initHeight()
-		this.setMapHeight()
+			this.selectedCity = this.$store.state.localCity;
+		});
+		this.initHeight();
+		this.setMapHeight();
 	},
 	methods: {
 		initHeight () {
