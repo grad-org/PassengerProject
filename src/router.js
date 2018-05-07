@@ -17,6 +17,7 @@ import Waiting from '@/components/trip/Waiting'
 import HistoryTrip from '@/components/trip/HistoryTrip'
 import TripDetail from '@/components/trip/TripDetail'
 import Progressing from '@/components/trip/Progressing'
+import CarDriving from '@/components/trip/CarDriving'
 
 Vue.use(VueRouter)
 
@@ -116,6 +117,14 @@ const routes = [
 			requireAuth: true
 		},
 		component: TripDetail
+	},
+	{
+		path: '/trip/car/driving',
+		name: 'CarDriving',
+		meta: {
+			requireAuth: true,
+		},
+		component: CarDriving
 	},
 ]
 
