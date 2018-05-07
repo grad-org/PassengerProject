@@ -59,6 +59,7 @@
 				let destination1 = new BMap.Point(_this.destinationPoint.lng, _this.destinationPoint.lat);
 				//三种驾车策略：最少时间，最短距离，避开高速，而采用的默认策略是：最少时间
 				var routePolicy = [BMAP_DRIVING_POLICY_LEAST_TIME, BMAP_DRIVING_POLICY_LEAST_DISTANCE, BMAP_DRIVING_POLICY_AVOID_HIGHWAYS];
+				// 检索完成后的回调函数
 				var searchComplete = function (results) {
 					console.log('驾车路线返回', results)
 					let plan = results.getPlan(0);
@@ -70,7 +71,7 @@
 					window.localStorage.setItem('TripDuration', duration);
 					_this.$axios.get('/api/fare/predictFare?lengthOfMileage=' + distance + '&lengthOfTime=' + duration)
 					.then((response) => {
-						console.log(response)
+						// console.log(response)
 						// window.localStorage.setItem('TripPredictFare', JSON.stringify(response.data.data.totalCost));
 						let d1 = response.data.data;
 						_this.$store.dispatch('predictFare', {fareRuleId: d1.fareRuleDTO.fareRuleId, mileage: d1.lengthOfMileage, duration: d1.lengthOfTime, totalCost: d1.totalCost})
@@ -81,21 +82,24 @@
 							_this.tripFare = false;
 						}
 					})
-				}
+				};
+
+				var polylineComplete = function (routes) {
+					
+				};
 				var transit = new BMap.DrivingRoute(
-					map,
+					map,	// 表示检索区域，类型可为地图实例
 					{
 						renderOptions: {map: map},	// 结果呈现设置，当前地图实例
+						policy: routePolicy[0],		// 驾车策略，时间最少
 						onSearchComplete: searchComplete,	// 检索完成后的回调函数。参数result
-						onPolylinesSet: function () {	// 折线添加完成后的回调函数。参数： routes: Array
-							setTimeout(function () {
-								// alert('abcd')
-								console.log('折线添加完成')
-							}, 1000)
+						// onPolylinesSet: polylineComplete,	// 折线添加完成后的回调函数。参数： routes: Array
+						onMarkersSet:function(routes) {
+							map.removeOverlay(routes[0].marker);	//删除起点
+							map.removeOverlay(routes[1].marker);	//删除终点
 						}
 					}
 				);
-				transit.setPolicy(routePolicy[0]);	// 设置线路搜索策略，时间最少
 				transit.search(outset1,destination1);
 			},
 			getLoctionSuccess (result) {
