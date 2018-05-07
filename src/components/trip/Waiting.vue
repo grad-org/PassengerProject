@@ -2,13 +2,16 @@
 	<div>
 		<mu-appbar title="等待应答" titleClass="AppBar">
 		</mu-appbar>
-		<h1>等待司机接单中…</h1>
-		<mu-raised-button label="取消订单" class="raised-button" secondary @click="cancelTrip"/>
+		<div style="margin-top: 200px">
+			<h1>等待司机接单中…</h1>
+			<mu-raised-button label="取消订单" class="raised-button" secondary @click="cancelTrip"/>
+		</div>
 	</div>
 </template>
 
 <script>
 
+	import { Toast } from 'vant'
 	import SockJS from '../../../static/utils/sockjs.js'
 	import Stomp from 'stompjs'
 
@@ -18,6 +21,7 @@
 				ls_tripdetail: null,
 				// 建立连接用
 				stompClient: null,
+				listenOrderSubscription: null,
 			}
 		},
 		created () {
@@ -34,6 +38,11 @@
 		mounted () {
 			
 		},
+		destotyed () {
+			window.localStorage.removeItem('TripDetail');	// 删除发布行程返回的数据
+			this.closeSubscription();
+			this.disconnect();
+		},
 		methods: {
 			cancelTrip () {
 				let _this = this;
@@ -42,13 +51,33 @@
 				})
 				.then((response) => {
 					console.log(response);
-					window.localStorage.removeItem('TripDetail');
-					_this.$store.state.outset = null;
-					_this.$store.state.destination = null;
-					_this.$router.replace({name: 'Home'});
+					if (response.status == 200) {
+						window.localStorage.removeItem('TripDetail');
+						_this.$store.state.outset = null;
+						_this.$store.state.destination = null;
+						const toast2 = Toast.loading({
+							duration: 0,
+							forbidClick: true,
+							message: '已被接单…'
+						});
+						let second = 2;
+						const time2 = setInterval(() => {
+							second--;
+							if (second == 1) {
+								toast2.message = '已被接单…';
+							} else {
+								clearInterval(time2);
+								Toast.clear();
+								_this.$router.replace({name: 'Home'});
+							}
+						}, 1000);
+					}
 				})
 				.catch((error) => {
 					console.log(error);
+					if (error.status == 400) {
+						Toast('本次行程不允许取消！')
+					}
 				})
 			},
 			checkOrder () {
@@ -66,8 +95,26 @@
 					function connectCallback (frame) {
 						_this.listenOrderSubscription = _this.stompClient.subscribe('/user/queue/hailingService/tripOrder/acceptance-notification', function (tripOrder) {
 							console.log(tripOrder.body);
-							window.localStorage.setItem('T1', tripOrder.body);
-							_this.$router.push({name: 'Progressing'});
+							let body = JSON.parse(tripOrder.body);
+							if (body.message == 'acceptTripOrder') {
+								window.localStorage.setItem('T1', JSON.stringify(body.data));
+								const toast2 = Toast.loading({
+									duration: 0,
+									forbidClick: true,
+									message: '司机已接单…'
+								});
+								let second = 2;
+								const time2 = setInterval(() => {
+									second--;
+									if (second == 1) {
+										toast2.message = '司机已接单…';
+									} else {
+										clearInterval(time2);
+										Toast.clear();
+										_this.$router.push({name: 'Progressing'});
+									}
+								}, 1000);
+							}
 						})
 					},
 					// 连接失败的回调函数
@@ -77,6 +124,14 @@
 					}
 				)
 			},
+			closeSubscription () {
+				if (this.listenOrderSubscription != null) {
+					this.listenOrderSubscription.unsubscribe();
+				}
+			},
+			disconnect () {
+				this.stompClient.disconnect();
+			}
 		},
 		computed: {
 
