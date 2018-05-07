@@ -4,7 +4,7 @@
 				<!-- 其中width指百分百 -->
 				<mu-col width="40" tablet="33" desktop="33">
 					<span>{{carPlateNo}}</span>
-					<span>{{carColor}} • {{carBrand}}{{carSeries}}</span>
+					<span>{{carColor}}{{carBrand}}{{carSeries}}</span>
 				</mu-col>
 				<mu-col width="20" tablet="34" desktop="33">
 					<mu-paper class="paper" circle :zDepth="1" >
@@ -12,7 +12,7 @@
 					</mu-paper>
 				</mu-col>
 				<mu-col width="40" tablet="33" desktop="33">
-					<span>{{driverName}}师傅</span>
+					<span>{{driverName}}</span>
 					<span>{{driverEvaluate}}</span>
 				</mu-col>
 			</mu-row>
@@ -26,7 +26,7 @@
 					<mu-flat-button label="发消息" class="flat-button"/>
 				</mu-col>
 				<mu-col width="33" tablet="33" desktop="33">
-					<mu-flat-button label="取消订单" class="flat-button"/>
+					<mu-flat-button label="取消订单" class="flat-button" @click="cancelOrder"/>
 				</mu-col>
 			</mu-row>
 		</div>
@@ -65,28 +65,66 @@
 			let ls_tripinfo = JSON.parse(window.localStorage.getItem('T1')) ;
 
 			// 获取车主相关
-			_this.$axios.get('/api/driver/2')
-			.then((response) => {
-				console.log(response);
-				// 车辆信息
-				_this.carBrand = response.data.data.carDTO.brand;
-				_this.carSeries = response.data.data.carDTO.series;
-				_this.carColor = response.data.data.carDTO.color;
-				_this.carPlateNo = response.data.data.carDTO.plateNo;
-				// 车主信息
-				_this.driverName = response.data.data.drivingLicenseDTO.driverName.substr(0,1);
-				window.localStorage.setItem('DriverInfo', JSON.stringify(response.data.data))
-			})
-			.catch((error) => {
-				console.log(error);
-			})
+			// _this.$axios.get('/api/driver/2')
+			// .then((response) => {
+			// 	console.log(response);
+			// 	// 车辆信息
+			// 	_this.carBrand = response.data.data.carDTO.brand;
+			// 	_this.carSeries = response.data.data.carDTO.series;
+			// 	_this.carColor = response.data.data.carDTO.color + ' • ';
+			// 	_this.carPlateNo = response.data.data.carDTO.plateNo;
+			// 	// 车主信息
+			// 	_this.driverName = response.data.data.drivingLicenseDTO.driverName.substr(0,1) + '师傅';
+			// 	window.localStorage.setItem('DriverInfo', JSON.stringify(response.data.data))
+			// })
+			// .catch((error) => {
+			// 	_this.carBrand = '品牌未知?';
+			// 	_this.carSeries = '';
+			// 	_this.carColor = '颜色? ';
+			// 	_this.carPlateNo = '车牌未知';
+			// 	console.log(error);
+			// })
+
+			// 从订单数据里获取车辆品牌、司机信息
+			if (ls_tripinfo.brand == null) {
+				_this.carBrand = '品牌未知?';
+			} else {
+				_this.carBrand = ls_tripinfo.brand;
+			}
+			// 品牌系列
+			if (ls_tripinfo.series == null) {
+				_this.carSeries = '';
+			} else {
+				_this.carSeries = ls_tripinfo.series;
+			}
+			// 车身颜色
+			if (ls_tripinfo.color == null) {
+				_this.carColor = '颜色? ';
+			} else {
+				_this.carColor = ls_tripinfo.color;
+			}
+			// 车牌号码
+			if (ls_tripinfo.plateNo == null) {
+				_this.carPlateNo = '车牌未知!';
+			} else {
+				_this.carPlateNo = ls_tripinfo.plateNo;
+			}
+			// 司机Username
+			if (ls_tripinfo.driverName == null) {
+				_this.driverName = '司机师傅';
+			} else {
+				_this.driverName = ls_tripinfo.driverName;
+			}
 			
 		},
 		mounted () {
 			
 		},
 		methods: {
-
+			cancelOrder () {
+				console.log('取消订单，暂无实现！');
+				this.$router.push({name: 'Home'});
+			}
 		}
 	}
 </script>
