@@ -63,8 +63,11 @@
 		},
 		created () {
 			let _this = this;
+			let userinfo = JSON.parse(window.localStorage.getItem('UserInfo'));
 			// _this.$axios.get('/api/tripOrder/search/findAllByPassenger/' + window.localStorage.getItem('UserId'))
-			_this.$axios.get('/api/tripOrder/search/findAllByPassenger/1')
+			// 根据乘客id查询历史行程
+			_this.$axios.get('/api/tripOrder/search/findAllByPassenger?passengerId=' + userinfo.passengerId)
+			// _this.$axios.get('/api/tripOrder/search/findAllByPassenger?passengerId=1')
 			.then((response) => {
 				console.log(response.data.data);
 				_this.tripLists = response.data.data;
@@ -122,21 +125,34 @@
 				}, 500);
 			},
 			itemClick (index, tripId) {
-				window.localStorage.setItem('HistoryTripDetail', JSON.stringify(this.tripLists[index]))
-				this.$axios.get('/api/tripOrder/' + tripId).then((response) => {
-					console.log(response)
-					if (response.status == 200) {
-						window.localStorage.setItem('HistoryTripDetail', JSON.stringify(response.data.data))
-						this.$router.push({path: '/trip/history/detail', name: 'TripDetail', params: {tripId: tripId}})
-					}
-				}).catch((error) => {
-					console.log(error)
-				})
+				// 先判断是否进行中，如果是点击会进入行车页面，否则进入历史行程的详细页面
+				// 
+				console.log(this.tripLists[index]);
+				if (this.tripLists[index].orderStatus == 'PROCESSING') {
+					console.log('进入车辆行驶中的页面');
+					window.localStorage.setItem('ProcessingTrip', JSON.stringify(this.tripLists[index]));
+					this.$router.push({name: 'CarDriving'})
+				} else {
+					window.localStorage.setItem('HistoryTripDetail', JSON.stringify(this.tripLists[index]))
+					this.$axios.get('/api/tripOrder/' + tripId).then((response) => {
+						console.log(response)
+						if (response.status == 200) {
+							window.localStorage.setItem('HistoryTripDetail', JSON.stringify(response.data.data))
+							this.$router.push({path: '/trip/history/detail', name: 'TripDetail', params: {tripId: tripId}})
+						}
+					}).catch((error) => {
+						console.log(error)
+					})
+				}
+				
 			},
 			orderStatus (index) {
 				let ts = this.tripLists[index].orderStatus;
 				if (ts == 'PAYMENT_COMPLETED') {
 					return '已完成'
+				};
+				if (ts == 'PROCESSING') {
+					return '进行中'
 				}
 			}
 		},
