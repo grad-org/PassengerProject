@@ -64,7 +64,7 @@
 			}
 		},
 		created () {
-
+			
 		},
 		mounted () {
 			// 发现附近已上线的司机
@@ -72,20 +72,27 @@
 		},
 		methods: {
 			handler ({BMap, map}) {
+				console.log('①地图加载完成');
 				this.styleJson = MapStyle.style();
 				let _this = this;	// 设置一个临时变量指向vue实例，因为在百度地图回调里使用this，指向的不是vue实例；
 				_this.map = map;	// 创建map对象，然后赋给map属性，以方便在别的方法使用，下同
 				_this.BMap = BMap;
 				let rs = this.$route.params.selectStatus;	// 当选择城市，返回首页是不进行定位
-				let rs1 = this.$route.params.searchStatus;	// 当用户搜索起点或终点时，不对其自动获取当前位置
-				if (!rs && !rs1) {
+				let rs1 = this.$route.params.searchStatus;	// 判断是否从搜索地点返回
+				console.log('两个判断值：', rs, rs1)
+				console.log('判断结果',rs == undefined && rs1 == undefined);
+				if (rs == undefined && rs1 == undefined) {
 					var geolocation = new BMap.Geolocation();
 					geolocation.getCurrentPosition(function(r) {
+						console.log(r);
+						console.log('②自动定位');
 						_this.center = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 设置center属性值
 						_this.autoLocationPoint = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 自定义覆盖物
-						const timer = setTimeout(function() {
-							_this.centerIconPoint = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 地图中心覆盖物
-						}, 500);
+						// const timer = setTimeout(function() {
+						// 	_this.centerIconPoint = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 地图中心覆盖物
+						// }, 500);
+						_this.centerIconPoint = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 地图中心覆盖物
+						
 						_this.initLocation = true;
 						_this.$store.dispatch('city', r.address.city);
 
@@ -98,7 +105,7 @@
 							} else {
 								
 							}
-							clearTimeout(timer)		// 清除定时器
+							// clearTimeout(timer)		// 清除定时器
 							console.log('定位附近的地点',rs.surroundingPois)
 						})
 					}, {enableHighAccuracy: true})
@@ -114,13 +121,12 @@
 					if (tmp1 != null) {
 						// _this.center = {lng: 110.396533, lat: 21.197716};
 						var p1 = new BMap.Point(tmp1.point.lng, tmp1.point.lat);
-						console.log(p1)
 						setTimeout(function() {
 							map.panTo(p1);
 							_this.centerIconPoint = {lng: tmp1.point.lng, lat: tmp1.point.lat}
 						}, 500)
 					} else {
-						console.log('aaaaaa');
+						console.log('localstorage中Outset为null');
 					}
 				} 
 			},
@@ -167,7 +173,10 @@
 						// 需要将订阅的对象传给一个变量，否则取消订阅时会找不到订阅id
 						_this.listenCarSubscription = _this.stompClient.subscribe('/topic/hailingService/car/uploadCarLocation', function (carLocation) {
 							console.log('附近车辆返回信息',JSON.parse(carLocation.body));
-							_this.carLists.push(carLocation.body)
+							let body = JSON.parse(carLocation.body);
+							if (body.message == 'uploadCarLocation') {
+								_this.carLists.push(body.data)
+							}
 						})
 					},
 					// 连接失败的回调函数
@@ -178,15 +187,13 @@
 			},
 			// 取消订阅
 			closeSubscribe () {
-				let _this = this
-				if (_this.listenCarSubscription != null) {
-					_this.listenCarSubscription.unsubscribe();
+				if (this.listenCarSubscription != null) {
+					this.listenCarSubscription.unsubscribe();
 				}
 			},
 			// 关闭连接
 			disconnect () {
-				let _this = this
-				_this.stompClient.disconnect()
+				this.stompClient.disconnect()
 			},
 			// 地图移动开始时触发此事件
 			movestart ({type, target}) {
@@ -195,6 +202,7 @@
 			},
 			// 地图移动结束时触发此事件
 			moveend ({type, target}) {
+				console.log('③移动地图');
 				let _this = this;
 				let rs = this.$route.params.searchStatus;	// 判断是否从搜索地点返回
 				
@@ -202,9 +210,9 @@
 				let lat_t = _this.map.getCenter().lat;
 				_this.centerIconPoint = {lng: lng_t, lat: lat_t}
 				let geocoder = new _this.BMap.Geocoder();
-				geocoder.getLocation(new _this.BMap.Point(lng_t, lat_t), function(rs) {
-					if (rs.surroundingPois.length > 0) {
-						_this.$store.dispatch('setOutset', {title: rs.surroundingPois[0].title, address: rs.surroundingPois[0].address, point: rs.surroundingPois[0].point});
+				geocoder.getLocation(new _this.BMap.Point(lng_t, lat_t), function(result) {
+					if (result.surroundingPois.length > 0) {
+						_this.$store.dispatch('setOutset', {title: result.surroundingPois[0].title, address: result.surroundingPois[0].address, point: result.surroundingPois[0].point});
 						window.localStorage.setItem('Outset', JSON.stringify(_this.$store.state.outset));
 					} else {
 						// let lc = {title: '当前位置', address: '未知', point: {lng: lng_t, lat: lat_t}};
@@ -212,7 +220,6 @@
 						window.localStorage.setItem('Outset', JSON.stringify({title: '当前位置', address: '未知', point: {lng: lng_t, lat: lat_t}}))
 					}
 				})
-			
 			},
 		},
 		destroyed () {
