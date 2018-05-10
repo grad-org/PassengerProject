@@ -81,7 +81,7 @@
 				.then( (response) => {
 					console.log(response);
 					if (response.status == 200) {
-						_this.$store.dispatch('userId', response.data.data.id);
+						_this.$store.dispatch('userId', response.data.data.userId);
 						_this.nickname = response.data.data.nickname;
 						_this.username = response.data.data.username;
 						// JSON.stringify() 将JSON对象转化成字符串  
