@@ -89,10 +89,9 @@
 				this.showTimePicker = false
 			} else {
 				let ls_rt = window.localStorage.getItem('ReserveTime');
-				let date = new Date(ls_rt).toISOString().slice(0, 10);
-				let dateTime = new Date(ls_rt).toISOString().slice(11, 16);
+				ls_rt = new Date(ls_rt);
 				this.isSelectTime = true;
-				this.selectTime = date + ' ' + dateTime;
+				this.selectTime = this.selectTime = ls_rt.getFullYear() + '年' + ls_rt.getMonth() + '月' + ls_rt.getDate() + '日 ' + ls_rt.getHours() + ':' + ls_rt.getMinutes();
 			}
 		},
 		mounted () {
@@ -197,6 +196,7 @@
 		/* display: flex; */
 		flex-wrap: wrap;
 		margin: 0 auto;
+		background: #fff
 	}
 	.demo-flat-button {
 		padding: 24px;
