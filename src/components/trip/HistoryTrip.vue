@@ -4,7 +4,7 @@
 			<mu-icon-button icon="keyboard_arrow_left" slot="left" @click="goBack"/>
 		</mu-appbar>
 		<div :style="listStyle">	
-			<van-pull-refresh v-model="isLoading" pulling-text="下拉即可刷新..." loosing-text="释放即可刷新..." loading-text="加载中..."  @refresh="onRefresh">					
+			<van-pull-refresh v-model="isLoading" pulling-text="下拉即可刷新..." loosing-text="释放即可刷新..." loading-text="加载中..."  @refresh="onRefresh">
 				<!-- 无行程，或者获取失败 -->
 				<div style="padding: 16px; font-size: 16px; text-align: center" v-if="!hasTrip" >
 					<div v-show="notTripTips">
@@ -15,9 +15,9 @@
 					</div>
 				</div>
 				<!-- 有行程 -->
-				<div style=" font-size: 16px; " v-else >
-					<van-cell-group v-for="(tripList, index) in tripLists" :key="index" :border="false" style="padding: 12px 8px 0 8px; background: #eee">
-						<van-cell :title="tripList.departureTime" :value="orderStatus(index)" :center="true" :is-link="true" @click="itemClick(index, tripList.tripId)" style="font-size: 15px; font-weight: bold"/>
+				<div style=" font-size: 16px; padding: 12px 8px 8px 8px;" v-else >
+					<van-cell-group v-for="(tripList, index) in tripLists" :key="index" :border="false" style="" class="block1">
+						<van-cell :title="tripList.departureTime.slice(0, 4) + '年' + tripList.departureTime.slice(5, 7) + '月' + tripList.departureTime.slice(8, 10) + '日 ' + tripList.departureTime.slice(11, 16)" :value="orderStatus(index)" :center="true" :is-link="true" @click="itemClick(index, tripList.tripId)" style="font-size: 15px; font-weight: bold"/>
 						<van-cell :title="'出发地：'+ tripList.departure" icon="location" :center="true" :border="false" style="color: #757575"/>
 						<van-cell :title="'目的地：'+ tripList.destination" icon="location" :center="true" :border="false" style="color: #757575" />
 					</van-cell-group>
@@ -58,15 +58,16 @@
 				// vant list
 				tripLists: null,
 				loading: false,
-				finished: true
+				finished: true,
+				userinfo: null
 			}
 		},
 		created () {
 			let _this = this;
-			let userinfo = JSON.parse(window.localStorage.getItem('UserInfo'));
+			this.userinfo = JSON.parse(window.localStorage.getItem('UserInfo'));
 			// _this.$axios.get('/api/tripOrder/search/findAllByPassenger/' + window.localStorage.getItem('UserId'))
 			// 根据乘客id查询历史行程
-			_this.$axios.get('/api/tripOrder/search/findAllByPassenger?passengerId=' + userinfo.passengerId)
+			_this.$axios.get('/api/tripOrder/search/findAllByPassenger?passengerId=' + this.userinfo.passengerId)
 			// _this.$axios.get('/api/tripOrder/search/findAllByPassenger?passengerId=1')
 			.then((response) => {
 				console.log(response.data.data);
@@ -78,7 +79,7 @@
 			})
 		},
 		mounted () {
-			this.listStyle.marginTop = this.$refs.barDiv.$el.clientHeight + 'px'
+			this.listStyle.marginTop = this.$refs.barDiv.$el.clientHeight + 'px';
 		},
 		methods: {
 			goBack () {
@@ -90,7 +91,8 @@
 				setTimeout(() => {
 					this.$toast('刷新成功');
 					this.isLoading = false;
-					_this.$axios.get('/api/tripOrder/search/findAllByPassenger/1')
+					// _this.$axios.get('/api/tripOrder/search/findAllByPassenger/?passengerId=1')	// 测试
+					_this.$axios.get('/api/tripOrder/search/findAllByPassenger/?passengerId=' + this.userinfo.passengerId)
 					.then((response) => {
 						console.log(response.data.data);
 						_this.tripLists = response.data.data;
@@ -129,7 +131,7 @@
 				// 
 				console.log(this.tripLists[index]);
 				if (this.tripLists[index].orderStatus == 'PROCESSING') {
-					console.log('进入车辆行驶中的页面');
+					// 进入车辆行驶页面
 					window.localStorage.setItem('ProcessingTrip', JSON.stringify(this.tripLists[index]));
 					this.$router.push({name: 'CarDriving'})
 				} else {
@@ -149,11 +151,25 @@
 			orderStatus (index) {
 				let ts = this.tripLists[index].orderStatus;
 				if (ts == 'PAYMENT_COMPLETED') {
+					// 订单完成，且支付完成
 					return '已完成'
 				};
 				if (ts == 'PROCESSING') {
+					// 订单未完成，行车过程中
 					return '进行中'
-				}
+				};
+				if (ts == 'PROCESSING_COMPLETED') {
+					// 订单完成，但未支付车费
+					return '未支付'
+				};
+				if (ts == 'CLOSED') {
+					// 订单已关闭
+					return '已关闭'
+				};
+				if (ts == 'PAID') {
+					// 已支付
+					return '已关闭'
+				};
 			}
 		},
 		computed: {
@@ -163,10 +179,14 @@
 </script>
 
 <style scoped>
-	#all {
-		/* background: #f7f7f7 */
-		/* background: #999 */
-		background: green
+	.test {
+		color: #757575
+	}
+	.block1 {
+		background: #eee;
+		-webkit-box-shadow: #e0e0e0 0px 0px 4px 4px;
+		-moz-box-shadow: #e0e0e0 0px 0px 4px 4px;
+		box-shadow: #e0e0e0 0px 0px 4px 4px;
 	}
 </style>
 
