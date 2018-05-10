@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div :style="{height: fullHeight}" class="all">
 		<!-- <button @click="goHome"><logo id="logo" height="48px" ></logo></button> -->
 		<span @click="goHome"><logo id="logo" height="48px" ></logo></span>
 		<div id="container">
@@ -41,11 +41,13 @@
 				errorText_username: '',
 
 				dialog: false,
-				errorTips: ''
+				errorTips: '',
+				fullHeight: document.documentElement.clientHeight + 'px',
 			}
 		},
 		created () {
-			// console.log('读取Login的token：' + this.$store.state.token)
+			this.initHeight();
+			this.setMapHeight();
 		},
 		methods: {
 			goHome () {
@@ -91,12 +93,44 @@
 			},
 			closeDialog () {
 				this.dialog = false
+			},
+			initHeight () {
+				let _this = this;
+				window.onresize = function () {
+					return (()=> {
+						// 浏览器内容可视高度
+						window.fullHeight = document.documentElement.clientHeight;
+						_this.fullHeight = window.fullHeight + 'px';
+					}) ()
+				}
+			},
+			setMapHeight () {
+				this.$nextTick (() => {
+					this.fullHeight = document.documentElement.clientHeight + 'px';
+				})
+			},
+		},
+		watch: {
+		// 如果 fullHeight 发生改变，这个函数就会运行
+		fullHeight (val) {
+			if(!this.timer) {
+				this.fullHeight = val
+				this.timer = true
+				let that = this
+				setTimeout(function () {
+					that.timer = false
+				}, 1000)
 			}
+			// console.log("触发watch的fullHeight")
 		}
+	}
 	}
 </script>
 
 
 <style scoped>
 	@import url(./css/login.css);
+	.all {
+		background: #fff
+	}
 </style>

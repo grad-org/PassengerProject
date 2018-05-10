@@ -15,12 +15,15 @@
 					</div>
 				</div>
 				<!-- 有行程 -->
-				<div style=" font-size: 16px; padding: 12px 8px 8px 8px;" v-else >
-					<van-cell-group v-for="(tripList, index) in tripLists" :key="index" :border="false" style="" class="block1">
-						<van-cell :title="tripList.departureTime.slice(0, 4) + '年' + tripList.departureTime.slice(5, 7) + '月' + tripList.departureTime.slice(8, 10) + '日 ' + tripList.departureTime.slice(11, 16)" :value="orderStatus(index)" :center="true" :is-link="true" @click="itemClick(index, tripList.tripId)" style="font-size: 15px; font-weight: bold"/>
-						<van-cell :title="'出发地：'+ tripList.departure" icon="location" :center="true" :border="false" style="color: #757575"/>
-						<van-cell :title="'目的地：'+ tripList.destination" icon="location" :center="true" :border="false" style="color: #757575" />
-					</van-cell-group>
+				<div style=" font-size: 16px; padding: 8px 8px 8px 8px;" v-else >
+					<div v-for="(tripList, index) in tripLists" :key="index">
+						<van-cell-group :border="false" class="block1">
+							<van-cell :title="tripList.departureTime.slice(0, 4) + '年' + tripList.departureTime.slice(5, 7) + '月' + tripList.departureTime.slice(8, 10) + '日 ' + tripList.departureTime.slice(11, 16)" :value="orderStatus(index)" :center="true" :is-link="true" @click="itemClick(index, tripList.tripId)" style="font-size: 15px; font-weight: bold"/>
+							<van-cell :title="'出发地：'+ tripList.departure" icon="location" :center="true" :border="false" style="color: #757575"/>
+							<van-cell :title="'目的地：'+ tripList.destination" icon="location" :center="true" :border="false" style="color: #757575" />
+						</van-cell-group>
+						<div style="height: 8px"></div>
+					</div>
 				</div>
 			</van-pull-refresh>
 		</div>
