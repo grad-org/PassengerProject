@@ -61,7 +61,7 @@
 				var routePolicy = [BMAP_DRIVING_POLICY_LEAST_TIME, BMAP_DRIVING_POLICY_LEAST_DISTANCE, BMAP_DRIVING_POLICY_AVOID_HIGHWAYS];
 				// 检索完成后的回调函数
 				var searchComplete = function (results) {
-					console.log('驾车路线返回', results)
+					// console.log('驾车路线返回', results)
 					let plan = results.getPlan(0);
 					console.log('里程：', plan.getDistance(false), '米')	// false返回数值，单位米；true返回字符串
 					console.log('用时：', plan.getDuration(false), '秒')	// false返回数值，单位秒；true返回字符串
