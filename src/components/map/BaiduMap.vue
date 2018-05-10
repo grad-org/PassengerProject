@@ -53,6 +53,9 @@
 
 				// 建立连接用
 				stompClient: Stomp.over(new SockJS('http://online-ride-hailing.herokuapp.com/orh')),
+				// stompClient: null,
+				// stompStatus: false,
+				listenCarSubscription: null,
 
 				map: null,	// 指定map对象
 				BMap: null,	// 指定BMap对象
@@ -63,12 +66,20 @@
 				carLists: [],
 			}
 		},
+		// watch: {
+		// 	stompStatus (newVal, oldVal) {
+		// 		console.log('执行了侦听器')
+		// 		this.findOnlineCar();
+		// 	}
+		// },
 		created () {
-			
+			// this.stompClient = this.$store.state.stompClient;
+			// this.stompStatus = this.$store.state.stompStatus;
 		},
 		mounted () {
 			// 发现附近已上线的司机
 			this.findOnlineCar();
+			// console.log('执行了mounted')
 		},
 		methods: {
 			handler ({BMap, map}) {
@@ -77,6 +88,7 @@
 				let _this = this;	// 设置一个临时变量指向vue实例，因为在百度地图回调里使用this，指向的不是vue实例；
 				_this.map = map;	// 创建map对象，然后赋给map属性，以方便在别的方法使用，下同
 				_this.BMap = BMap;
+				// _this.findOnlineCar();
 				let rs = this.$route.params.selectStatus;	// 当选择城市，返回首页是不进行定位
 				let rs1 = this.$route.params.searchStatus;	// 判断是否从搜索地点返回
 				console.log('两个判断值：', rs, rs1)
@@ -84,7 +96,7 @@
 				if (rs == undefined && rs1 == undefined) {
 					var geolocation = new BMap.Geolocation();
 					geolocation.getCurrentPosition(function(r) {
-						console.log(r);
+						// console.log(r);
 						console.log('②自动定位');
 						_this.center = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 设置center属性值
 						_this.autoLocationPoint = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 自定义覆盖物
@@ -164,7 +176,7 @@
 				let _this = this
 				let token = window.localStorage.getItem('Token');
 
-				// 创建连接
+				// // 创建连接
 				_this.stompClient.connect(
 					// headers
 					{'Auth-Token': token},
@@ -172,7 +184,7 @@
 					function connectCallback (frame) {
 						// 需要将订阅的对象传给一个变量，否则取消订阅时会找不到订阅id
 						_this.listenCarSubscription = _this.stompClient.subscribe('/topic/hailingService/car/uploadCarLocation', function (carLocation) {
-							console.log('附近车辆返回信息',JSON.parse(carLocation.body));
+							console.log('监测附近车辆：',JSON.parse(carLocation.body));
 							let body = JSON.parse(carLocation.body);
 							if (body.message == 'uploadCarLocation') {
 								_this.carLists.push(body.data)
@@ -184,6 +196,18 @@
 						console.log('连接失败回调',error);
 					}
 				)
+				// console.log(_this.stompStatus);
+				// if (_this.stompStatus) {
+					// console.log('true时执行了findOnlineCar几次');
+					// _this.listenCarSubscription = _this.stompClient.subscribe('/topic/hailingService/car/uploadCarLocation', function (carLocation) {
+					// 	console.log('监测附近车辆：',JSON.parse(carLocation.body));
+					// 	let body = JSON.parse(carLocation.body);
+					// 	if (body.message == 'uploadCarLocation') {
+					// 		_this.carLists.push(body.data)
+					// 	}
+					// })
+				// }
+				// console.log("看看这里执行了多少次！")
 			},
 			// 取消订阅
 			closeSubscribe () {
