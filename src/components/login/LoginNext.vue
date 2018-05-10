@@ -79,8 +79,8 @@
 				_this.errorText_password = checkFormat.checkPassword(_this.value_password)
 				if (_this.errorText_password == '') {
 					_this.$axios.post("/api/auth/login",{
-						// username: "d1", 
-						// password: "d1"
+						// username: "p1", 
+						// password: "p1"
 						// username: "admin", 
 						// password: "admin"
 						username: _this.$route.params.username,
