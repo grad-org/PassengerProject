@@ -132,6 +132,7 @@
 		/* display: flex; */
 		flex-wrap: wrap;
 		margin: 0 auto;
+		background: #fff
 	}
 	.flat-button {
 		margin: 0;
