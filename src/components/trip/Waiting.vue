@@ -55,16 +55,16 @@
 						window.localStorage.removeItem('TripDetail');
 						_this.$store.state.outset = null;
 						_this.$store.state.destination = null;
-						const toast2 = Toast.loading({
+						const toast1 = Toast.loading({
 							duration: 0,
 							forbidClick: true,
-							message: '已被接单…'
+							message: '已取消订单…'
 						});
 						let second = 2;
 						const time2 = setInterval(() => {
 							second--;
 							if (second == 1) {
-								toast2.message = '已被接单…';
+								toast1.message = '已取消订单…';
 							} else {
 								clearInterval(time2);
 								Toast.clear();
