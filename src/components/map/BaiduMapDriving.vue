@@ -13,7 +13,7 @@
 			:icon = "icon"
 			:play = "play"
 			:autoView = "true"
-			:speed = "1000"
+			:speed = "3000"
 			:rotation = "true">
 		</bml-lushu>
 	</baidu-map>
@@ -47,7 +47,6 @@
 
 				map: null,	// 指定map对象
 				BMap: null,	// 指定BMap对象
-				ls_outset: null,
 				ls_processingtrip: null,
 			}
 		},
@@ -74,12 +73,14 @@
 				var routePolicy = [BMAP_DRIVING_POLICY_LEAST_TIME, BMAP_DRIVING_POLICY_LEAST_DISTANCE, BMAP_DRIVING_POLICY_AVOID_HIGHWAYS];
 				// 检索完成后的回调函数
 				var searchComplete = function (results) {
-					console.log('驾车路线返回', results)
+					console.log('驾车路线返回', results);
 					let plan = results.getPlan(0);
-					console.log('里程：', plan.getDistance(false), '米')	// false返回数值，单位米；true返回字符串
-					console.log('用时：', plan.getDuration(false), '秒')	// false返回数值，单位秒；true返回字符串
+					console.log('里程：', plan.getDistance(false), '米');	// false返回数值，单位米；true返回字符串
+					console.log('用时：', plan.getDuration(false), '秒');	// false返回数值，单位秒；true返回字符串
 					let distance = (plan.getDistance(false)/1000).toFixed(1);
 					let duration = (plan.getDuration(false)/60).toFixed(0);
+					window.localStorage.setItem('TripDistance', distance);
+					window.localStorage.setItem('TripDuration', duration);
 					_this.path = results.getPlan(0).getRoute(0).getPath();
 				};
 
