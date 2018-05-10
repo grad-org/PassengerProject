@@ -7,12 +7,12 @@
 			<div>
 				<div style="padding: 6px 0 10px 0; text-align: center; font-size: 14px; color: rgb(177, 177, 177);" @click="openBottomSheet" v-show="showTimePicker">
 					<span style="font-weight: bold" v-if="!isSelectTime">预约时间 ＞</span>
-					<span style="font-weight: bold" v-else>出行时间：{{selectTime}}</span>
+					<!-- <span style="font-weight: bold" v-else>出行时间：{{selectTime}}</span> -->
+					<span style="font-weight: bold" v-else>{{selectTime}}</span>
 				</div>
 				<mu-divider shallowInset v-show="showTimePicker"/>
 				<mu-bottom-sheet :open="bottomSheet" @close="closeBottomSheet">
 					<mu-divider shallowInset/>
-					
 					<van-datetime-picker
 						v-model = "currentDate"
 						type = "datetime"
@@ -80,7 +80,8 @@
 			}
 			// 判断是否显示预约时间
 			let ls_rt = window.localStorage.getItem('ReserveTime');
-			console.log(new Date(ls_rt))
+			ls_rt = new Date(ls_rt);
+			// console.log(new Date(ls_rt))
 			if ( ls_rt == '' || ls_rt == null || ls_rt == undefined) {
 				this.selectTime = null;
 			} else {
@@ -89,10 +90,7 @@
 					console.log('本地缓存预约时间小于当前时间，需要重新选择预约时间！');
 					window.localStorage.removeItem('ReserveTime');
 				} else {
-					let date = new Date(ls_rt).toISOString().slice(0, 10);
-					let dateTime = new Date(ls_rt).toISOString().slice(11, 16);
-					this.isSelectTime = true;
-					this.selectTime = date + ' ' + dateTime;
+					this.selectTime = ls_rt.getFullYear() + '年' + ls_rt.getMonth() + '月' + ls_rt.getDate() + '日 ' + ls_rt.getHours() + ':' + ls_rt.getMinutes();
 				}
 			}
 		},
@@ -204,16 +202,18 @@
 				this.bottomSheet = true
 			},
 			confirmSelect (val) {
-				this.isSelectTime = true;
-				this.bottomSheet = false;
-				let date = new Date(val).toISOString().slice(0, 10);
-				let dateTime = new Date(val).toISOString().slice(11, 16);
-				let dateTime2 = new Date(val).toISOString().slice(11, 19);
-				console.log(new Date(val).toISOString());
-				let rt = date + ' ' + dateTime;
-				let rt2 = date + ' ' + dateTime2;
-				this.selectTime = rt;
-				window.localStorage.setItem('ReserveTime', new Date(val));
+				// console.log('val:', val);
+				// console.log('Year:', val.getFullYear());
+				// console.log('Month:', val.getMonth());
+				// console.log('Date:', val.getDate());
+				// console.log('Hours:', val.getHours());
+				// console.log('Minutes:', val.getMinutes());
+				// console.log('Seconds:', val.getSeconds());
+				// console.log('Milliseconds:', val.getMilliseconds());
+				this.isSelectTime = true;	// 显示预约时间
+				this.bottomSheet = false;	// 收起BottomSheet
+				this.selectTime = val.getFullYear() + '年' + val.getMonth() + '月' + val.getDate() + '日 ' + val.getHours() + ':' + val.getMinutes();
+				window.localStorage.setItem('ReserveTime', val);
 			},
 			cancelSelect () {
 				this.bottomSheet = false;
@@ -227,6 +227,7 @@
 		/* display: flex; */
 		flex-wrap: wrap;
 		margin: 0 auto;
+		background: #fff
 	}
 	.raised-button {
 		margin: 12px;
