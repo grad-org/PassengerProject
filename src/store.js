@@ -14,6 +14,9 @@ const store = new Vuex.Store({
 		userId: null,
 		currentCity: null,
 
+		stompClient: null,	// stomp对象
+		stompStatus: false,	// stomp状态，用于判断是否可以订阅
+
 		// 起点、终点
 		outset: null,
 		destination: null,
@@ -53,6 +56,10 @@ const store = new Vuex.Store({
 		},
 		predictFare: (state, payload) => {
 			state.predictFare = payload
+		},
+		setStompClient: (state, payload) => {
+			state.stompClient = payload.obj
+			state.stompStatus = payload.status
 		}
 	},
 	actions: {
@@ -76,6 +83,9 @@ const store = new Vuex.Store({
 		},
 		predictFare: (context, fare) => {
 			context.commit('predictFare', fare)
+		},
+		setStompClient: (context, obj) => {
+			context.commit('setStompClient', obj)
 		}
 	}
 })
