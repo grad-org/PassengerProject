@@ -1,24 +1,38 @@
 
 <template>
 	<div>
-		<mu-appbar ref="barDiv" style="position: fixed; top: 0">
-			<mu-text-field icon="search" class="appbar-search-field" v-model="keyword" slot="left" hintText="请输入搜索关键词"/>
-			<mu-flat-button label="取消" slot="right" @click="cancal"/>
-		</mu-appbar>
+		<div ref="barDiv" style=" width: 100%; padding: 4px 0; background: #fff">
+			<form action="/">
+				<van-search
+					v-model="keyword"
+					placeholder="搜索地址..."
+					show-action
+					@search=""
+					@cancel="cancal"
+					style="background: #fff; color: red"
+				/>
+			</form>
+		</div>
+		<!-- 空的Div用于抵消padding -->
+		<div></div>
 		<div :style="listStyle">
-			<div v-if="arr == null" style="text-align: center" >
-				<h1>无搜索结果</h1>
+		
+			<div v-if="arr == null" style="text-align: center; height: 500px; line-height: 500px" >
+				<!-- <van-icon name="location" /> -->
+				<h1>{{searchResultTips}}</h1>
 			</div>
 			<!-- 若当它们处于同一节点，v-for 的优先级比 v-if 更高，这意味着 v-if 将分别重复运行于每个 v-for 循环中。想避免这情况可以将 v-if 置于外层元素 -->
 			<!-- 使用v-for时，如有warning提示：component lists rendered with v-for should have explicit keys，说明没有添加 key 属性，官方建议加上 -->
 			<div v-else>
-				<mu-list v-for="(a, index) in arr"  @itemClick="itemClick(index)" :key="index">
-					<mu-list-item  :title="a.title" :describeText="a.address" >
-						<mu-icon value="grade" slot="left" />
-						<mu-icon value="info" slot="right"/>
-					</mu-list-item>
-					<mu-divider/>
-				</mu-list>
+				<div style="padding: 8px 8px 8px 8px;">
+					<div v-for="(a, index) in arr"  :key="index">
+						<van-cell-group class="block1" >
+							<van-cell :title="a.title" is-link style="font-size: 16px; font-weight: bold" @click="itemClick(index)"/>
+							<van-cell icon="location" :title="a.address" :clickable="true" style="color: #757575" @click="itemClick(index)"/>
+						</van-cell-group>
+						<div style="height: 8px"></div>
+					</div>
+				</div>
 			</div>
 			<!-- panel="false"将搜索返回结果隐藏 -->
 			<baidu-map>
@@ -33,8 +47,19 @@
 	// 还需要考虑的问题，选择的地点是存在store.state还是localStorage
 
 	import { Toast } from 'vant'
+	import { Search } from 'vant'
+	import { Cell} from 'vant'
+	import { CellGroup } from 'vant'
+	// import { Icon } from 'vant'
 
 	export default {
+		components: {
+			[Toast.name]: Toast,
+			[Search.name]: Search,
+			[Cell.name]: Cell,
+			[CellGroup.name]: CellGroup,
+			// [Icon.name]: Icon
+		},
 		data() {
 			return {
 				keyword: '',
@@ -42,9 +67,11 @@
 					{title: '', address: '', point: ''}
 				],
 				arr: null,
+				searchResultTips: '请输入关键词进行搜索...',
 				marginTop: '',
 				listStyle: {
-					marginTop: ''
+					marginTop: '',
+					// background: '#fff'
 				},
 				// 用来判断是终点还是起点
 				placeStyle: ''
@@ -85,8 +112,8 @@
 			}
 		},
 		mounted() {
-			var temp = this.$refs.barDiv.$el.clientHeight
-			this.listStyle.marginTop = this.$refs.barDiv.$el.clientHeight + 'px'
+			var temp = this.$refs.barDiv.clientHeight
+			// this.listStyle.marginTop = this.$refs.barDiv.clientHeight + 'px'
 		},
 		computed: {
 			location () {
@@ -99,8 +126,13 @@
 			},
 			searchResult (result) {
 				if (result == null || result == undefined || result == '') {
-					console.log('无搜索结果')
-					this.arr = null
+					console.log('无搜索结果');
+					this.arr = null;
+					if (this.keyword == '' || this.keyword == null) {
+						this.searchResultTips = '请输入关键词搜索...';
+					} else {
+						this.searchResultTips = '抱歉！搜索不到(／_＼)';
+					}
 				} else {
 				this.arr = result.Br
 				}
@@ -151,6 +183,15 @@
 		.mu-text-field-focus-line {
 			background-color: #FFF;
 		}
+	}
+	.block1 {
+		background: #eee;
+		-webkit-box-shadow: #eee 0px 0px 4px 4px;
+		-moz-box-shadow: #eee 0px 0px 4px 4px;
+		box-shadow: #eee 0px 0px 4px 4px;
+	}
+	.van-search__action-text {
+		color: #000
 	}
 </style>
 
