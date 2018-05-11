@@ -91,7 +91,7 @@
 				let ls_rt = window.localStorage.getItem('ReserveTime');
 				ls_rt = new Date(ls_rt);
 				this.isSelectTime = true;
-				this.selectTime = this.selectTime = ls_rt.getFullYear() + '年' + ls_rt.getMonth() + '月' + ls_rt.getDate() + '日 ' + ls_rt.getHours() + ':' + ls_rt.getMinutes();
+				this.selectTime = this.selectTime = ls_rt.getFullYear() + '年' + (ls_rt.getMonth() + 1) + '月' + ls_rt.getDate() + '日 ' + ls_rt.getHours() + ':' + ls_rt.getMinutes();
 			}
 		},
 		mounted () {
