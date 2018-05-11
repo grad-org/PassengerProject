@@ -81,7 +81,9 @@
 			// 判断是否显示预约时间
 			let ls_rt = window.localStorage.getItem('ReserveTime');
 			ls_rt = new Date(ls_rt);
-			// console.log(new Date(ls_rt))
+			console.log(ls_rt)
+			console.log(ls_rt == '' || ls_rt == null || ls_rt == undefined)
+			console.log(new Date(ls_rt) < new Date())
 			if ( ls_rt == '' || ls_rt == null || ls_rt == undefined) {
 				this.selectTime = null;
 			} else {
@@ -90,7 +92,8 @@
 					console.log('本地缓存预约时间小于当前时间，需要重新选择预约时间！');
 					window.localStorage.removeItem('ReserveTime');
 				} else {
-					this.selectTime = ls_rt.getFullYear() + '年' + ls_rt.getMonth() + '月' + ls_rt.getDate() + '日 ' + ls_rt.getHours() + ':' + ls_rt.getMinutes();
+					this.isSelectTime = true;
+					this.selectTime = ls_rt.getFullYear() + '年' + (ls_rt.getMonth() + 1) + '月' + ls_rt.getDate() + '日 ' + ls_rt.getHours() + ':' + ls_rt.getMinutes();
 				}
 			}
 		},
@@ -212,7 +215,7 @@
 				// console.log('Milliseconds:', val.getMilliseconds());
 				this.isSelectTime = true;	// 显示预约时间
 				this.bottomSheet = false;	// 收起BottomSheet
-				this.selectTime = val.getFullYear() + '年' + val.getMonth() + '月' + val.getDate() + '日 ' + val.getHours() + ':' + val.getMinutes();
+				this.selectTime = val.getFullYear() + '年' + (val.getMonth()+1) + '月' + val.getDate() + '日 ' + val.getHours() + ':' + val.getMinutes();
 				window.localStorage.setItem('ReserveTime', val);
 			},
 			cancelSelect () {
