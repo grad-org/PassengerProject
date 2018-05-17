@@ -4,8 +4,8 @@
 				<span style="font-weight: bold">出行时间：{{selectTime}}</span>
 			</div>
 			<mu-divider shallowInset v-show="showTimePicker"/>
-			<div style="padding: 18px 0 15px 0; text-align: center; font-size: 14px;">
-				<img :src="carIcon" width="84px"/>
+			<div style="padding: 15px 0 15px 0; text-align: center; font-size: 14px;">
+				<img :src="carIcon" width="130px" height="44px"/>
 				<div style="margin-top: 6px">
 					<span class="span1">{{farePrediction}}</span>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -93,9 +93,12 @@
 				this.isSelectTime = true;
 				this.selectTime = this.selectTime = ls_rt.getFullYear() + '年' + (ls_rt.getMonth() + 1) + '月' + ls_rt.getDate() + '日 ' + ls_rt.getHours() + ':' + ls_rt.getMinutes();
 			}
+			
 		},
 		mounted () {
-
+			this.$nextTick (() => {
+				this.$emit('heightChanged', this.$refs.selectorDiv.clientHeight);
+			});
 		},
 		methods: {
 			havaDone () {
