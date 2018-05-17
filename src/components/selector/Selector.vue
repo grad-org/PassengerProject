@@ -81,15 +81,12 @@
 			// 判断是否显示预约时间
 			let ls_rt = window.localStorage.getItem('ReserveTime');
 			ls_rt = new Date(ls_rt);
-			console.log(ls_rt)
-			console.log(ls_rt == '' || ls_rt == null || ls_rt == undefined)
-			console.log(new Date(ls_rt) < new Date())
 			if ( ls_rt == '' || ls_rt == null || ls_rt == undefined) {
 				this.selectTime = null;
 			} else {
 				// 判断缓存时间是否小于当前时间
 				if (new Date(ls_rt) < new Date()) {
-					console.log('本地缓存预约时间小于当前时间，需要重新选择预约时间！');
+					// console.log('本地缓存预约时间小于当前时间，需要重新选择预约时间！');
 					window.localStorage.removeItem('ReserveTime');
 				} else {
 					this.isSelectTime = true;
@@ -101,14 +98,14 @@
 			let condition1 = this.$store.state.outset;
 			let condition2 = this.$store.state.destination;
 			if (condition1 == null) {
-				console.log('未选起点');
+				// console.log('未选起点');
 				this.btn_disabled = true
 			} else if (condition2 == null) {
-				console.log('未选终点');
+				// console.log('未选终点');
 				this.btn_disabled = true
 			} else {
 				this.btn_disabled = false
-				console.log('已选起点终点')
+				// console.log('已选起点终点')
 			}
 		},
 		computed: {
@@ -161,6 +158,7 @@
 					// 预约出行
 					if (window.localStorage.getItem('ReserveTime') == undefined || window.localStorage.getItem('ReserveTime') == null) {
 						console.log('预约时间未选');
+						this.bottomSheet = true;		//打开时间选择器
 					} else {
 						this.$router.push({path: '/confirm', name: 'ConfirmCalling'});
 						window.localStorage.removeItem('PlaceStyle');	// 删除localstorage中的搜索地点判断状态
@@ -228,8 +226,8 @@
 <style scoped>
 	.container{
 		/* display: flex; */
-		flex-wrap: wrap;
-		margin: 0 auto;
+		/* flex-wrap: wrap; */
+		margin: 0 0;
 		background: #fff
 	}
 	.raised-button {
