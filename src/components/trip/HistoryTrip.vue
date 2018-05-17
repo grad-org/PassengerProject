@@ -1,10 +1,10 @@
 <template>
-	<div >
+	<div>
 		<mu-appbar ref="barDiv" title="我的行程" style="position: fixed; top: 0">
 			<mu-icon-button icon="keyboard_arrow_left" slot="left" @click="goBack"/>
 		</mu-appbar>
-		<div :style="listStyle">	
-			<van-pull-refresh v-model="isLoading" pulling-text="下拉即可刷新..." loosing-text="释放即可刷新..." loading-text="加载中..."  @refresh="onRefresh">
+		<div :style="listStyle" >	
+			<van-pull-refresh v-model="isLoading" pulling-text="下拉即可刷新..." loosing-text="释放即可刷新..." loading-text="加载中..." @refresh="onRefresh">
 				<!-- 无行程，或者获取失败 -->
 				<div style="padding: 16px; font-size: 16px; text-align: center" v-if="!hasTrip" >
 					<div v-show="notTripTips">
@@ -51,6 +51,7 @@
 				hasTrip: true,	// 判断是否有行程
 				listStyle: {
 					marginTop: '',	// 用于判断Bar高度
+					overFlow_y: 'auto'
 				},
 				
 				// 无行程，上拉刷新
@@ -71,10 +72,15 @@
 			// _this.$axios.get('/api/tripOrder/search/findAllByPassenger/' + window.localStorage.getItem('UserId'))
 			// 根据乘客id查询历史行程
 			_this.$axios.get('/api/tripOrder/search/findAllByPassenger?passengerId=' + this.userinfo.passengerId)
-			// _this.$axios.get('/api/tripOrder/search/findAllByPassenger?passengerId=1')
+			// _this.$axios.get('/api/tripOrder/search/findAllByPassenger?passengerId=1')	//测试用
 			.then((response) => {
-				console.log(response.data.data);
+				console.log(response.data);
 				_this.tripLists = response.data.data;
+				// console.log(_this.tripLists.length)
+				if (_this.tripLists.length == 0) {
+					_this.notTripTips = true;
+					_this.serviceError = false;
+				}
 			})
 			.catch((error) => {
 				console.log(error);
@@ -88,14 +94,14 @@
 			goBack () {
 				this.$router.go(-1);
 			},
-			// 上拉刷新
+			// 下拉刷新
 			onRefresh() {
 				let _this = this;
 				setTimeout(() => {
 					this.$toast('刷新成功');
 					this.isLoading = false;
 					// _this.$axios.get('/api/tripOrder/search/findAllByPassenger/?passengerId=1')	// 测试
-					_this.$axios.get('/api/tripOrder/search/findAllByPassenger/?passengerId=' + this.userinfo.passengerId)
+					_this.$axios.get('/api/tripOrder/search/findAllByPassenger?passengerId=' + this.userinfo.passengerId)
 					.then((response) => {
 						console.log(response.data.data);
 						_this.tripLists = response.data.data;
@@ -115,7 +121,7 @@
 					})
 				}, 500);
 			},
-			// 下拉加载
+			// 上拉加载
 			onLoad() {
 				setTimeout(() => {
 					// for (let i = 0; i < 10; i++) {
@@ -133,10 +139,13 @@
 				// 先判断是否进行中，如果是点击会进入行车页面，否则进入历史行程的详细页面
 				// 
 				console.log(this.tripLists[index]);
-				if (this.tripLists[index].orderStatus == 'PROCESSING') {
+				let status = this.tripLists[index].orderStatus;		// 读取订单状态
+				if (status == 'PROCESSING') {	// 司机已通知上车，在行车中
 					// 进入车辆行驶页面
 					window.localStorage.setItem('ProcessingTrip', JSON.stringify(this.tripLists[index]));
 					this.$router.push({name: 'CarDriving'})
+				} else if (status == 'ACCEPTED') {		// 已被受理
+					alert('已被受理')
 				} else {
 					window.localStorage.setItem('HistoryTripDetail', JSON.stringify(this.tripLists[index]))
 					this.$axios.get('/api/tripOrder/' + tripId).then((response) => {
@@ -171,7 +180,11 @@
 				};
 				if (ts == 'PAID') {
 					// 已支付
-					return '已关闭'
+					return '已完成'
+				};
+				if (ts == 'ACCEPTED') {
+					// 被受理
+					return '已受理'
 				};
 			}
 		},
@@ -182,9 +195,6 @@
 </script>
 
 <style scoped>
-	.test {
-		color: #757575
-	}
 	.block1 {
 		background: #eee;
 		-webkit-box-shadow: #e0e0e0 0px 0px 4px 4px;
