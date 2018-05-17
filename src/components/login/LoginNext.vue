@@ -88,7 +88,7 @@
 						password: _this.value_password
 					})
 					.then( (response) => {
-						console.log(response);
+						console.log('登录返回：',response);
 						if (response.status == 200) {
 								_this.$store.dispatch('login', response.data.data.token)
 								const toast = Toast.loading({
@@ -96,16 +96,16 @@
 									forbidClick: true,
 									message: '登录成功…'
 								});
-									let second = 2;
-									const timer = setInterval(() => {
-										second--;
-										if (second == 1) {
-											toast.message = '前往首页…';
-										} else {
-											clearInterval(timer);
-											Toast.clear();
-											_this.$router.push({name: 'Home'})
-										}
+								let second = 2;
+								const timer = setInterval(() => {
+									second--;
+									if (second == 1) {
+										toast.message = '前往首页…';
+									} else {
+										clearInterval(timer);
+										Toast.clear();
+										_this.$router.push({name: 'Home'})
+									}
 								}, 1000);
 						}
 					})
