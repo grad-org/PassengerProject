@@ -14,12 +14,12 @@
 			:icon="{url: require('../../svg/destination.svg'), size: {width: 20, height: 31}}" :offset="{width: 0, height: -14}">
 		</bm-marker>
 	</baidu-map>
-	
 </template>
 
 <script>
 
 	import MapStyle from './js/map-style.js'
+	import { Toast } from 'vant'
 
 	export default {
 		data () {
@@ -40,9 +40,29 @@
 			this.styleJson = MapStyle.style();
 			this.ls_outset = JSON.parse(window.localStorage.getItem('Outset'))
 			this.ls_destination = JSON.parse(window.localStorage.getItem('Destination'))
-			this.center = this.ls_outset.point;
-			this.outsetPoint = this.ls_outset.point;
-			this.destinationPoint = this.ls_destination.point;
+			// 如果不存在起点和终点，则返回首页
+			if (this.ls_outset == null || this.ls_destination == null) {
+				const toast = Toast.loading({
+					duration: 0,
+					forbidClick: true,
+					message: '出现错误…'
+				});
+				let second = 2;
+				const timer = setInterval(() => {
+					second--;
+					if (second == 1) {
+						toast.message = '返回首页…';
+					} else {
+						clearInterval(timer);
+						Toast.clear();
+						this.$router.push({name: 'Home'})
+					}
+				}, 1000);
+			} else {
+				this.center = this.ls_outset.point;
+				this.outsetPoint = this.ls_outset.point;
+				this.destinationPoint = this.ls_destination.point;
+			}
 		},
 		mounted () {
 			
@@ -79,7 +99,7 @@
 					.catch((error) => {
 						console.log(error)
 						if (error.status == 400) {
-							_this.tripFare = false;
+							
 						}
 					})
 				};
