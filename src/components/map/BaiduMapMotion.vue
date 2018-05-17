@@ -62,7 +62,7 @@
 			}
 		},
 		created () {
-			let socket = new SockJS('http://online-ride-hailing.herokuapp.com/orh');
+			let socket = new SockJS(this.$serverUrl + '/orh');
 			this.stompClient = Stomp.over(socket);
 			this.styleJson = MapStyle.style();
 			this.ls_triping = JSON.parse(window.localStorage.getItem('T1'))
