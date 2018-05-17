@@ -7,8 +7,16 @@
 				</div>
 			</div>
 			<div style="text-align: center">
-				<mu-raised-button label="支付车费" class="raised-button" :backgroundColor="backgroundColor" :rippleOpacity="rippleOpacity" @click="clickButton"/>
+				<mu-raised-button label="支付车费" class="raised-button" :backgroundColor="backgroundColor" :rippleOpacity="rippleOpacity" @click="payButton"/>
 			</div>
+			<!-- <mu-bottom-sheet :open="bottomSheet" @close="closeBottomSheet" style="height: 300px">
+				<div v-html="rawHtml"></div>
+				<form>
+					<input type="text" value="" v-model="amount1" placeholder="车费">
+					<input type="text" value="" v-model="id1" placeholder="订单号">
+					<button @click="submitForm($event)">提交</button>
+				</form>
+			</mu-bottom-sheet> -->
 		</div>
 </template>
 
@@ -22,6 +30,7 @@
 	// https://segmentfault.com/a/1190000006617344#articleHeader13
 
 	import Vue from 'vue'
+	import { Toast } from 'vant'
 	import car from '../../svg/car.svg'
 	import SockJS from '../../../static/utils/sockjs.js'
 	import Stomp from 'stompjs'
@@ -30,6 +39,10 @@
 		data () {
 			return {
 				disable: false,
+				bottomSheet: false,		// 控制弹出，是否可见
+				rawHtml: null,
+				amount1: null,
+				id1: null,
 
 				// localStorage信息
 				carIcon: car,
@@ -42,26 +55,22 @@
 				stompClient: null,
 				listenOrderSubscription: null,
 
+				ls_processingtrip: null,
 				fareTips: '车费计算中...'
 			}
 		},
 		computed: {
-			// fareTips () {
-			// 	let store1 = this.$store.state.predictFare;
-			// 	if (store1 == null) {
-			// 		return '车费计算中...';
-			// 	} else {
-			// 		return '本次车费：' + store1.totalCost + '元';
-			// 	}
-			// },
+			
 		},
 		created () {
 			let _this = this;
-			let token = window.localStorage.getItem('Token');
-
+			this.ls_processingtrip = JSON.parse(window.localStorage.getItem('ProcessingTrip'));
 			// 根据订单状态判断，解决页面刷新的问题
-
-			let socket = new SockJS('http://online-ride-hailing.herokuapp.com/orh');
+		if (this.ls_processingtrip.orderStatus == 'PROCESSING_COMPLETED') {
+			this.fareTips = '请支付车费：' + this.ls_processingtrip.totalCost + '元';
+		} else {
+			let token = window.localStorage.getItem('Token');
+			let socket = new SockJS(this.$serverUrl + '/orh');
 			_this.stompClient = Stomp.over(socket);
 			// 创建连接
 			_this.stompClient.connect(
@@ -108,16 +117,66 @@
 					console.log('失败回调',error);
 				}
 			)
+		};
 		},
 		mounted () {
 
 		},
 		methods: {
-			clickButton () {
-				
+			payButton () {
+				this.amount1 = this.ls_processingtrip.totalCost;
+				this.id1 = this.ls_processingtrip.tripOrderId;
+				this.$axios.post('/api/payment/alipay/pay',
+				{
+					tripOrderId: this.ls_processingtrip.tripOrderId,
+					totalAmount: this.ls_processingtrip.totalCost
+				}
+				// {
+				// 	headers: {
+				// 		'Content-Type': 'multipart/form-data'
+				// 	}
+				// }
+				).then((response) => {
+					console.log(response);
+					console.log(response.data);
+					// this.bottomSheet = true;
+					// this.rawHtml = response.data;
+				}).catch((error) => {
+					console.log(error);
+					// if (error.status == 400) {
+					// 	alert(error.data.message)
+					// 	// this.$router.push({name: 'Home'});	// 调试用
+					// }
+				})
 			},
-			
-			
+			// closeBottomSheet () {
+			// 	this.bottomSheet = false
+			// },
+			// submitForm (event) {
+			// 	event.preventDefault();
+			// 	let formData = new FormData();
+			// 	formData.append('tripOrderId', 8);
+			// 	formData.append('totalAmount', 110.25);
+			// 	console.log(formData);
+			// 	window.localStorage.setItem('formData', JSON.stringify(formData))
+			// 	let config = {
+			// 		headers: {
+			// 			'Content-Type': 'multipart/form-data'
+			// 		}
+			// 	}
+			// 	this.$axios.post('/api/payment/alipay/pay', formData, config).then((response) => {
+			// 		console.log(response);
+			// 		console.log(response.data);
+			// 		// this.bottomSheet = true;
+			// 		// this.rawHtml = response.data;
+			// 	}).catch((error) => {
+			// 		console.log(error);
+			// 		if (error.status == 400) {
+			// 			alert(error.data.message)
+			// 			// this.$router.push({name: 'Home'});	// 调试用
+			// 		}
+			// 	})
+			// }
 		},
 		destroyed () {
 			
