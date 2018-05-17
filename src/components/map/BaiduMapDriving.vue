@@ -14,7 +14,8 @@
 			:play = "play"
 			:autoView = "true"
 			:speed = "3000"
-			:rotation = "true">
+			:rotation = "true"
+			v-if="!isCompleted">
 		</bml-lushu>
 	</baidu-map>
 	
@@ -40,7 +41,7 @@
 				// speed: null,
 				path: [],
 				icon: {
-					url: require('../../assets/image/car.png'),
+					url: require('../../svg/carmoving.svg'),
 					size: {width: 52, height: 26},
 					opts: {anchor: {width: 27, height:13}}
 				},
@@ -48,12 +49,18 @@
 				map: null,	// 指定map对象
 				BMap: null,	// 指定BMap对象
 				ls_processingtrip: null,
+				isCompleted: false,
 			}
 		},
 		created () {
 			// this.center = this.$store.state.currentCity
 			this.ls_processingtrip = JSON.parse(window.localStorage.getItem('ProcessingTrip'));
-			this.center = this.ls_processingtrip.departureLocation;
+			this.ls_processingtrip = JSON.parse(window.localStorage.getItem('ProcessingTrip'));
+			if (this.ls_processingtrip.orderStatus == 'PROCESSING_COMPLETED') {
+				this.isCompleted = true;
+			} else {
+				this.center = this.ls_processingtrip.departureLocation;
+			}
 		},
 		mounted () {
 			this.play = true;
@@ -73,10 +80,10 @@
 				var routePolicy = [BMAP_DRIVING_POLICY_LEAST_TIME, BMAP_DRIVING_POLICY_LEAST_DISTANCE, BMAP_DRIVING_POLICY_AVOID_HIGHWAYS];
 				// 检索完成后的回调函数
 				var searchComplete = function (results) {
-					console.log('驾车路线返回', results);
+					// console.log('驾车路线返回', results);
 					let plan = results.getPlan(0);
-					console.log('里程：', plan.getDistance(false), '米');	// false返回数值，单位米；true返回字符串
-					console.log('用时：', plan.getDuration(false), '秒');	// false返回数值，单位秒；true返回字符串
+					// console.log('里程：', plan.getDistance(false), '米');	// false返回数值，单位米；true返回字符串
+					// console.log('用时：', plan.getDuration(false), '秒');	// false返回数值，单位秒；true返回字符串
 					let distance = (plan.getDistance(false)/1000).toFixed(1);
 					let duration = (plan.getDuration(false)/60).toFixed(0);
 					window.localStorage.setItem('TripDistance', distance);
@@ -101,10 +108,6 @@
 					}
 				);
 				transit.search(outset1,destination1);
-			},
-			// 停止路书
-			stopLS () {
-				this.play = false;
 			},
 			getLoctionSuccess (result) {
 				console.log('result');
