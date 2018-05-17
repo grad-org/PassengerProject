@@ -53,8 +53,8 @@
 					console.log(response);
 					if (response.status == 200) {
 						window.localStorage.removeItem('TripDetail');
-						_this.$store.state.outset = null;
-						_this.$store.state.destination = null;
+						_this.$store.dispatch('setOutset', null);
+						_this.$store.dispatch('setDestination', null);
 						const toast1 = Toast.loading({
 							duration: 0,
 							forbidClick: true,
@@ -77,6 +77,7 @@
 					console.log(error);
 					if (error.status == 400) {
 						Toast('本次行程不允许取消！')
+						this.$router.push({name: 'HistoryTrip'})
 					}
 				})
 			},
@@ -84,7 +85,7 @@
 				let _this = this;
 				let token = window.localStorage.getItem('Token')
 
-				let socket = new SockJS('http://online-ride-hailing.herokuapp.com/orh');
+				let socket = new SockJS(this.$serverUrl + '/orh');
 				_this.stompClient = Stomp.over(socket);
 
 				// 创建连接
