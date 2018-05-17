@@ -1,9 +1,11 @@
 <template>
 	<!-- ready是组件加载完之后才能执行的代码 -->
-	<baidu-map class="map" :center="center" :zoom="zoom" @ready="handler" @load="loadding" :scroll-wheel-zoom="true"
+	<baidu-map class="map" :center="center" :zoom="zoom" @ready="handler" @load="loadding" :scroll-wheel-zoom="true" :inertial-dragging="true" :max-zoom="16"
 		@moveend="moveend"
 		@movestart="movestart"
+		@zoomend="zoomend"
 		:mapStyle="{styleJson: styleJson}">
+		<!-- :mapStyle="mapStyle"> -->
 		<!-- 其中bm-geolocation中的locationIcon属性要加上“:”，否则会报错！ -->
 		<bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="false" :autoLocation="false"
 			:locationIcon="{url: require('../../svg/location.svg'), size: {width: 18, height: 18}}" 
@@ -13,16 +15,30 @@
 		<bm-marker :position="autoLocationPoint"
 			:icon="{url: require('../../svg/location.svg'), size: {width: 18, height: 18}}" v-if="initLocation">
 		</bm-marker>
-		<bm-marker :position="enableSelectPoint"
+		<!-- <bm-marker :position="enableSelectPoint"
 			:icon="{url: require('../../svg/enableselect.svg'), size: {width: 14, height: 14}}">
 			<my-label :position="{lng: 110.307236, lat: 21.157355}" :text="selectAddress" :active="active"
 				@mouseover.native="active = true" @mouseleave.native="active = false">
 			</my-label>
-		</bm-marker>
+		</bm-marker> -->
 		<bm-marker :position="centerIconPoint" 
 			:icon="{url: require('../../svg/centericon.svg'), size: {width: 20, height: 31}}"
 			:offset="{width: 0, height: -14}">
 		</bm-marker>
+
+		<!-- 路书测试 -->
+		<!-- 参考：https://github.com/Dafrok/vue-baidu-map/issues/174 -->
+		<bml-lushu
+			v-for="(item, index) in list"
+			:key="index"
+			:path="item.path"
+			:rotation="true"
+			:content="item.content"
+			:infoWindow="true"
+			:speed="100"
+			:icon="icon"
+			:play="true">
+		</bml-lushu>
 	</baidu-map>
 	
 </template>
@@ -33,28 +49,79 @@
 	 * 安装stompjs: https://www.cnblogs.com/liemei/p/7064386.html
 	 */
 	import MapStyle from './js/map-style.js'
+	import Handler from './js/handler.js'
 	import MyLabel from './overlay/Label.vue'
 	import SockJS from '../../../static/utils/sockjs.js'
 	// import Stomp from '../../../static/utils/stomp.js'
 	import Stomp from 'stompjs'
+	import {BmlLushu} from 'vue-baidu-map'
 
 	export default {
 		components: {
-			MyLabel
+			MyLabel, BmlLushu
 		},
 		data () {
 			return {
 				center: this.$store.state.currentCity,
-				zoom: 15,
-				styleJson: null,
+				zoom: 16,
+				styleJson: MapStyle.style(),
+				// mapStyle: {
+				// 	styleJson: [
+				// 		{
+				// 			"featureType": "all",
+				// 			"elementType": "geometry",
+				// 			"stylers": {
+				// 				"hue": "#007fff",
+				// 				"saturation": 89
+				// 			}
+				// 		},
+				// 		{
+				// 			"featureType": "water",
+				// 			"elementType": "all",
+				// 			"stylers": {
+				// 				"color": "#ffffff"
+				// 			}
+				// 		}
+				// 	]
+				// },
+				list: [
+					{
+						path: [
+							{lng: 110.30926, lat: 21.15172},
+							{lng: 110.303442, lat: 21.151441}
+						]
+					},
+					{
+						path: [
+							{lng: 110.365067, lat: 21.257463},
+							{lng: 110.361648, lat: 21.252284}
+						]
+					},
+					{
+						path: [
+							{lng: 110.363444, lat: 21.260705},
+							{lng: 110.376604, lat: 21.259686}
+						]
+					},
+					{
+						path: [
+							{lng: 116.405, lat: 39.920},
+							{lng: 116.423493, lat: 39.907445}
+						]
+					},
+				],
+				icon: {
+					// url: 'http://api.map.baidu.com/library/LuShu/1.2/examples/car.png',
+					url: require('../../svg/carmoving.svg'),
+					size: {width: 42, height: 22},
+					opts: {anchor: {width: 21, height:11}}
+				},
 				enableSelectPoint: {lng: 110.307236, lat: 21.157355},
 				active: false,
 				selectAddress: '广东海洋大学',
 
 				// 建立连接用
-				stompClient: Stomp.over(new SockJS('http://online-ride-hailing.herokuapp.com/orh')),
-				// stompClient: null,
-				// stompStatus: false,
+				stompClient: Stomp.over(new SockJS(this.$serverUrl + '/orh')),
 				listenCarSubscription: null,
 
 				map: null,	// 指定map对象
@@ -73,8 +140,7 @@
 		// 	}
 		// },
 		created () {
-			// this.stompClient = this.$store.state.stompClient;
-			// this.stompStatus = this.$store.state.stompStatus;
+
 		},
 		mounted () {
 			// 发现附近已上线的司机
@@ -83,8 +149,6 @@
 		},
 		methods: {
 			handler ({BMap, map}) {
-				console.log('①地图加载完成');
-				this.styleJson = MapStyle.style();
 				let _this = this;	// 设置一个临时变量指向vue实例，因为在百度地图回调里使用this，指向的不是vue实例；
 				_this.map = map;	// 创建map对象，然后赋给map属性，以方便在别的方法使用，下同
 				_this.BMap = BMap;
@@ -93,20 +157,33 @@
 				let rs1 = this.$route.params.searchStatus;	// 判断是否从搜索地点返回
 				console.log('两个判断值：', rs, rs1)
 				console.log('判断结果',rs == undefined && rs1 == undefined);
+
+				// 参数分别是BMap、map、城市选择判断、搜索地点判断、
+				// let obj = Handler.handle(BMap, map, rs, rs1);
+				// console.log('obj返回', obj)
+
 				if (rs == undefined && rs1 == undefined) {
 					var geolocation = new BMap.Geolocation();
-					geolocation.getCurrentPosition(function(r) {
-						// console.log(r);
-						console.log('②自动定位');
-						_this.center = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 设置center属性值
-						_this.autoLocationPoint = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 自定义覆盖物
-						// const timer = setTimeout(function() {
-						// 	_this.centerIconPoint = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 地图中心覆盖物
-						// }, 500);
-						_this.centerIconPoint = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 地图中心覆盖物
+					geolocation.getCurrentPosition(function(result) {
+						let rs_lng = parseFloat(result.longitude);
+						let rs_lat = parseFloat(result.latitude);
+						_this.center = {lng: rs_lng, lat: rs_lat};		// 设置center属性值
+						_this.autoLocationPoint = {lng: rs_lng, lat: rs_lat};		// 自定义覆盖物
+						_this.centerIconPoint = {lng: rs_lng, lat: rs_lat};		// 地图中心覆盖物
+						
+						// 上车点
+						// jsonp跨域参考：https://www.cnblogs.com/rapale/p/7839203.html
+						// _this.$jsonp('http://api.map.baidu.com/parking/search?location=110.36506726,21.2574631&coordtype=bd09ll&ak=fZjHntKQ477LNrWlWsjEQKH3ZeVnKySz')
+						// _this.$jsonp('http://api.map.baidu.com/parking/search?location='+ rs_lng +',' + rs_lat + '&coordtype=bd09ll&ak=fZjHntKQ477LNrWlWsjEQKH3ZeVnKySz')
+						// .then((response) => {
+						// 	console.log('推荐上车点成功返回：', response);
+						// 	console.log('推荐上车点个数：', response.recommendStops.length);
+						// }).catch((error) => {
+						// 	console.log('推荐上车点失败返回', error);
+						// })
 						
 						_this.initLocation = true;
-						_this.$store.dispatch('city', r.address.city);
+						_this.$store.dispatch('city', result.address.city);
 
 						// 当定位完成，进行搜索附近位置，如果放在getCurrentPosition外面是不可以的，因为只是异步操作。
 						let geocoder = new BMap.Geocoder();
@@ -140,16 +217,22 @@
 					} else {
 						console.log('localstorage中Outset为null');
 					}
-				} 
+				}
 			},
 			loadding () {
 				// console.log("load组件加载时执行的抽象方法")
+			},
+			pickUpPoint (response) {
+				console.log('这里这里');
+				console.log(response);
 			},
 			getLoctionSuccess (result) {
 				let data = result;
 				// console.log(result)
 				let _this = this;
-				_this.zoom = 15
+				// _this.zoom = 16
+				// _this.map.setZoom(16)
+				console.log(_this.map.getZoom());
 				_this.initLocation = false;
 				_this.$store.dispatch('city', data.addressComponent.city);
 				_this.centerIconPoint = {lng: data.point.lng, lat: data.point.lat};
@@ -196,18 +279,6 @@
 						console.log('连接失败回调',error);
 					}
 				)
-				// console.log(_this.stompStatus);
-				// if (_this.stompStatus) {
-					// console.log('true时执行了findOnlineCar几次');
-					// _this.listenCarSubscription = _this.stompClient.subscribe('/topic/hailingService/car/uploadCarLocation', function (carLocation) {
-					// 	console.log('监测附近车辆：',JSON.parse(carLocation.body));
-					// 	let body = JSON.parse(carLocation.body);
-					// 	if (body.message == 'uploadCarLocation') {
-					// 		_this.carLists.push(body.data)
-					// 	}
-					// })
-				// }
-				// console.log("看看这里执行了多少次！")
 			},
 			// 取消订阅
 			closeSubscribe () {
@@ -226,9 +297,8 @@
 			},
 			// 地图移动结束时触发此事件
 			moveend ({type, target}) {
-				console.log('③移动地图');
 				let _this = this;
-				let rs = this.$route.params.searchStatus;	// 判断是否从搜索地点返回
+				// let rs = this.$route.params.searchStatus;	// 判断是否从搜索地点返回
 				
 				let lng_t = _this.map.getCenter().lng;
 				let lat_t = _this.map.getCenter().lat;
@@ -245,6 +315,21 @@
 					}
 				})
 			},
+			// 地图更改缩放级别结束时触发触发此事件
+			zoomend () {
+				let _this = this;
+				let map = _this.map;
+				console.log('覆盖物数量：', map.getOverlays().length)
+				// 获取地图级别
+				let val_zoom = map.getZoom();
+				console.log('地图级别：', val_zoom);
+				if (val_zoom < 12) {
+					// map.clearOverlays();
+					// map.getOverlays().hide();
+				} else {
+					// map.getOverlays().show();
+				}
+			}
 		},
 		destroyed () {
 			this.closeSubscribe();
