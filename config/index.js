@@ -20,7 +20,6 @@ dev: {
 		// 	}
 		// }
 	},
-
 	// Various Dev Server settings
 	// can be overwritten by process.env.HOST
 	host: '192.168.31.213',
