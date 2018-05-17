@@ -27,7 +27,7 @@
 		},
 		data () {
 			return {
-				youChoiceCityName: '请选择城市...',
+				// youChoiceCityName: '请选择城市...',
 				city: {
 					isShow: true,
 					cityData: [],
@@ -41,16 +41,16 @@
 			
 		},
 		mounted(){
-			this.city.cityData = cityList.cityData()
-			let that = this;
+			this.city.cityData = cityList.cityData();
+			let _this = this;
 			this.getCityInfo();
 			this.city.onChoose = function(res){
 				//ToDo: 选完城市后......
 				console.log(res);
-				that.city.isShow = false;
-				that.youChoiceCityName = '你选的城市是：' + res.cityName;
-				this.$store.dispatch('city', res.cityName)
-				this.$router.push({path:'/', name: 'Home', params: {selectStatus: true}});
+				_this.city.isShow = false;
+				// _this.youChoiceCityName = '你选的城市是：' + res.cityName;
+				_this.$store.dispatch('city', res.cityName)
+				_this.$router.push({path:'/', name: 'Home', params: {selectStatus: true}});
 			}
 			
 		},
