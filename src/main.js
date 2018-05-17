@@ -10,13 +10,16 @@ import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
 import 'muse-ui/dist/theme-light.css'
 import BaiduMap from 'vue-baidu-map'
+import VueJsonp from 'vue-jsonp'
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
+Vue.prototype.$serverUrl = 'http://online-ride-hailing.herokuapp.com'
 Vue.use(MuseUI)
 Vue.use(BaiduMap, {
 	ak: '8yg5IA7svz9uCGoocOMDt6PSApHhQTF7'
 })
+Vue.use(VueJsonp)
 
 /* eslint-disable no-new */
 new Vue({
