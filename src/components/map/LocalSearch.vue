@@ -1,43 +1,74 @@
 
 <template>
 	<div>
-		<div ref="barDiv" style=" width: 100%; padding: 4px 0; background: #fff">
-			<form action="/">
-				<van-search
-					v-model="keyword"
-					placeholder="搜索地址..."
-					show-action
-					@search=""
-					@cancel="cancal"
-					style="background: #fff; color: red"
-				/>
-			</form>
-		</div>
-		<!-- 空的Div用于抵消padding -->
-		<div></div>
-		<div :style="listStyle">
-		
-			<div v-if="arr == null" style="text-align: center; height: 500px; line-height: 500px" >
-				<!-- <van-icon name="location" /> -->
-				<h1>{{searchResultTips}}</h1>
+		<div v-if="citySelectorClose"> 
+			<div ref="barDiv" style="position: fixed; top: 0; width: 100%; padding: 4px 0; background: #fff">
+				<!-- <form action="/">
+					<van-search
+						v-model="keyword"
+						placeholder="搜索地址..."
+						show-action
+						@search=""
+						@cancel="cancal"
+						style="background: #fff"
+					/>
+				</form> -->
+				<mu-row >
+					<mu-col width="20" tablet="20" desktop="20">
+						<div style=" overflow: hidden; text-align: center; padding: 6px 0 6px 14px">
+							<van-button size="small" @click="openSelector" style="height: 34px; margin: -2px 0">{{location}}</van-button>
+						</div>
+					</mu-col>
+					<mu-col width="80" tablet="80" desktop="80">
+						<div style="background:#abcdef; overflow: hidden">
+							<!-- <mu-text-field hintText="提示文字"/><br/> -->
+							<form action="/">
+								<van-search
+									v-model="keyword"
+									placeholder="搜索地址..."
+									show-action
+									@search=""
+									@cancel="cancal"
+									style="background: #fff"
+								/>
+							</form>
+						</div>
+					</mu-col>
+					<!-- <mu-col width="30" tablet="20" desktop="33">
+						<div style="background: #abcdef; overflow: hidden">
+							<mu-flat-button label="取消"/>
+						</div>
+					</mu-col> -->
+				</mu-row>
 			</div>
-			<!-- 若当它们处于同一节点，v-for 的优先级比 v-if 更高，这意味着 v-if 将分别重复运行于每个 v-for 循环中。想避免这情况可以将 v-if 置于外层元素 -->
-			<!-- 使用v-for时，如有warning提示：component lists rendered with v-for should have explicit keys，说明没有添加 key 属性，官方建议加上 -->
-			<div v-else>
-				<div style="padding: 8px 8px 8px 8px;">
-					<div v-for="(a, index) in arr"  :key="index">
-						<van-cell-group class="block1" >
-							<van-cell :title="a.title" is-link style="font-size: 16px; font-weight: bold" @click="itemClick(index)"/>
-							<van-cell icon="location" :title="a.address" :clickable="true" style="color: #757575" @click="itemClick(index)"/>
-						</van-cell-group>
-						<div style="height: 8px"></div>
+			<!-- 空的Div用于抵消padding -->
+			<div></div>
+			<div :style="listStyle">
+				<div v-if="arr == null" style="text-align: center; height: 500px; line-height: 500px" >
+					<!-- <van-icon name="location" /> -->
+					<h1>{{searchResultTips}}</h1>
+				</div>
+				<!-- 若当它们处于同一节点，v-for 的优先级比 v-if 更高，这意味着 v-if 将分别重复运行于每个 v-for 循环中。想避免这情况可以将 v-if 置于外层元素 -->
+				<!-- 使用v-for时，如有warning提示：component lists rendered with v-for should have explicit keys，说明没有添加 key 属性，官方建议加上 -->
+				<div v-else>
+					<div style="padding: 8px 8px 8px 8px;">
+						<div v-for="(a, index) in arr"  :key="index">
+							<van-cell-group class="block1" >
+								<van-cell :title="a.title" is-link style="font-size: 16px; font-weight: bold" @click="itemClick(index)"/>
+								<van-cell icon="location" :title="a.address" :clickable="true" style="color: #757575" @click="itemClick(index)"/>
+							</van-cell-group>
+							<div style="height: 8px"></div>
+						</div>
 					</div>
 				</div>
+				<!-- panel="false"将搜索返回结果隐藏 -->
+				<baidu-map>
+					<bm-local-search :keyword="keyword" :auto-viewport="true" :panel="false" :location="location" :forceLocal="true" :pageCapacity="30" @searchcomplete="searchResult" ></bm-local-search>
+				</baidu-map>
 			</div>
-			<!-- panel="false"将搜索返回结果隐藏 -->
-			<baidu-map>
-				<bm-local-search :keyword="keyword" :auto-viewport="true" :panel="false" :location="location" :forceLocal="true" :pageCapacity="30" @searchcomplete="searchResult" ></bm-local-search>
-			</baidu-map>
+		</div>
+		<div v-else>
+			<city-selector-search @switchMode="closeSelector" @destinationSelect="destinationSelect($event)" @outsetSelect="outsetSelect($event)"></city-selector-search>
 		</div>
 	</div>
 </template>
@@ -50,7 +81,9 @@
 	import { Search } from 'vant'
 	import { Cell} from 'vant'
 	import { CellGroup } from 'vant'
+	import { Button } from 'vant'
 	// import { Icon } from 'vant'
+	import CitySelectorSearch from '../city/CitySelectorSearch'
 
 	export default {
 		components: {
@@ -58,28 +91,55 @@
 			[Search.name]: Search,
 			[Cell.name]: Cell,
 			[CellGroup.name]: CellGroup,
-			// [Icon.name]: Icon
+			[Button.name]: Button,
+			// [Icon.name]: Icon,
+			CitySelectorSearch,
 		},
 		data() {
 			return {
 				keyword: '',
+				location: '',
 				items: [
 					{title: '', address: '', point: ''}
 				],
 				arr: null,
 				searchResultTips: '请输入关键词进行搜索...',
-				marginTop: '',
 				listStyle: {
 					marginTop: '',
-					// background: '#fff'
 				},
 				// 用来判断是终点还是起点
-				placeStyle: ''
+				placeStyle: '',
+
+				city: {
+					isShow: false,
+					cityData: [],
+					onChoose: null,
+					localCity: {},
+					starCity: []
+				},
+				citySelectorClose: true,	// 城市选择器关闭状态
+			}
+		},
+		computed: {
+			listenLocation () {
+				if (window.localStorage.getItem('PlaceStyle') == 'destination') {
+					if (window.localStorage.getItem('TempDestinationCity') == null) {
+						console.log('终点，这里！')
+						console.log(window.localStorage.getItem('TempDestinationCity'));
+						this.location = this.$store.state.currentCity;
+					} else {
+						console.log('起点11111111111，这里！')
+						this.location = window.localStorage.getItem('TempDestinationCity');
+					}
+				} else {
+					this.location = this.$store.state.currentCity
+				}
 			}
 		},
 		created () {
 			// 当placeStyle为0时，表示起点；若为1，则为终点
 			// 加载页面先判断style是否为空？如果为空，则读取本地的PlaceStyle；若不空则读取参数
+			this.location = this.$store.state.currentCity;
 			let s = this.$route.params.style;
 			if ( s == undefined || s == null || s =='') {
 				// 判断localstorage中是否存在PlaceStyle字段，
@@ -112,13 +172,11 @@
 			}
 		},
 		mounted() {
-			var temp = this.$refs.barDiv.clientHeight
-			// this.listStyle.marginTop = this.$refs.barDiv.clientHeight + 'px'
+			this.listStyle.marginTop = this.$refs.barDiv.clientHeight + 'px';
 		},
-		computed: {
-			location () {
-				return this.$store.state.currentCity
-			}
+		destoryed () {
+			// 选择一次清空一次
+			window.localStorage.removeItem('TempDestinationCity');
 		},
 		methods: {
 			cancal () {
@@ -152,12 +210,27 @@
 					this.$store.dispatch('setOutset', {title: this.items.title, address: this.items.address, point: this.items.point});
 					window.localStorage.setItem('Outset', JSON.stringify(this.$store.state.outset));
 					this.$router.replace({path: '/', name: 'Home', params: {searchStatus: true}});
+					this.$store.dispatch('city', this.location);
 				}
 				if ( this.placeStyle == 'destination' ) {
 					this.$store.dispatch('setDestination', {title: this.items.title, address: this.items.address, point: this.items.point});
 					window.localStorage.setItem('Destination', JSON.stringify(this.$store.state.destination));
 					this.$router.replace({path: '/', name: 'Home', params: {searchStatus: true}});
 				}
+			},
+			// 打开城市选择器
+			openSelector () {
+				this.citySelectorClose = false;
+			},
+			// 关闭城市选择器
+			closeSelector () {
+				this.citySelectorClose = true;
+			},
+			destinationSelect (event) {
+				this.location = event;
+			},
+			outsetSelect(event) {
+				this.location = event;
 			}
 		}
 	}
