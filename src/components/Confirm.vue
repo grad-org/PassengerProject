@@ -31,11 +31,7 @@
 			}
 		},
 		created () {
-			// 后期需要作一个判断，如果outset、destination不存在，则会返回首页！
-			// 还要考虑刷新页面，store.state会消失导致的问题！
-			// this.ls_outset = JSON.parse(window.localStorage.getItem('Outset'));
-			// this.outsetPoint = this.ls_outset.point;
-			// this.zoom = 12
+			
 		},
 		mounted () {
 			this.initHeight();
@@ -62,6 +58,7 @@
 						_this.selectHeight = _this.$refs.selectDiv.$el.clientHeight
 						// console.log('触发onresize事件，此时地图高度为：' + this.fullHeight)
 						_this.mapHeight = (_this.fullHeight - _this.barHeight - _this.selectHeight) + 'px'
+						console.log(_this.mapHeight)
 					}) ()
 				}
 			},
@@ -71,10 +68,9 @@
 					this.selectHeight = this.$refs.selectDiv.$el.clientHeight;
 					// 页面加载后，对地图高度进行设置
 					let h = this.fullHeight - this.barHeight - this.selectHeight;
-					// console.log('地图高度：' +h)
 					this.mapHeight = h + 'px';
 				})
-			},
+			}
 		},
 		computed: {
 
