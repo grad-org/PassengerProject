@@ -7,6 +7,8 @@ import Vue from 'vue'
 // axios 配置
 axios.defaults.timeout = 2500	// 覆写库的超时默认值，现在在超时前，所有请求都会等待 2.5 秒
 axios.defaults.baseURL = 'http://online-ride-hailing.herokuapp.com/'
+// axios.defaults.baseURL = 'http://online-ride-hailing.herokuapp.com/'
+// axios.defaults.baseURL = 'http://forcar.vip:8080'
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8'
 
 // https://segmentfault.com/q/1010000011171046 发起get、post请求自动添加token
@@ -17,7 +19,6 @@ axios.interceptors.request.use(
 	config => {
 		if (store.state.token) {	// 判断是否存在token，如果存在的话，则每个http header都加上token
 			config.headers.Authorization = `Bearer ${store.state.token}`;
-			// console.log("有token");
 		}
 		return config;
 	},
@@ -37,15 +38,18 @@ axios.interceptors.response.use(
 			switch (error.response.status) {
 				case 401: 
 					// 401 清除token信息并跳转到登录界面
-					// store.commit(types.LOGOUT);
-					// router.replace({
-					// 	path: '/login',
-					// 	query: {redirect: router.currentRoute.fullPath}
-					// })
-			}
-		}
-		// console.log(JSON.stringify(error));//console : Error: Request failed with status code 402
-		return Promise.reject(error.response.data)
+					store.dispatch('logout');
+					router.replace({
+						path: '/login',
+						query: {redirect: router.currentRoute.fullPath}
+					});
+			};
+		};
+		// console.log(JSON.stringify(error));	//console : Error: Request failed with status code 402
+		// return Promise.reject(error);
+		// return Promise.reject(error.response);
+		let errorInfo = error.response.data ? error.response.data : (error.response ? error.response : error);
+		return Promise.reject(errorInfo);
 	}
 )
 
