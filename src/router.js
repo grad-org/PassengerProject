@@ -138,9 +138,9 @@ const router = new VueRouter({
 
 // 页面刷新时，重新赋值token
 if (window.localStorage.getItem('Token')) {
-	let ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'))
+	let userId = JSON.parse(window.localStorage.getItem('UserId'))
 	store.dispatch('login', window.localStorage.getItem('Token'));
-	store.dispatch('userId', ls_userinfo.userId);
+	store.dispatch('userId', userId);
 }
 
 if (window.localStorage.getItem('CurrentCity') == '' || window.localStorage.getItem('CurrentCity') == null || window.localStorage.getItem('CurrentCity') == undefined) {
