@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<mu-appbar ref="barDiv" title="我的行程" style="position: fixed; top: 0">
-			<mu-icon-button icon="keyboard_arrow_left" slot="left" @click="goBack"/>
+			<mu-icon-button icon="arrow_back" slot="left" @click="goBack"/>
 		</mu-appbar>
 		<div :style="listStyle" >	
 			<van-pull-refresh v-model="isLoading" pulling-text="下拉即可刷新..." loosing-text="释放即可刷新..." loading-text="加载中..." @refresh="onRefresh">
