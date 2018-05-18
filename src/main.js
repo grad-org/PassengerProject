@@ -11,15 +11,24 @@ import 'muse-ui/dist/muse-ui.css'
 import 'muse-ui/dist/theme-light.css'
 import BaiduMap from 'vue-baidu-map'
 import VueJsonp from 'vue-jsonp'
+import Vant from 'vant'
+import 'vant/lib/vant-css/index.css'
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
-Vue.prototype.$serverUrl = 'http://online-ride-hailing.herokuapp.com'
+/**
+ * 常用服务器地址：
+ * 1. http://forcar.vip:8080
+ * 2. http://online-ride-hailing.herokuapp.com
+ * 3. http://138.128.215.194:8080
+ */
+Vue.prototype.$serverUrl = 'http://forcar.vip:8080'
 Vue.use(MuseUI)
 Vue.use(BaiduMap, {
 	ak: '8yg5IA7svz9uCGoocOMDt6PSApHhQTF7'
 })
 Vue.use(VueJsonp)
+Vue.use(Vant)
 
 /* eslint-disable no-new */
 new Vue({
