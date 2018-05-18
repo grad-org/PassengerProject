@@ -258,7 +258,7 @@
 				// 变量
 				let _this = this
 				let token = window.localStorage.getItem('Token');
-
+				
 				// // 创建连接
 				_this.stompClient.connect(
 					// headers
