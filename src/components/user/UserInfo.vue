@@ -2,7 +2,7 @@
 <template>
 	<div>
 		<mu-appbar ref="barDiv" title="返回">
-			<mu-icon-button icon="keyboard_arrow_left" slot="left" @click="goBack"/>
+			<mu-icon-button icon="arrow_back" slot="left" @click="goBack"/>
 			<mu-flat-button label="编辑资料" slot="right" @click="goEdit"/> 
 		</mu-appbar>
 		<div ref="avaterDiv" style="margin-bottom: 12px; text-align: center">
