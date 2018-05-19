@@ -60,7 +60,7 @@
 				username: '',
 				userBackground: {
 					backgroundImage: 'url(' + require('../assets/image/bg.jpg') + ')',
-					backgroundRepeat: "no-repeat",
+					backgroundRepeat: 'no-repeat',
 					backgroundSize: "100% auto",
 				}
 			}
@@ -70,6 +70,7 @@
 			// 二次刷新页面时，根据localstorage是否存在UserInfo，来判断是否发起请求，以减少http的请求次数
 			let _this = this;
 			let ls_userinfo = null;
+			this.avater = this.$serverUrl + '/images/user/' + this.$store.state.userId + '.jpg'
 			if (typeof window.localStorage.getItem('UserInfo') === 'string') {
 				ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'));
 			} else {
@@ -91,25 +92,11 @@
 				.catch ( (error) => {
 					console.log(error);
 				})
-				// 根据用户ID获取用户头像
-				_this.$axios.get('/images/user/' + _this.$store.state.userId + '.jpg')
-				.then( (response) => {
-					console.log('获取头像返回',response)
-					if (response.status == 200) {
-						this.avater = '/images/user/' + _this.$store.state.userId + '.jpg'
-						// _this.avater = 'http://forcar.vip:8080/images/user/2.jpg'
-					}
-				})
-				.catch( (error) => {
-					// console.log(error)
-					_this.avater = avater
-				})
 			} else {
 				// localstorage已存在本地信息，不需要再发起http请求
 				// 本地缓存图片的方法还没实现，暂时头像统一采用默认头像
 				_this.nickname = ls_userinfo.nickname;
 				_this.username = ls_userinfo.username;
-				_this.avater = avater;
 			}
 		},
 		mounted() {
