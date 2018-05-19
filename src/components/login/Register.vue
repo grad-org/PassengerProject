@@ -97,16 +97,16 @@
 								forbidClick: true,
 								message: '注册成功…'
 							});
-								let second = 2;
-								const timer = setInterval(() => {
-									second--;
-									if (second == 1) {
-										toast.message = '前往登录…';
-									} else {
-										clearInterval(timer);
-										Toast.clear();
-										_this.$router.push({name: 'Login'})
-									}
+							let second = 2;
+							const timer = setInterval(() => {
+								second--;
+								if (second == 1) {
+									toast.message = '前往登录…';
+								} else {
+									clearInterval(timer);
+									Toast.clear();
+									_this.$router.push({name: 'Login'})
+								}
 							}, 1000);
 						}
 					})
