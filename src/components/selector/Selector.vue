@@ -252,11 +252,14 @@
 	}
 
 	.timeStyle button {
+		height: 30px;
+		/* line-height: 30px; */
+		/* text-align: center; */
 		margin: 6px 12px;
 		padding: 4px 16px;
 		color: #999;
-		/* border: rgb(230, 230, 230) solid 0.5px;
-		border-radius: 16px; */
+		border: rgb(255, 255, 255) solid 1px;
+		border-radius: 16px;
 		background-color: #fff
 	}
 </style>
@@ -267,9 +270,10 @@
 	.titleclass_destination {
 		color: #999
 	}
-	.active {
+	button.active {
 		color: #000 !important;
-		border: rgb(202, 202, 202) solid 0.5px;
+		/* border: rgb(202, 202, 202) solid 1px; */
+		border: rgb(230, 230, 230) solid 1px !important;
 		/* border: rgb(33, 150, 243) solid 0.5px; */
 		/* 2196f3 */
 		border-radius: 16px;
