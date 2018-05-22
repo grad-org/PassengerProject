@@ -92,7 +92,8 @@
 		},
 		methods: {
 			goBack () {
-				this.$router.go(-1);
+				// this.$router.go(-1);
+				this.$router.push({name: 'Home'});
 			},
 			// 下拉刷新
 			onRefresh() {
@@ -145,7 +146,10 @@
 					window.localStorage.setItem('ProcessingTrip', JSON.stringify(this.tripLists[index]));
 					this.$router.push({name: 'CarDriving'})
 				} else if (status == 'ACCEPTED') {		// 已被受理
-					alert('已被受理')
+					alert('已被受理');
+					window.localStorage.removeItem('TripDetail')
+					window.localStorage.setItem('T1', JSON.stringify(this.tripLists[index]));
+					this.$router.push({name: 'Progressing'});
 				} else {
 					window.localStorage.setItem('HistoryTripDetail', JSON.stringify(this.tripLists[index]))
 					this.$axios.get('/api/tripOrder/' + tripId).then((response) => {
