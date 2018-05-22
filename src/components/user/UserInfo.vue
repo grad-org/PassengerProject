@@ -32,7 +32,7 @@
 				</div>
 			</div>
 			<!-- 车主认证 -->
-			<div class="van-cell-group van-hairline--bottom">
+			<div class="van-cell-group van-hairline--bottom" @click="goApply">
 				<div class="van-cell van-hairline van-cell--clickable">
 					<mu-badge content="已认证" color="#52b4f8" style="right: 30px; position: absolute; top: 14px;" v-show="isDriver"/>
 					<div class="van-cell__title">
@@ -98,6 +98,10 @@
 			goEdit () {
 				this.$router.push({name: 'Edit'})
 			},
+			// 申请车主认证
+			goApply () {
+				this.$router.push({name: 'Welcome'});
+			},
 			initHeight () {
 				let _this = this
 				window.onresize = function () {
@@ -108,7 +112,7 @@
 						_this.avaterHeight = _this.$refs.avaterDiv.clientHeight;
 						_this.barHeight = _this.$refs.barDiv.$el.clientHeight;
 						_this.settingsHeight = (_this.fullHeight - _this.barHeight - _this.avaterHeight) + 'px';
-						console.log(_this.settingsHeight)
+						// console.log(_this.settingsHeight);
 					}) ()
 				}
 			},
@@ -117,7 +121,7 @@
 					this.barHeight = this.$refs.barDiv.$el.clientHeight;
 					this.avaterHeight = this.$refs.avaterDiv.clientHeight;
 					this.settingsHeight = (this.fullHeight - this.barHeight - this.avaterHeight) + 'px';
-					console.log(this.settingsHeight)
+					// console.log(this.settingsHeight);
 				})
 			},
 		},
