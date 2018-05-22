@@ -59,7 +59,7 @@
 	 * 如果认证回来，应该重新获取一次用户信息，用来覆盖localstorage信息，否则认证信息可能未更新！
 	 */
 	import Avater from '../../assets/image/avater.jpg'
-	import CheckFormat from './js/CheckNicknameFormat.js'
+	import CheckFormat from './js/CheckFormat.js'
 
 	export default {
 		data() {
@@ -81,7 +81,6 @@
 					marginTop: ''
 				},
 				ageStyle: {
-					// color: 'red !important'
 					// opacity: 0.9,
 					// filter:'alpha(opacity=70)',
 					// color: '#666',
