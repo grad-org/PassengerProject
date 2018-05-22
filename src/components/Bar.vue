@@ -18,8 +18,8 @@
 				<mu-list-item title="钱包">
 					<mu-icon slot="left" value="account_balance_wallet" />
 				</mu-list-item>
-				<mu-list-item title="设置">
-					<mu-icon slot="left" value="settings" />
+				<mu-list-item title="设置" @click="goSettings">
+					<mu-icon slot="left" value="settings"/>
 				</mu-list-item>
 				<mu-list-item title="客服">
 					<mu-icon slot="left" value="live_help"/>
@@ -142,7 +142,11 @@
 			},
 			goHistoryTrip () {
 				this.open_drawer = false;
-				this.$router.push({name: 'HistoryTrip'})
+				this.$router.push({name: 'HistoryTrip'});
+			},
+			goSettings () {
+				this.open_drawer = false;
+				this.$router.push({name: 'Settings'});
 			}
 		}
 	}
