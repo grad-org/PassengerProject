@@ -11,11 +11,14 @@ import Register from '@/components/login/Register'
 import CitySelector from '@/components/city/CitySelector'
 import UserInfo from '@/components/user/UserInfo'
 import Edit from '@/components/user/Edit'
+import Welcome from '@/components/user/Welcome'
+import ApplyDriver from '@/components/user/ApplyDriver'
 import LocalSearch from '@/components/map/LocalSearch'
 import Confirm from '@/components/Confirm'
 import Waiting from '@/components/trip/Waiting'
 import HistoryTrip from '@/components/trip/HistoryTrip'
 import TripDetail from '@/components/trip/TripDetail'
+import Settings from '@/components/Settings'
 import Progressing from '@/components/trip/Progressing'
 import CarDriving from '@/components/trip/CarDriving'
 
@@ -41,6 +44,22 @@ const routes = [
 			requireAuth: true
 		},
 		component: UserInfo
+	},
+	{
+		path: '/apply/driver/welcome',
+		name: 'Welcome',
+		meta: {
+			requireAuth: true
+		},
+		component: Welcome
+	},
+	{
+		path: '/apply/driver/',
+		name: 'ApplyDriver',
+		meta: {
+			requireAuth: true
+		},
+		component: ApplyDriver
 	},
 	{
 		path: '/user/edit',
@@ -117,6 +136,11 @@ const routes = [
 			requireAuth: true
 		},
 		component: TripDetail
+	},
+	{
+		path: '/settings',
+		name: 'Settings',
+		component: Settings
 	},
 	{
 		path: '/trip/car/driving',
