@@ -11,6 +11,9 @@
 
 			}
 		},
+		computed: {
+
+		},
 		created () {
 
 		},
@@ -18,9 +21,6 @@
 
 		},
 		methods: {
-
-		},
-		computed: {
 
 		}
 	}
