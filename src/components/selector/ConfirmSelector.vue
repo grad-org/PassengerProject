@@ -130,14 +130,18 @@
 					"passengerId": _this.ls_userinfo.passengerId
 				}).then((response) => {
 					// 成功返回
-					console.log(response)
-					window.localStorage.setItem('TripDetail', JSON.stringify(response.data.data));
-					window.localStorage.removeItem('Outset')	// 删除起点
-					window.localStorage.removeItem('Destination')	// 删除终点
-					_this.$store.dispatch('outset', null);		// 将状态改成null，下同
-					_this.$store.dispatch('destination', null);
-					_this.$router.push({path: '/trip/waiting', name: 'Waiting', params: {published: true}})
-				}).catch((error) => {
+					console.log(response);
+					let trip = response.data.data;
+					window.localStorage.setItem('TripDetail', JSON.stringify(trip));
+					window.localStorage.removeItem('Outset');	// 删除起点
+					window.localStorage.removeItem('Destination');	// 删除终点
+					_this.$store.dispatch('setOutset', null);		// 将状态改成null，下同
+					_this.$store.dispatch('setDestination', null);
+					// 提交发布行程
+					_this.$socket.emit('publishTrip', trip);
+					_this.$router.push({path: '/trip/waiting', name: 'Waiting', params: {published: true}});
+				})
+				.catch((error) => {
 					// post失败
 					console.log(error)
 					alert('出错！')

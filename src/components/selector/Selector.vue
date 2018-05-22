@@ -160,6 +160,7 @@
 						console.log('预约时间未选');
 						this.bottomSheet = true;		//打开时间选择器
 					} else {
+						this.$socket.off('broadcastCarLocation');
 						this.$router.push({path: '/confirm', name: 'ConfirmCalling'});
 						window.localStorage.removeItem('PlaceStyle');	// 删除localstorage中的搜索地点判断状态
 						console.log('预约时间已选');

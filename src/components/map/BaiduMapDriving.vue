@@ -8,7 +8,7 @@
 			@locationSuccess="getLoctionSuccess" @locationError="getLocationError">
 		</bm-geolocation>
 		<bml-lushu
-			@stop = "stopLS"
+			@stop = ""
 			:path = "path"
 			:icon = "icon"
 			:play = "play"
@@ -24,7 +24,7 @@
 <script>
 
 	import MapStyle from './js/map-style.js'
-	import {BmlLushu} from 'vue-baidu-map'
+	import { BmlLushu } from 'vue-baidu-map'
 
 	export default {
 		components: {
@@ -34,7 +34,7 @@
 			return {
 				center: null,
 				zoom: 12,
-				styleJson: null,
+				styleJson: MapStyle.style(),
 
 				// 路书
 				play: false,
@@ -71,7 +71,7 @@
 				let _map = map;
 				_this.map = map;	// 创建map对象，然后赋给map属性，以方便在别的方法使用，下同
 				_this.BMap = BMap;
-				_this.styleJson = MapStyle.style();
+				// _this.styleJson = MapStyle.style();
 
 				// 驾车线路类：http://lbsyun.baidu.com/cms/jsapi/reference/jsapi_reference.html#a7b16
 				let outset1 = new BMap.Point(_this.ls_processingtrip.departureLocation.lng, _this.ls_processingtrip.departureLocation.lat);

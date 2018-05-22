@@ -22,13 +22,6 @@
 
 <script>
 
-	// 基于spring websocket+sockjs实现的长连接请求
-	// 参考：https://blog.csdn.net/hzzhoushaoyu/article/details/49407835
-	// 客户端接收服务端消息推送sockjs-client的使用
-	// 参考：https://blog.csdn.net/nongshuqiner/article/details/78792079
-	// Stomp Over Websocket文档
-	// https://segmentfault.com/a/1190000006617344#articleHeader13
-
 	import Vue from 'vue'
 	import { Toast } from 'vant'
 	import car from '../../svg/car.svg'
@@ -51,9 +44,6 @@
 				rippleOpacity: 0.1,		// 按钮波纹效果的透明度
 				// predictMileage: null,	// 本次行程预估里程
 				// predictDuration: null,	// 本次行程预估时长
-				
-				stompClient: null,
-				listenOrderSubscription: null,
 
 				ls_processingtrip: null,
 				fareTips: '车费计算中...'
@@ -66,58 +56,35 @@
 			let _this = this;
 			this.ls_processingtrip = JSON.parse(window.localStorage.getItem('ProcessingTrip'));
 			// 根据订单状态判断，解决页面刷新的问题
-		if (this.ls_processingtrip.orderStatus == 'PROCESSING_COMPLETED') {
-			this.fareTips = '请支付车费：' + this.ls_processingtrip.totalCost + '元';
-		} else {
-			let token = window.localStorage.getItem('Token');
-			let socket = new SockJS(this.$serverUrl + '/orh');
-			_this.stompClient = Stomp.over(socket);
-			// 创建连接
-			_this.stompClient.connect(
-				// headers
-				{
-					'Auth-Token': token,
-				},
-				// 连接成功的回调函数
-				function connectCallback (frame) {
-					// 订阅司机到达通知
-					_this.listenOrderSubscription = _this.stompClient.subscribe('/user/queue/hailingService/tripOrder/acceptance-notification', function (trip) {
-						console.log(trip);
-						let body = JSON.parse(trip.body);
-						window.localStorage.setItem('ProcessingTrip', JSON.stringify(body.data));
-						if (body.message == 'confirmArrival') {
-							// 计算车费
-							let d1 = body.data;
-							console.log(d1)
-							_this.fareTips = '本次车费为' + d1.totalCost + '元 >'
-							// 暂时未做支付功能，先提示然后跳转到首页
-							const toast1 = Toast.loading({
-								duration: 0,
-								forbidClick: true,
-								message: '已到达'
-							});
-							let second = 2;
-							const time1 = setInterval(() => {
-								second--;
-								console.log(second);
-								if (second) {
-									toast1.message = '返回首页...';
-								} else {
-									clearInterval(time1);
-									Toast.clear();
-									this.$router.push({name: 'Home'})
-								}
-							}, 1000);
+			if (this.ls_processingtrip.orderStatus == 'PROCESSING_COMPLETED') {
+				this.fareTips = '请支付车费：' + this.ls_processingtrip.totalCost + '元';
+			} else {
+				_this.$socket.on('confirmArrival', function (tripOrder) {
+					window.localStorage.setItem('ProcessingTrip', JSON.stringify(tripOrder));
+					// 计算车费
+					_this.fareTips = '本次车费为' + tripOrder.totalCost + '元 >';
+					// 取消监听整个行车过程
+					
+					// 暂时未做支付功能，先提示然后跳转到首页
+					const toast1 = Toast.loading({
+						duration: 0,
+						forbidClick: true,
+						message: '已到达'
+					});
+					let second = 2;
+					const time1 = setInterval(() => {
+						second--;
+						console.log(second);
+						if (second) {
+							toast1.message = '返回首页...';
+						} else {
+							clearInterval(time1);
+							Toast.clear();
+							// this.$router.push({name: 'Home'})
 						}
-					})	
-				},
-				// 连接失败的回调函数
-				function errorCallback (error) {
-					console.log(error);
-					console.log('失败回调',error);
-				}
-			)
-		};
+					}, 1000);
+				});
+			};
 		},
 		mounted () {
 

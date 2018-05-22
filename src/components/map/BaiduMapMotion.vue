@@ -1,7 +1,6 @@
 <template>
 	<!-- ready是组件加载完之后才能执行的代码 -->
-	<baidu-map class="map" :center="center" :zoom="zoom" @ready="handler" :scroll-wheel-zoom="true"
-		:mapStyle="{styleJson: styleJson}">
+	<baidu-map class="map" :center="center" :zoom="zoom" @ready="handler" :scroll-wheel-zoom="true" :mapStyle="{styleJson: styleJson}">
 		<!-- 其中bm-geolocation中的locationIcon属性要加上“:”，否则会报错！ -->
 		<bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="false" :autoLocation="false"
 			:locationIcon="{url: require('../../svg/location.svg'), size: {width: 18, height: 18}}" 
@@ -14,9 +13,7 @@
 		<!-- 通知控件 -->
 		<bm-control style="width: 100%" anchor="BMAP_ANCHOR_TOP_LEFT" :offset="{width: 0, height: 0}"  v-show="seen">
 			<van-notice-bar  mode="closeable" :scrollable="true"  background="rgba(0,0,0, 0.4)" color="#fff">
-				<!-- 调试用：上赛季半决赛上恒大以两回合5-3的总比分淘汰富力。 -->
 				{{noticeContent}}
-				<!-- <span style="color: #fff">{{noticeContent}}</span> -->
 			</van-notice-bar>
 		</bm-control>
 		<bm-marker :position="driverPoint"
@@ -73,86 +70,44 @@
 		},
 		destroyed () {
 			clearTimeout(this.timer);	// 清除定时器
-			this.closeSubscribe();		// 取消订阅
-			this.disconnect();			// 关闭连接
 		},
 		methods: {
 			handler ({BMap, map}) {
 				let _this = this;	// 设置一个临时变量指向vue实例，因为在百度地图回调里使用this，指向的不是vue实例；
-				let token = window.localStorage.getItem('Token')
 				let _map = map;
 				_this.map = map;	// 创建map对象，然后赋给map属性，以方便在别的方法使用，下同
 				_this.BMap = BMap;
+				_this.subscribeCarLocation(BMap, map);	// 订阅司机位置通知
+				_this.subscribePickUpPassenger();	// 订阅乘客已上车通知
+				// 进行定位
 				var geolocation = new BMap.Geolocation();
 				geolocation.getCurrentPosition(function(r) {
 					_this.center = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 设置center属性值
 					_this.autoLocationPoint = {lng: parseFloat(r.longitude), lat: parseFloat(r.latitude)};		// 自定义覆盖物
 					_this.initLocation = true;
 					_this.$store.dispatch('city', r.address.city);
-
-					// 订阅司机的位置
-					_this.stompClient.connect(
-						// headers
-						{'Auth-Token': token},
-						function connectCallback (frame) {
-							console.log('连接成功');
-							Toast('连接成功！')
-							_this.subscribeCarLocation(BMap, map);	// 订阅司机位置通知
-							_this.subscribePickUpPassenger()	// 订阅乘客已上车通知
-						},
-						function errorCallback (error) {
-							console.log('连接失败', error);
-							Toast('连接失败！需要重新刷新页面！')
-						}
-					)
-
-
 				}, {enableHighAccuracy: true})
 			},
 			// 订阅确认上车通知
 			subscribePickUpPassenger () {
 				let _this = this;
-				_this.listenPickUpSubscription = _this.stompClient.subscribe('/user/queue/hailingService/tripOrder/acceptance-notification', function(tripOrder) {
-					console.log(tripOrder.body);
-					let body = JSON.parse(tripOrder.body);
-					if (body.message == 'pickUpPassenger') {
-						window.localStorage.removeItem('T1');	// 删除上车之前的订单信息，如果乘客上车，订单状态会改变
-						window.localStorage.setItem('ProcessingTrip', JSON.stringify(body.data));
-						_this.$router.push({name: 'CarDriving'})
-					}
+				_this.$socket.on('pickUpPassenger', function(tripOrder) {
+					console.log(tripOrder);
+					window.localStorage.removeItem('T1');	// 删除上车之前的订单信息，如果乘客上车，订单状态会改变
+					window.localStorage.setItem('ProcessingTrip', JSON.stringify(tripOrder));
+					_this.$router.push({name: 'CarDriving'});
 				})
 			},
 			// 订阅司机位置
 			subscribeCarLocation (BMap, map) {
 				let _this = this;
-				this.listenCarLocationSubscription = _this.stompClient.subscribe('/user/queue/hailingService/car/uploadCarLocation', function (carLocation) {
-					console.log(carLocation);
-					let body = JSON.parse(carLocation.body);
-					if (body.message == 'uploadCarLocation') {
-						_this.driverPoint.lng = body.data.lng;
-						_this.driverPoint.lat = body.data.lat;
-						// _this.driverPoint = {lng: body.data.lng, lat: body.data.lat};
-						_this.driverLocationSeen = true;
-						// map.getDistance(pointA,pointB)	// 测试当前位置和起点的距离
-						_this.setDriveRoute(BMap, map);	// 驾车路线
-					}
-					console.log(_this.driverPoint)
+				_this.$socket.on('receiveCarLocation', function (carLocation) {
+					console.log('订阅车主位置：', carLocation);
+					_this.driverPoint = {lng: carLocation.lng, lat: carLocation.lat};
+					_this.driverLocationSeen = true;
+					// map.getDistance(pointA,pointB)	// 测试当前位置和起点的距离
+					_this.setDriveRoute(BMap, map);	// 驾车路线
 				})
-			},
-			// 取消订阅
-			closeSubscribe () {
-				// 关闭乘客上车订阅
-				if (this.listenPickUpSubscription != null) {
-					this.listenPickUpSubscription.unsubscribe();
-				};
-				// 关闭司机位置订阅
-				if (this.listenCarLocationSubscription != null) {
-					this.listenCarLocationSubscription.unsubscribe();
-				}
-			},
-			// 关闭连接
-			disconnect () {
-				this.stompClient.disconnect();
 			},
 			// 画驾车路线（司机 → 我的位置）
 			setDriveRoute (BMap, map) {

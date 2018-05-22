@@ -64,27 +64,6 @@
 			let _this = this;
 			let ls_tripinfo = JSON.parse(window.localStorage.getItem('T1')) ;
 
-			// 获取车主相关
-			// _this.$axios.get('/api/driver/2')
-			// .then((response) => {
-			// 	console.log(response);
-			// 	// 车辆信息
-			// 	_this.carBrand = response.data.data.carDTO.brand;
-			// 	_this.carSeries = response.data.data.carDTO.series;
-			// 	_this.carColor = response.data.data.carDTO.color + ' • ';
-			// 	_this.carPlateNo = response.data.data.carDTO.plateNo;
-			// 	// 车主信息
-			// 	_this.driverName = response.data.data.drivingLicenseDTO.driverName.substr(0,1) + '师傅';
-			// 	window.localStorage.setItem('DriverInfo', JSON.stringify(response.data.data))
-			// })
-			// .catch((error) => {
-			// 	_this.carBrand = '品牌未知?';
-			// 	_this.carSeries = '';
-			// 	_this.carColor = '颜色? ';
-			// 	_this.carPlateNo = '车牌未知';
-			// 	console.log(error);
-			// })
-
 			// 从订单数据里获取车辆品牌、司机信息
 			if (ls_tripinfo.brand == null) {
 				_this.carBrand = '品牌未知?';
