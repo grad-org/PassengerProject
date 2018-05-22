@@ -13,6 +13,7 @@ import BaiduMap from 'vue-baidu-map'
 import VueJsonp from 'vue-jsonp'
 import Vant from 'vant'
 import 'vant/lib/vant-css/index.css'
+import VueSocketio from 'vue-socket.io'
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
@@ -29,6 +30,7 @@ Vue.use(BaiduMap, {
 })
 Vue.use(VueJsonp)
 Vue.use(Vant)
+Vue.use(VueSocketio, 'http://forcar.vip:8081?token='+ store.state.token + '&role=role_passenger')
 
 /* eslint-disable no-new */
 new Vue({
