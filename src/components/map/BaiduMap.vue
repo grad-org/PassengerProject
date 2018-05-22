@@ -51,9 +51,9 @@
 	import MapStyle from './js/map-style.js'
 	import Handler from './js/handler.js'
 	import MyLabel from './overlay/Label.vue'
-	import SockJS from '../../../static/utils/sockjs.js'
+	// import SockJS from '../../../static/utils/sockjs.js'
 	// import Stomp from '../../../static/utils/stomp.js'
-	import Stomp from 'stompjs'
+	// import Stomp from 'stompjs'
 	import {BmlLushu} from 'vue-baidu-map'
 
 	export default {
@@ -62,28 +62,10 @@
 		},
 		data () {
 			return {
+				socket: null,
 				center: this.$store.state.currentCity,
 				zoom: 16,
 				styleJson: MapStyle.style(),
-				// mapStyle: {
-				// 	styleJson: [
-				// 		{
-				// 			"featureType": "all",
-				// 			"elementType": "geometry",
-				// 			"stylers": {
-				// 				"hue": "#007fff",
-				// 				"saturation": 89
-				// 			}
-				// 		},
-				// 		{
-				// 			"featureType": "water",
-				// 			"elementType": "all",
-				// 			"stylers": {
-				// 				"color": "#ffffff"
-				// 			}
-				// 		}
-				// 	]
-				// },
 				list: [
 					{
 						path: [
@@ -120,10 +102,6 @@
 				active: false,
 				selectAddress: '广东海洋大学',
 
-				// 建立连接用
-				stompClient: Stomp.over(new SockJS(this.$serverUrl + '/orh')),
-				listenCarSubscription: null,
-
 				map: null,	// 指定map对象
 				BMap: null,	// 指定BMap对象
 				autoLocationPoint: {lng: 0, lat: 0},
@@ -133,18 +111,15 @@
 				carLists: [],
 			}
 		},
-		// watch: {
-		// 	stompStatus (newVal, oldVal) {
-		// 		console.log('执行了侦听器')
-		// 		this.findOnlineCar();
-		// 	}
-		// },
+		sockets: {
+			
+		},
 		created () {
-
+			
 		},
 		mounted () {
 			// 发现附近已上线的司机
-			this.findOnlineCar();
+			// this.findOnlineCar();
 			// console.log('执行了mounted')
 		},
 		methods: {
@@ -152,24 +127,22 @@
 				let _this = this;	// 设置一个临时变量指向vue实例，因为在百度地图回调里使用this，指向的不是vue实例；
 				_this.map = map;	// 创建map对象，然后赋给map属性，以方便在别的方法使用，下同
 				_this.BMap = BMap;
-				// _this.findOnlineCar();
 				let rs = this.$route.params.selectStatus;	// 当选择城市，返回首页是不进行定位
 				let rs1 = this.$route.params.searchStatus;	// 判断是否从搜索地点返回
-				console.log('两个判断值：', rs, rs1)
-				console.log('判断结果',rs == undefined && rs1 == undefined);
-
-				// 参数分别是BMap、map、城市选择判断、搜索地点判断、
-				// let obj = Handler.handle(BMap, map, rs, rs1);
-				// console.log('obj返回', obj)
+				// console.log('两个判断值：', rs, rs1)
+				// console.log('判断结果',rs == undefined && rs1 == undefined);
 
 				if (rs == undefined && rs1 == undefined) {
 					var geolocation = new BMap.Geolocation();
 					geolocation.getCurrentPosition(function(result) {
+						// 定位返回数据
 						let rs_lng = parseFloat(result.longitude);
 						let rs_lat = parseFloat(result.latitude);
-						_this.center = {lng: rs_lng, lat: rs_lat};		// 设置center属性值
-						_this.autoLocationPoint = {lng: rs_lng, lat: rs_lat};		// 自定义覆盖物
-						_this.centerIconPoint = {lng: rs_lng, lat: rs_lat};		// 地图中心覆盖物
+
+						// 设置center属性、自定义定位图标位置、地图中心点覆盖物
+						_this.center = {lng: rs_lng, lat: rs_lat};
+						_this.autoLocationPoint = {lng: rs_lng, lat: rs_lat};
+						_this.centerIconPoint = {lng: rs_lng, lat: rs_lat};
 						
 						// 上车点
 						// jsonp跨域参考：https://www.cnblogs.com/rapale/p/7839203.html
@@ -182,10 +155,12 @@
 						// 	console.log('推荐上车点失败返回', error);
 						// })
 						
+						// 自动定位成功后：显示定位图标、获取当前城市、监听司机位置
 						_this.initLocation = true;
 						_this.$store.dispatch('city', result.address.city);
+						_this.findOnlineCar();
 
-						// 当定位完成，进行搜索附近位置，如果放在getCurrentPosition外面是不可以的，因为只是异步操作。
+						// 当定位完成，进行搜索附近位置。
 						let geocoder = new BMap.Geocoder();
 						geocoder.getLocation(new BMap.Point(_this.center.lng, _this.center.lat), function(rs) {
 							if (rs.surroundingPois.length > 0) {
@@ -195,12 +170,12 @@
 								
 							}
 							// clearTimeout(timer)		// 清除定时器
-							console.log('定位附近的地点',rs.surroundingPois)
+							console.log('搜索定位附近的地点：',rs.surroundingPois)
 						})
 					}, {enableHighAccuracy: true})
 				};
+				// 搜索起（终）点返回首页时，自动定位到起点
 				if (rs1) {
-					// 搜索起（终）点返回首页时，自动定位到起点
 					let tmp1 = null;
 					if (typeof window.localStorage.getItem('Outset') === 'string') {
 						tmp1 = JSON.parse(window.localStorage.getItem('Outset'));
@@ -217,22 +192,17 @@
 					} else {
 						console.log('localstorage中Outset为null');
 					}
+					// 调用函数，订阅司机位置
+					_this.findOnlineCar();
 				}
 			},
 			loadding () {
 				// console.log("load组件加载时执行的抽象方法")
 			},
-			pickUpPoint (response) {
-				console.log('这里这里');
-				console.log(response);
-			},
 			getLoctionSuccess (result) {
 				let data = result;
-				// console.log(result)
 				let _this = this;
-				// _this.zoom = 16
-				// _this.map.setZoom(16)
-				console.log(_this.map.getZoom());
+				// console.log(_this.map.getZoom());
 				_this.initLocation = false;
 				_this.$store.dispatch('city', data.addressComponent.city);
 				_this.centerIconPoint = {lng: data.point.lng, lat: data.point.lat};
@@ -252,43 +222,39 @@
 			getLocationError () {
 				alert("获取位置失败，请重试！")
 			},
-
-			// 用来订阅司机
+			// 查找附近车辆
 			findOnlineCar () {
-				// 变量
-				let _this = this
-				let token = window.localStorage.getItem('Token');
-				
-				// // 创建连接
-				_this.stompClient.connect(
-					// headers
-					{'Auth-Token': token},
-					// 连接成功的回调函数
-					function connectCallback (frame) {
-						// 需要将订阅的对象传给一个变量，否则取消订阅时会找不到订阅id
-						_this.listenCarSubscription = _this.stompClient.subscribe('/topic/hailingService/car/uploadCarLocation', function (carLocation) {
-							console.log('监测附近车辆：',JSON.parse(carLocation.body));
-							let body = JSON.parse(carLocation.body);
-							if (body.message == 'uploadCarLocation') {
-								_this.carLists.push(body.data)
-							}
-						})
-					},
-					// 连接失败的回调函数
-					function errorCallback (error) {
-						console.log('连接失败回调',error);
-					}
-				)
-			},
-			// 取消订阅
-			closeSubscribe () {
-				if (this.listenCarSubscription != null) {
-					this.listenCarSubscription.unsubscribe();
+				// SockJS 连接方法
+				let useless = function () {
+					// // 变量
+					// let _this = this
+					// let token = window.localStorage.getItem('Token');
+					// let socket = new SockJS(this.$serverUrl + '/orh');
+					// let stompClient = Stomp.over(socket);
+					// // // 创建连接
+					// _this.stompClient.connect(
+					// 	// headers
+					// 	{'Auth-Token': token},
+					// 	// 连接成功的回调函数
+					// 	function connectCallback (frame) {
+					// 		// 需要将订阅的对象传给一个变量，否则取消订阅时会找不到订阅id
+					// 		_this.listenCarSubscription = _this.stompClient.subscribe('/topic/hailingService/car/uploadCarLocation', function (carLocation) {
+					// 			console.log('监测附近车辆：',JSON.parse(carLocation.body));
+					// 			let body = JSON.parse(carLocation.body);
+					// 			if (body.message == 'uploadCarLocation') {
+					// 				_this.carLists.push(body.data)
+					// 			}
+					// 		})
+					// 	},
+					// 	// 连接失败的回调函数
+					// 	function errorCallback (error) {
+					// 		console.log('连接失败回调',error);
+					// 	}
+					// )
 				}
-			},
-			// 关闭连接
-			disconnect () {
-				this.stompClient.disconnect()
+				this.$socket.on('broadcastCarLocation', function(carLocation) {
+					console.log('监听到附近的车辆：',carLocation)
+				})
 			},
 			// 地图移动开始时触发此事件
 			movestart ({type, target}) {
@@ -319,10 +285,10 @@
 			zoomend () {
 				let _this = this;
 				let map = _this.map;
-				console.log('覆盖物数量：', map.getOverlays().length)
+				// console.log('覆盖物数量：', map.getOverlays().length)
 				// 获取地图级别
 				let val_zoom = map.getZoom();
-				console.log('地图级别：', val_zoom);
+				// console.log('地图级别：', val_zoom);
 				if (val_zoom < 12) {
 					// map.clearOverlays();
 					// map.getOverlays().hide();
@@ -332,8 +298,7 @@
 			}
 		},
 		destroyed () {
-			this.closeSubscribe();
-			this.disconnect();
+			this.$socket.off('broadcastCarLocation');
 		}
 	}
 </script>
