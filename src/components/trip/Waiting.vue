@@ -19,9 +19,6 @@
 		data () {
 			return {
 				ls_tripdetail: null,
-				// 建立连接用
-				stompClient: null,
-				listenOrderSubscription: null,
 			}
 		},
 		created () {
@@ -33,15 +30,12 @@
 				let redirect = decodeURIComponent(this.$route.query.redirect || '/');
 				this.$router.push({path: redirect})
 			}
-			this.checkOrder();
 		},
 		mounted () {
-			
+			this.checkOrder();
 		},
 		destotyed () {
 			window.localStorage.removeItem('TripDetail');	// 删除发布行程返回的数据
-			this.closeSubscription();
-			this.disconnect();
 		},
 		methods: {
 			cancelTrip () {
@@ -55,6 +49,11 @@
 						window.localStorage.removeItem('TripDetail');
 						_this.$store.dispatch('setOutset', null);
 						_this.$store.dispatch('setDestination', null);
+
+						let trip = response.data.data;
+						_this.$socket.emit('cancelTrip', trip);
+
+						// 跳转动画
 						const toast1 = Toast.loading({
 							duration: 0,
 							forbidClick: true,
@@ -83,55 +82,27 @@
 			},
 			checkOrder () {
 				let _this = this;
-				let token = window.localStorage.getItem('Token')
-
-				let socket = new SockJS(this.$serverUrl + '/orh');
-				_this.stompClient = Stomp.over(socket);
-
-				// 创建连接
-				_this.stompClient.connect(
-					// headers
-					{'Auth-Token': token},
-					// 连接成功的回调函数
-					function connectCallback (frame) {
-						_this.listenOrderSubscription = _this.stompClient.subscribe('/user/queue/hailingService/tripOrder/acceptance-notification', function (tripOrder) {
-							console.log(tripOrder.body);
-							let body = JSON.parse(tripOrder.body);
-							if (body.message == 'acceptTripOrder') {
-								window.localStorage.setItem('T1', JSON.stringify(body.data));
-								const toast2 = Toast.loading({
-									duration: 0,
-									forbidClick: true,
-									message: '司机已接单…'
-								});
-								let second = 2;
-								const time2 = setInterval(() => {
-									second--;
-									if (second == 1) {
-										toast2.message = '司机已接单…';
-									} else {
-										clearInterval(time2);
-										Toast.clear();
-										_this.$router.push({name: 'Progressing'});
-									}
-								}, 1000);
-							}
-						})
-					},
-					// 连接失败的回调函数
-					function errorCallback (error) {
-						console.log(error);
-						console.log('失败回调',error);
-					}
-				)
-			},
-			closeSubscription () {
-				if (this.listenOrderSubscription != null) {
-					this.listenOrderSubscription.unsubscribe();
-				}
-			},
-			disconnect () {
-				this.stompClient.disconnect();
+				_this.$socket.on('acceptTrip', function (tripOrder) {
+					console.log('车主接单返回：', tripOrder);
+					window.localStorage.removeItem('TripDetail');
+					window.localStorage.setItem('T1', JSON.stringify(tripOrder));
+					const toast2 = Toast.loading({
+						duration: 0,
+						forbidClick: true,
+						message: '司机已接单…'
+					});
+					let second = 2;
+					const time2 = setInterval(() => {
+						second--;
+						if (second == 1) {
+							toast2.message = '司机已接单…';
+						} else {
+							clearInterval(time2);
+							Toast.clear();
+							_this.$router.push({name: 'Progressing'});
+						}
+					}, 1000);
+				})
 			}
 		},
 		computed: {
