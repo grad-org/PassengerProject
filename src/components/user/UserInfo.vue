@@ -34,14 +34,16 @@
 			<!-- 车主认证 -->
 			<div class="van-cell-group van-hairline--bottom" @click="goApply">
 				<div class="van-cell van-hairline van-cell--clickable">
-					<mu-badge content="已认证" color="#52b4f8" style="right: 30px; position: absolute; top: 14px;" v-show="isDriver"/>
+					<mu-badge content="已认证" color="#5aa479" style="right: 30px; position: absolute; top: 14px;" v-show="isDriverApproved"/>
+					<mu-badge content="审核中" color="#52b4f8" style="right: 30px; position: absolute; top: 14px;" v-show="isDriverPendingReview"/>
+					<mu-badge content="未通过" color="#ff4444" style="right: 30px; position: absolute; top: 14px;" v-show="isDriverUnapproved"/>
 					<div class="van-cell__title">
 						<i class="van-icon van-icon-shop"></i>
 						<span class="van-cell__text">车主认证</span>
 						<span class="van-tag van-hairline--surround van-tag--danger">认证车主，享更多优惠</span>
 						<i class="van-icon van-cell__right-icon van-icon-arrow icon-cover"></i>
 					</div>
-					<div class="van-cell__value van-cell__value--link link-color-cover" v-show="!isDriver">
+					<div class="van-cell__value van-cell__value--link link-color-cover" v-show="isDriverUnapply">
 						<span>去申请</span>
 					</div>
 				</div>
@@ -55,6 +57,7 @@
 	 * 设置背景图片，参考：https://blog.csdn.net/woyidingshijingcheng/article/details/72903800
 	 */
 	import avater from '../../assets/image/avater.jpg'
+	import { Toast } from 'vant'
 
 	export default {
 		data() {
@@ -63,8 +66,12 @@
 				nickname: '',
 				username: '',
 				ls_userinfo: '',
-				isDriver: false,	// 是否已认证车主
+				isDriverUnapply: true,	// 未申请车主认证
+				isDriverApproved: false,	// 车主认证成功
+				isDriverPendingReview: false,	// 车主认证审核中
+				isDriverUnapproved: false,	// 车主认证未通过
 				isVerified: false,	// 是否已实名认证
+				driverStatus: 'unapply',	// 用于判断是否能否前往认证车主
 
 				// 组件高度控制
 				fullHeight: document.documentElement.clientHeight,
@@ -81,8 +88,37 @@
 			_this.avater = this.$serverUrl + '/images/user/' + this.$store.state.userId + '.jpg';
 			// 根据是否存在driverId，判断是否已认证车主
 			if (_this.ls_userinfo.driverId == null || _this.ls_userinfo.driverId == '' || _this.ls_userinfo.driverId == undefined) {
-				_this.isDriver = false;
+				_this.isDriverUnapply = true;
 			} else {
+				let driverId = _this.ls_userinfo.driverId;
+				_this.$axios.get('/api/driver/' + driverId).then(
+					(response) => {
+						console.log('获取车主资料返回数据：', response);
+						let status = response.data.data.driverStatus;	// 获取当前认证车主的状态
+						if (status == 'PENDING_REVIEW') {
+							_this.isDriverUnapply = false;
+							_this.isDriverApproved = false;
+							_this.isDriverPendingReview = true;		// 认证审核中
+							_this.isDriverUnapproved = false;
+							_this.driverStatus = 'pendingReview';
+						} else if (status == 'UNAPPROVED') {
+							_this.isDriverUnapply = false;
+							_this.isDriverApproved = false;
+							_this.isDriverPendingReview = false;
+							_this.isDriverUnapproved = true;		// 认证未通过
+							_this.driverStatus = 'unapproved';
+						} else {
+							_this.isDriverUnapply = false;
+							_this.isDriverApproved = true;		// 认证通过
+							_this.isDriverPendingReview = false;
+							_this.isDriverUnapproved = false;
+							_this.driverStatus = 'approved';
+						}
+					}
+				).catch((error) => {
+						console.log('获取车主资料错误返回：', error);
+						alert('获取信息错误，请重新刷新');
+				});
 				_this.isDriver = true;
 			}
 			this.initHeight();
@@ -95,17 +131,28 @@
 			goBack () {
 				this.$router.push({name: 'Home'});
 			},
+			// 更新资料
 			goEdit () {
-				this.$router.push({name: 'Edit'})
+				this.$router.push({name: 'Edit'});
 			},
 			// 申请车主认证
 			goApply () {
-				this.$router.push({name: 'Welcome'});
+				console.log(this.driverStatus == 'unapply' || this.driverStatus == 'unapproved');
+				if (this.driverStatus == 'unapply' || this.driverStatus == 'unapproved') {
+					// 未申请认证或未通过
+					this.$router.push({name: 'Welcome'});
+				} else if (this.driverStatus == 'pendingReview') {
+					// 审核中
+					Toast('已提交申请，正在审核中...');
+				} else {
+					// 审核通过
+					Toast('已通过车主认证！');
+				}
 			},
 			initHeight () {
 				let _this = this
 				window.onresize = function () {
-					return ( ()=> {
+					return (()=> {
 						// 浏览器内容可视高度
 						window.fullHeight = document.documentElement.clientHeight;
 						_this.fullHeight = window.fullHeight;
