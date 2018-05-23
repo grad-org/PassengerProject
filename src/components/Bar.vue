@@ -25,7 +25,7 @@
 					<mu-icon slot="left" value="live_help"/>
 				</mu-list-item>
 				<mu-list-item title="退出" @click="logout">
-					<mu-icon slot="left" value="close"/>
+					<mu-icon slot="left" value="exit_to_app"/>
 				</mu-list-item>
 			</mu-list>
 		</mu-drawer>
