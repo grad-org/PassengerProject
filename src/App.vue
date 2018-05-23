@@ -14,6 +14,9 @@
 		sockets: {
 			connect: function () {
 				console.log('WebSocket连接成功了，ID是：', this.$socket.id);
+			},
+			disconnect: function () {
+				console.log('WebSocket连接失败！')
 			}
 		}
 	}
