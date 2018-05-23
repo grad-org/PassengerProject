@@ -226,20 +226,6 @@
 					Toast('请保证信息完整！');
 				} else {
 					this.$axios.post('/api/driver/certifyDriver',
-					// {
-					// 	'userId': tmp_u_id,
-					// 	'driverLicense.driverName': tmp_r_n,
-					// 	'drivingLicense.identification': tmp_id_n,
-					// 	'drivingLicense.issueDate': tmp_init_d,
-					// 	'drivingLicense.drivingLicenseImage': tmp_d_p,
-					// 	'vehicleLicense.owner': tmp_o,
-					// 	'vehicleLicense.registerDate': tmp_r_d,
-					// 	'vehicleLicense.vehicleLicenseImage': tmp_v_p,
-					// 	'car.plateNo': tmp_c_p,
-					// 	'car.brand': tmp_c_b,
-					// 	'car.series': tmp_c_s,
-					// 	'car.color': tmp_c_c
-					// }
 					{
 						userId: tmp_u_id,
 						drivingLicense: {
@@ -263,7 +249,18 @@
 					).then((response) => {
 						console.log('申请车主认证返回：', response);
 						if (response.status == 200) {
-							this.$router.push({name: 'User'})
+							// 提交申请成功，重新获取用户信息
+							this.$axios.get('/api/auth/user')
+							.then( (response) => {
+								console.log('获取用户信息返回数据：', response);
+								if (response.status == 200) {
+									window.localStorage.setItem('UserInfo' ,JSON.stringify(response.data.data));
+									this.$router.push({name: 'User'});
+								}
+							})
+							.catch ( (error) => {
+								console.log(error);
+							})
 						}
 					}).catch((error) => {
 						console.log(error);
