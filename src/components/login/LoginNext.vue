@@ -80,10 +80,6 @@
 				_this.errorText_password = checkFormat.checkPassword(_this.value_password)
 				if (_this.errorText_password == '') {
 					_this.$axios.post("/api/auth/login",{
-						// username: "p1", 
-						// password: "p1"
-						// username: "admin", 
-						// password: "admin"
 						username: _this.$route.params.username,
 						password: _this.value_password
 					})
@@ -104,7 +100,8 @@
 									} else {
 										clearInterval(timer);
 										Toast.clear();
-										_this.$router.push({name: 'Home'})
+										_this.$router.push({name: 'Home'});
+										window.location.reload();	// 页面重新加载
 									}
 								}, 1000);
 						}
