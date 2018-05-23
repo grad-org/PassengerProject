@@ -4,11 +4,11 @@
 		<mu-drawer :width="width" :zDepth="zDepth" :open="open_drawer" :docked="docked" @close="toggle()">
 
 			<div class="user-info" :style="userBackground">
-				<mu-paper class="paper" circle :zDepth="2" >
+				<mu-paper class="paper" circle :zDepth="1" >
 					<img :src="avater" style="width: 100%; height: 100%"/>
 				</mu-paper>
 				<mu-list-item :title="nickname" :describeText="username" @click="goUserInfo">
-					<mu-icon value="info" slot="right" color="#333"/>
+					<mu-icon value="portrait" slot="right" color="#333"/>
 				</mu-list-item>
 			</div>
 			<mu-list>
@@ -59,9 +59,10 @@
 				nickname: '',
 				username: '',
 				userBackground: {
-					backgroundImage: 'url(' + require('../assets/image/bg.jpg') + ')',
+					backgroundImage: 'url(' + require('../assets/image/bg4.jpg') + ')',
 					backgroundRepeat: 'no-repeat',
-					backgroundSize: "100% auto",
+					backgroundPosition: 'center',
+					backgroundSize: "cover",
 				}
 			}
 		},
