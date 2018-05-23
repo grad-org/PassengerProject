@@ -27,7 +27,7 @@
 			}
 		},
 		created () {
-			console.log('路由中的tripId是：', this.$route.params.tripId)
+			console.log('路由中的tripOrderId是：', this.$route.params.tripOrderId)
 		},
 		mounted () {
 			this.initHeight()
