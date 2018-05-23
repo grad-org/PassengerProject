@@ -49,7 +49,6 @@
 				hasTrip: true,	// 判断是否有行程
 				listStyle: {
 					marginTop: '',	// 用于判断Bar高度
-					overFlow_y: 'auto'
 				},
 				
 				// 无行程，上拉刷新
