@@ -9,19 +9,14 @@
 			<div style="text-align: center">
 				<mu-raised-button label="支付车费" class="raised-button" :backgroundColor="backgroundColor" :rippleOpacity="rippleOpacity" @click="payButton"/>
 			</div>
-			<!-- <mu-bottom-sheet :open="bottomSheet" @close="closeBottomSheet" style="height: 300px">
-				<div v-html="rawHtml"></div>
-				<form>
-					<input type="text" value="" v-model="amount1" placeholder="车费">
-					<input type="text" value="" v-model="id1" placeholder="订单号">
-					<button @click="submitForm($event)">提交</button>
-				</form>
-			</mu-bottom-sheet> -->
 		</div>
 </template>
 
 <script>
 
+	/**
+	 * 支付宝链接嵌入参考：https://segmentfault.com/q/1010000010377953/a-1020000010379509
+	 */
 	import Vue from 'vue'
 	import { Toast } from 'vant'
 	import car from '../../svg/car.svg'
@@ -32,8 +27,6 @@
 		data () {
 			return {
 				disable: false,
-				bottomSheet: false,		// 控制弹出，是否可见
-				rawHtml: null,
 				amount1: null,
 				id1: null,
 
@@ -53,16 +46,26 @@
 			
 		},
 		created () {
+			
+		},
+		mounted () {
 			let _this = this;
 			this.ls_processingtrip = JSON.parse(window.localStorage.getItem('ProcessingTrip'));
 			// 根据订单状态判断，解决页面刷新的问题
 			if (this.ls_processingtrip.orderStatus == 'PROCESSING_COMPLETED') {
 				this.fareTips = '请支付车费：' + this.ls_processingtrip.totalCost + '元';
+				this.amount1 = this.ls_processingtrip.totalCost;
+				this.id1 = this.ls_processingtrip.tripOrderId;
 			} else {
 				_this.$socket.on('confirmArrival', function (tripOrder) {
+					console.log('有监听到？？？？？？');
+					console.log('监听返回的tripOrder：', tripOrder);
 					window.localStorage.setItem('ProcessingTrip', JSON.stringify(tripOrder));
 					// 计算车费
 					_this.fareTips = '本次车费为' + tripOrder.totalCost + '元 >';
+					// 支付所需提供的参数
+					_this.amount1 = tripOrder.totalCost;
+					_this.id1 = tripOrder.tripOrderId;
 					// 取消监听整个行车过程
 					
 					// 暂时未做支付功能，先提示然后跳转到首页
@@ -74,7 +77,6 @@
 					let second = 2;
 					const time1 = setInterval(() => {
 						second--;
-						console.log(second);
 						if (second) {
 							toast1.message = '返回首页...';
 						} else {
@@ -86,28 +88,21 @@
 				});
 			};
 		},
-		mounted () {
-
-		},
 		methods: {
 			payButton () {
-				this.amount1 = this.ls_processingtrip.totalCost;
-				this.id1 = this.ls_processingtrip.tripOrderId;
 				this.$axios.post('/api/payment/alipay/pay',
 				{
-					tripOrderId: this.ls_processingtrip.tripOrderId,
-					totalAmount: this.ls_processingtrip.totalCost
+					tripOrderId: this.id1,
+					totalAmount: this.amount1
 				}
-				// {
-				// 	headers: {
-				// 		'Content-Type': 'multipart/form-data'
-				// 	}
-				// }
 				).then((response) => {
 					console.log(response);
 					console.log(response.data);
-					// this.bottomSheet = true;
-					// this.rawHtml = response.data;
+					window.localStorage.removeItem('ProcessingTrip');
+					const div = document.createElement('div');	// 创建div
+					div.innerHTML = response.data;				// 将返回的form 放入div
+					document.body.appendChild(div);
+					document.forms[0].submit();
 				}).catch((error) => {
 					console.log(error);
 					// if (error.status == 400) {
@@ -115,35 +110,7 @@
 					// 	// this.$router.push({name: 'Home'});	// 调试用
 					// }
 				})
-			},
-			// closeBottomSheet () {
-			// 	this.bottomSheet = false
-			// },
-			// submitForm (event) {
-			// 	event.preventDefault();
-			// 	let formData = new FormData();
-			// 	formData.append('tripOrderId', 8);
-			// 	formData.append('totalAmount', 110.25);
-			// 	console.log(formData);
-			// 	window.localStorage.setItem('formData', JSON.stringify(formData))
-			// 	let config = {
-			// 		headers: {
-			// 			'Content-Type': 'multipart/form-data'
-			// 		}
-			// 	}
-			// 	this.$axios.post('/api/payment/alipay/pay', formData, config).then((response) => {
-			// 		console.log(response);
-			// 		console.log(response.data);
-			// 		// this.bottomSheet = true;
-			// 		// this.rawHtml = response.data;
-			// 	}).catch((error) => {
-			// 		console.log(error);
-			// 		if (error.status == 400) {
-			// 			alert(error.data.message)
-			// 			// this.$router.push({name: 'Home'});	// 调试用
-			// 		}
-			// 	})
-			// }
+			}
 		},
 		destroyed () {
 			
