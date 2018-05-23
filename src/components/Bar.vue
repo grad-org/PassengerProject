@@ -71,9 +71,9 @@
 			// 二次刷新页面时，根据localstorage是否存在UserInfo，来判断是否发起请求，以减少http的请求次数
 			let _this = this;
 			let ls_userinfo = null;
-			this.avater = this.$serverUrl + '/images/user/' + this.$store.state.userId + '.jpg'
 			if (typeof window.localStorage.getItem('UserInfo') === 'string') {
 				ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'));
+				this.avater = this.$serverUrl + '/images/user/' + ls_userinfo.userId + '.jpg';
 			} else {
 				ls_userinfo = window.localStorage.getItem('UserInfo');
 			}
@@ -82,12 +82,14 @@
 				_this.$axios.get('/api/auth/user')
 				.then( (response) => {
 					console.log(response);
+					console.log('执行到哪33333')
 					if (response.status == 200) {
 						_this.$store.dispatch('userId', response.data.data.userId);
 						_this.nickname = response.data.data.nickname;
 						_this.username = response.data.data.username;
 						// JSON.stringify() 将JSON对象转化成字符串  
 						window.localStorage.setItem('UserInfo' ,JSON.stringify(response.data.data));
+						_this.avater = this.$serverUrl + '/images/user/' + response.data.data.userId + '.jpg';
 					}
 				})
 				.catch ( (error) => {
