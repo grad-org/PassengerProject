@@ -12,8 +12,6 @@
 <script>
 
 	import { Toast } from 'vant'
-	import SockJS from '../../../static/utils/sockjs.js'
-	import Stomp from 'stompjs'
 
 	export default {
 		data () {
@@ -28,7 +26,7 @@
 				this.ls_tripdetail = window.localStorage.getItem('TripDetail');
 				// this.$router.push({name: 'Home'});
 				let redirect = decodeURIComponent(this.$route.query.redirect || '/');
-				this.$router.push({path: redirect})
+				this.$router.push({path: redirect});
 			}
 		},
 		mounted () {
