@@ -119,7 +119,6 @@
 						console.log('获取车主资料错误返回：', error);
 						alert('获取信息错误，请重新刷新');
 				});
-				_this.isDriver = true;
 			}
 			this.initHeight();
 			this.setSetttingsHeight();
