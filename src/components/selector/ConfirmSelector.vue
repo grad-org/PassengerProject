@@ -81,6 +81,32 @@
 				// predictDuration: null,	// 本次行程预估时长
 			}
 		},
+		computed: {
+			farePrediction () {
+				let store1 = this.$store.state.predictFare;
+				if (store1 == null) {
+					return '车费预估中...';
+				} else {
+					return '车费预估：' + store1.totalCost + '元';
+				}
+			},
+			predictMileage () {
+				let store2 = this.$store.state.predictFare;
+				if (store2 == null) {
+					return '...';
+				} else {
+					return this.$store.state.predictFare.mileage;
+				}
+			},
+			predictDuration () {
+				let store3 = this.$store.state.predictFare;
+				if (store3 == null) {
+					return '...';
+				} else {
+					return this.$store.state.predictFare.duration;
+				}
+			}
+		},
 		created () {
 			this.ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'));
 			this.ls_trip_outset = JSON.parse(window.localStorage.getItem('Outset'));
@@ -105,7 +131,6 @@
 				// 变量
 				let _this = this;
 				let token = window.localStorage.getItem('Token');
-				let userId = 7
 
 				// 发布行程
 				// 判断出行方式，进而决定出行时间是否为null
@@ -166,32 +191,6 @@
 				})
 			}
 		},
-		computed: {
-			farePrediction () {
-				let store1 = this.$store.state.predictFare;
-				if (store1 == null) {
-					return '车费预估中...';
-				} else {
-					return '车费预估：' + store1.totalCost + '元';
-				}
-			},
-			predictMileage () {
-				let store2 = this.$store.state.predictFare;
-				if (store2 == null) {
-					return '...';
-				} else {
-					return this.$store.state.predictFare.mileage;
-				}
-			},
-			predictDuration () {
-				let store3 = this.$store.state.predictFare;
-				if (store3 == null) {
-					return '...';
-				} else {
-					return this.$store.state.predictFare.duration;
-				}
-			}
-		},
 		destroyed () {
 			clearTimeout(this.timer)
 		}
@@ -199,6 +198,7 @@
 </script>
 
 <style scoped>
+	@import './css/costRule.css';
 	.container{
 		/* display: flex; */
 		flex-wrap: wrap;
@@ -228,24 +228,5 @@
 		line-height: 56px;
 		font-size: 15px;
 		font-weight: bold;
-	}
-	.span1 {
-		display: inline-block;
-		font-size: 14px;
-		color: #757575
-	}
-	.span-rule {
-		display: block;
-		text-align: center;
-		font-size: 18px;
-		font-weight: bold;
-		color: #424242
-	}
-	.span-rule-header {
-		display: block;
-		font-size: 15px;
-		font-weight: bold;
-		color: #616161;
-		margin-bottom: 6px;
 	}
 </style>
