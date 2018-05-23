@@ -14,12 +14,11 @@
 				<mu-col width="40" tablet="33" desktop="33">
 					<!-- <span>{{driverName.substr(0,1)}}师傅</span> -->
 					<span>{{driverName}}师傅</span>
-					<span>{{driverEvaluate}}</span>
+					<!-- <span>{{driverEvaluate}}</span> -->
 				</mu-col>
 			</mu-row>
-			<mu-divider shallowInset />
+			<!-- <mu-divider shallowInset />
 			<mu-row gutter style="text-align: center; align-items:center">
-				<!-- 其中width指百分百 -->
 				<mu-col width="33" tablet="33" desktop="33">
 					<mu-flat-button label="打电话" class="flat-button"/>
 				</mu-col>
@@ -29,7 +28,7 @@
 				<mu-col width="33" tablet="33" desktop="33">
 					<mu-flat-button label="联系客服" class="flat-button"/>
 				</mu-col>
-			</mu-row>
+			</mu-row> -->
 			<mu-divider shallowInset />
 			<div style="padding: 18px 0 15px 0; text-align: center; font-size: 16px;">
 				<span style="display: inline-block; font-size: 36px; font-weight: bold">{{totalCost}}</span>元
@@ -111,7 +110,7 @@
 				carPlateNo: null,	// 车牌号码
 
 				// 车主信息
-				avater: avater,		// 头像
+				avater: null,		// 头像
 				driverName: null,	// 车主名字
 				driverEvaluate: '评分：4.0',	// 车主评分
 
@@ -148,12 +147,27 @@
 			_this.carPlateNo = ls_tripdetail.plateNo;
 			// 车主信息
 			_this.driverName = ls_tripdetail.driverName;
-			// 获取订单相关
+			_this.avater = this.$serverUrl + '/images/user/' + this.$store.state.userId + '.jpg';
+			// 车费明细
 			_this.totalCost = ls_tripdetail.totalCost;
 			_this.tripMileage = ls_tripdetail.lengthOfMileage;
 			_this.tripDuration = ls_tripdetail.lengthOfTime;
 			_this.tripMileageCost = ls_tripdetail.mileageCost;
 			_this.tripDurationCost = ls_tripdetail.timeCost;
+			// 关于车费明细、计费规则
+			_this.$axios.get('/api/fare/' + ls_tripdetail.tripOrderId)
+			.then((response) => {
+				console.log('根据tripOrderId查看车费明细返回：', response);
+				let fareRuleDTO = response.data.data.fareRuleDTO;
+				_this.initialPrice = fareRuleDTO.initialPrice;
+				_this.initialMileage = fareRuleDTO.initialMileage;
+				_this.setupTime = fareRuleDTO.selectTime;
+				_this.unitPricePerKilometer = fareRuleDTO.unitPricePerKilometer;
+				_this.unitPricePerMinute = fareRuleDTO.unitPricePerMinute;
+			})
+			.catch((error) => {
+				console.log(error);
+			});
 		},
 		mounted () {
 			
@@ -167,18 +181,6 @@
 			},
 			openBottomSheet2 () {
 				this.bottomSheet2 = true;
-				this.$axios.get('/api/fareRule/1')
-				.then((response) => {
-					// console.log(response);
-					this.initialPrice = response.data.data.initialPrice;
-					this.initialMileage = response.data.data.initialMileage;
-					this.setupTime = response.data.data.selectTime;
-					this.unitPricePerKilometer = response.data.data.unitPricePerKilometer;
-					this.unitPricePerMinute = response.data.data.unitPricePerMinute;
-				})
-				.catch((error) => {
-					console.log(error)
-				})
 			},
 			closebottomSheet1 () {
 				this.bottomSheet1 = false;
