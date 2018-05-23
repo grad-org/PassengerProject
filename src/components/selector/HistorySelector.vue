@@ -12,7 +12,8 @@
 					</mu-paper>
 				</mu-col>
 				<mu-col width="40" tablet="33" desktop="33">
-					<span>{{driverName.substr(0,1)}}师傅</span>
+					<!-- <span>{{driverName.substr(0,1)}}师傅</span> -->
+					<span>{{driverName}}师傅</span>
 					<span>{{driverEvaluate}}</span>
 				</mu-col>
 			</mu-row>
@@ -33,14 +34,49 @@
 			<div style="padding: 18px 0 15px 0; text-align: center; font-size: 16px;">
 				<span style="display: inline-block; font-size: 36px; font-weight: bold">{{totalCost}}</span>元
 				<div>
-					<span class="span1">车费明细 ＞</span>
+					<span class="span1" @click="openbottomSheet1">车费明细 ＞</span>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					<span class="span1">计费规则 ＞</span>
+					<span class="span1" @click="openBottomSheet2">计费规则 ＞</span>
 				</div>
 			</div>
 			<div style="text-align: center">
 				<mu-raised-button label="评价本次服务" class="raised-button" :backgroundColor="backgroundColor" :rippleOpacity="rippleOpacity" @click="evaluateTrip"/>
 			</div>
+			<!-- 车费详情 -->
+			<mu-bottom-sheet :open="bottomSheet1" @close="closebottomSheet1">
+				<div style="background: #fff; padding: 16px"  @click="closebottomSheet1">
+					<span class="span-rule">本次车费明细</span>
+					<span class="span-rule-header">行程信息：</span>
+					ーーー总里程：{{tripMileage}} 公里<br>
+					ーーー总时长：{{tripDuration}} 分钟
+					<hr>
+					<span class="span-rule-header">费用信息：</span>
+					ーーー里程费：{{tripMileageCost}} 元<br>
+					ーーー时长费：{{tripDurationCost}} 元
+					<hr>
+					<span class="span-rule-header">实际支付：</span>
+					ーーー支付方式：支付宝<br>
+					ーーー支付费用：{{totalCost}} 元（含起步价10元）
+				</div>
+			</mu-bottom-sheet>
+			<!-- 计费规则 -->
+			<mu-bottom-sheet :open="bottomSheet2" @close="closeBottomSheet2">
+				<div style="background: #fff; padding: 16px"  @click="closeBottomSheet2">
+					<span class="span-rule">计费规则</span>
+					<span class="span-rule-header">起步范围：</span>
+					ーーー起步价：{{initialPrice}} 公里<br>
+					ーーー起步里程：{{initialMileage}} 元
+					<hr>
+					<span class="span-rule-header">超出起步范围，按照计价规则收取：</span>
+					ーーー总费用 = 起步价 + 里程费 + 时长费<br>
+					ーーー里程费：{{unitPricePerKilometer}} 元/公里<br>
+					ーーー时长费：{{unitPricePerMinute}} 元/分钟
+					<hr>
+					<span class="span-rule-header">关于本次行程：</span>
+					ーーー总里程：{{tripMileage}} 公里<br>
+					ーーー总时长：{{tripDuration}} 分钟
+				</div>
+			</mu-bottom-sheet>
 		</div>
 </template>
 
@@ -57,6 +93,8 @@
 	export default {
 		data () {
 			return {
+				bottomSheet1: false,	// 车费详情BottomSheet
+				bottomSheet2: false,	// 计费规则BottomSheet
 				disable: false,
 				selectorHeight: '',
 
@@ -64,7 +102,7 @@
 				rippleOpacity: 0.1,			// 按钮波纹效果的透明度
 
 				// 订单详情
-				totalCost: null,	// 车费
+				totalCost: null,	// 总车费
 
 				// 车信息
 				carBrand: null,		// 品牌
@@ -75,46 +113,47 @@
 				// 车主信息
 				avater: avater,		// 头像
 				driverName: null,	// 车主名字
-				driverEvaluate: '评分：4.0'	// 车主评分
+				driverEvaluate: '评分：4.0',	// 车主评分
+
+				// 车费计费规则
+				setupTime: null,		// 规则设定时间
+				initialPrice: null,		// 起步价
+				initialMileage: null,	// 起步里程
+				unitPricePerKilometer: null,	// 里程费
+				unitPricePerMinute: null,		// 时长费
+				tripMileage: null,	// 行程的里程
+				tripDuration: null,	// 行程的时长
+				tripMileageCost: null,	// 行程的里程费
+				tripDurationCost: null,	// 行程的时长费
+			}
+		},
+		computed: {
+			farePrediction () {
+				let store1 = this.$store.state.predictFare;
+				if (store1 == null) {
+					return '车费预估中...';
+				} else {
+					return '车费预估：' + store1.totalCost + '元';
+				}
 			}
 		},
 		created () {
 			let _this = this;
 			let ls_tripdetail = JSON.parse(window.localStorage.getItem('HistoryTripDetail'));
-			let ls_driverinfo = JSON.parse(window.localStorage.getItem('DriverInfo')) ;
+			
+			// 车辆信息
+			_this.carBrand = ls_tripdetail.brand;
+			_this.carSeries = ls_tripdetail.series;
+			_this.carColor = ls_tripdetail.color;
+			_this.carPlateNo = ls_tripdetail.plateNo;
+			// 车主信息
+			_this.driverName = ls_tripdetail.driverName;
 			// 获取订单相关
 			_this.totalCost = ls_tripdetail.totalCost;
-
-			// 获取车主相关
-			if (ls_driverinfo == null) {
-				console.log('要获取DriverInfo')
-				_this.$axios.get('/api/driver/' + ls_tripdetail.driverId)
-				.then((response) => {
-					console.log(response);
-					// 车辆信息
-					_this.carBrand = response.data.data.carDTO.brand;
-					_this.carSeries = response.data.data.carDTO.series;
-					_this.carColor = response.data.data.carDTO.color;
-					_this.carPlateNo = response.data.data.carDTO.plateNo;
-					// 车主信息
-					_this.driverName = response.data.data.drivingLicenseDTO.driverName;
-					window.localStorage.setItem('DriverInfo', JSON.stringify(response.data.data))
-				})
-				.catch((error) => {
-					console.log(error);
-				})
-			} else {
-				// 车辆信息
-				_this.carBrand = ls_driverinfo.carDTO.brand;
-				_this.carSeries = ls_driverinfo.carDTO.series;
-				_this.carColor = ls_driverinfo.carDTO.color;
-				_this.carPlateNo = ls_driverinfo.carDTO.plateNo;
-				// 车主信息
-				_this.driverName = ls_driverinfo.drivingLicenseDTO.driverName;
-			}
-				
-			
-			
+			_this.tripMileage = ls_tripdetail.lengthOfMileage;
+			_this.tripDuration = ls_tripdetail.lengthOfTime;
+			_this.tripMileageCost = ls_tripdetail.mileageCost;
+			_this.tripDurationCost = ls_tripdetail.timeCost;
 		},
 		mounted () {
 			
@@ -122,12 +161,37 @@
 		methods: {
 			evaluateTrip () {
 				
+			},
+			openbottomSheet1 () {
+				this.bottomSheet1 = true;
+			},
+			openBottomSheet2 () {
+				this.bottomSheet2 = true;
+				this.$axios.get('/api/fareRule/1')
+				.then((response) => {
+					// console.log(response);
+					this.initialPrice = response.data.data.initialPrice;
+					this.initialMileage = response.data.data.initialMileage;
+					this.setupTime = response.data.data.selectTime;
+					this.unitPricePerKilometer = response.data.data.unitPricePerKilometer;
+					this.unitPricePerMinute = response.data.data.unitPricePerMinute;
+				})
+				.catch((error) => {
+					console.log(error)
+				})
+			},
+			closebottomSheet1 () {
+				this.bottomSheet1 = false;
+			},
+			closeBottomSheet2 () {
+				this.bottomSheet2 = false;
 			}
 		}
 	}
 </script>
 
 <style scoped>
+	@import './css/costRule.css';
 	.container{
 		/* display: flex; */
 		flex-wrap: wrap;
