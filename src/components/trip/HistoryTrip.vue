@@ -18,7 +18,7 @@
 				<div style=" font-size: 16px; padding: 8px 8px 8px 8px;" v-else >
 					<div v-for="(tripList, index) in tripLists" :key="index">
 						<van-cell-group :border="false" class="block1">
-							<van-cell :title="tripList.departureTime.slice(0, 4) + '年' + tripList.departureTime.slice(5, 7) + '月' + tripList.departureTime.slice(8, 10) + '日 ' + tripList.departureTime.slice(11, 16)" :value="orderStatus(index)" :center="true" :is-link="true" @click="itemClick(index, tripList.tripId)" style="font-size: 15px; font-weight: bold"/>
+							<van-cell :title="tripList.departureTime.slice(0, 4) + '年' + tripList.departureTime.slice(5, 7) + '月' + tripList.departureTime.slice(8, 10) + '日 ' + tripList.departureTime.slice(11, 16)" :value="orderStatus(index)" :center="true" :is-link="true" @click="itemClick(index, tripList.tripOrderId)" style="font-size: 15px; font-weight: bold"/>
 							<van-cell :title="'出发地：'+ tripList.departure" icon="location" :center="true" :border="false" style="color: #757575"/>
 							<van-cell :title="'目的地：'+ tripList.destination" icon="location" :center="true" :border="false" style="color: #757575" />
 						</van-cell-group>
@@ -34,11 +34,9 @@
 	/**
 	 * 订单状态未完全判断完，如已取消等
 	 */
-
 	import { PullRefresh } from 'vant'
 	import { List } from 'vant';
 	import { Cell, CellGroup } from 'vant';
-
 	export default {
 		components: {
 			[PullRefresh.name]: PullRefresh,
@@ -58,7 +56,6 @@
 				isLoading: true,	// 刷新操作完成后，将isLoading设置为false，表示加载完成
 				notTripTips: true,	// 没有历史行程的提示
 				serviceError: false,	// 内部服务出错的提示
-
 				// vant list
 				tripLists: null,
 				loading: false,
@@ -74,7 +71,7 @@
 			_this.$axios.get('/api/tripOrder/search/findAllByPassenger?passengerId=' + this.userinfo.passengerId)
 			// _this.$axios.get('/api/tripOrder/search/findAllByPassenger?passengerId=1')	//测试用
 			.then((response) => {
-				console.log(response.data);
+				console.log('查看某乘客的全部历史行程返回数据：', response.data);
 				_this.tripLists = response.data.data;
 				// console.log(_this.tripLists.length)
 				if (_this.tripLists.length == 0) {
@@ -95,7 +92,81 @@
 				// this.$router.go(-1);
 				this.$router.push({name: 'Home'});
 			},
-			// 下拉刷新
+			itemClick (index, tripOrderId) {
+				// 先判断是否进行中，如果是点击会进入行车页面，否则进入历史行程的详细页面
+				// 
+				console.log('点击某项行程，获得其信息：', this.tripLists[index]);
+				// 读取订单状态
+				let status = this.tripLists[index].orderStatus;		
+				if (status == 'PROCESSING') {	// 司机已通知上车，在行车中：PROCESSING
+					// 进入车辆行驶页面
+					window.localStorage.setItem('ProcessingTrip', JSON.stringify(this.tripLists[index]));
+					this.$router.push({name: 'CarDriving'})
+				} else if (status == 'ACCEPTED') {		// 已被受理：ACCEPTED
+					alert('已被受理');
+					window.localStorage.removeItem('TripDetail')
+					window.localStorage.setItem('T1', JSON.stringify(this.tripLists[index]));
+					this.$router.push({name: 'Progressing'});
+				} else if (status == 'PROCESSING_COMPLETED') {		// 订单完成，但未支付车费：PROCESSING_COMPLETED
+					this.$axios.post('/api/payment/alipay/pay',
+					{
+						tripOrderId: this.tripLists[index].tripOrderId,
+						totalAmount: this.tripLists[index].totalCost
+					}
+					).then((response) => {
+						const div = document.createElement('div');	// 创建div
+						div.innerHTML = response.data;				// 将返回的form 放入div
+						document.body.appendChild(div);
+						document.forms[0].submit();
+					}).catch((error) => {
+						console.log(error);
+						// if (error.status == 400) {
+						// 	alert(error.data.message)
+						// 	// this.$router.push({name: 'Home'});	// 调试用
+						// }
+					})
+				} else {
+					// 订单完成，且支付完成：PAYMENT_COMPLETED
+					window.localStorage.setItem('HistoryTripDetail', JSON.stringify(this.tripLists[index]))
+					this.$axios.get('/api/tripOrder/' + tripOrderId).then((response) => {
+						console.log('根据行程订单id查询行程明细返回数据：', response)
+						if (response.status == 200) {
+							window.localStorage.setItem('HistoryTripDetail', JSON.stringify(response.data.data))
+							this.$router.push({path: '/trip/history/detail', name: 'TripDetail', params: {tripOrderId: tripOrderId}})
+						}
+					}).catch((error) => {
+						console.log(error)
+					})
+				}
+			},
+			orderStatus (index) {
+				let ts = this.tripLists[index].orderStatus;
+				if (ts == 'PAYMENT_COMPLETED') {
+					// 订单完成，且支付完成
+					return '已完成'
+				};
+				if (ts == 'PROCESSING') {
+					// 订单未完成，行车过程中
+					return '进行中'
+				};
+				if (ts == 'PROCESSING_COMPLETED') {
+					// 订单完成，但未支付车费
+					return '未支付'
+				};
+				if (ts == 'CLOSED') {
+					// 订单已关闭
+					return '已关闭'
+				};
+				if (ts == 'PAID') {
+					// 已支付
+					return '已完成'
+				};
+				if (ts == 'ACCEPTED') {
+					// 被受理
+					return '已受理'
+				};
+			},
+					// 下拉刷新
 			onRefresh() {
 				let _this = this;
 				setTimeout(() => {
@@ -129,68 +200,12 @@
 					// 	this.tripLists.push(this.list.length + 1);
 					// }
 					// this.loading = false;
-
 					// if (this.tripLists.length >= this.tripLists) {
 					// 	this.finished = true;
 					// }
 					this.finished = true
 				}, 500);
 			},
-			itemClick (index, tripId) {
-				// 先判断是否进行中，如果是点击会进入行车页面，否则进入历史行程的详细页面
-				// 
-				console.log(this.tripLists[index]);
-				let status = this.tripLists[index].orderStatus;		// 读取订单状态
-				if (status == 'PROCESSING') {	// 司机已通知上车，在行车中
-					// 进入车辆行驶页面
-					window.localStorage.setItem('ProcessingTrip', JSON.stringify(this.tripLists[index]));
-					this.$router.push({name: 'CarDriving'})
-				} else if (status == 'ACCEPTED') {		// 已被受理
-					alert('已被受理');
-					window.localStorage.removeItem('TripDetail')
-					window.localStorage.setItem('T1', JSON.stringify(this.tripLists[index]));
-					this.$router.push({name: 'Progressing'});
-				} else {
-					window.localStorage.setItem('HistoryTripDetail', JSON.stringify(this.tripLists[index]))
-					this.$axios.get('/api/tripOrder/' + tripId).then((response) => {
-						console.log(response)
-						if (response.status == 200) {
-							window.localStorage.setItem('HistoryTripDetail', JSON.stringify(response.data.data))
-							this.$router.push({path: '/trip/history/detail', name: 'TripDetail', params: {tripId: tripId}})
-						}
-					}).catch((error) => {
-						console.log(error)
-					})
-				}
-				
-			},
-			orderStatus (index) {
-				let ts = this.tripLists[index].orderStatus;
-				if (ts == 'PAYMENT_COMPLETED') {
-					// 订单完成，且支付完成
-					return '已完成'
-				};
-				if (ts == 'PROCESSING') {
-					// 订单未完成，行车过程中
-					return '进行中'
-				};
-				if (ts == 'PROCESSING_COMPLETED') {
-					// 订单完成，但未支付车费
-					return '未支付'
-				};
-				if (ts == 'CLOSED') {
-					// 订单已关闭
-					return '已关闭'
-				};
-				if (ts == 'PAID') {
-					// 已支付
-					return '已完成'
-				};
-				if (ts == 'ACCEPTED') {
-					// 被受理
-					return '已受理'
-				};
-			}
 		},
 		computed: {
 
@@ -206,5 +221,3 @@
 		box-shadow: #e0e0e0 0px 0px 4px 4px;
 	}
 </style>
-
-
