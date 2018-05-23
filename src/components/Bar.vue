@@ -8,7 +8,7 @@
 					<img :src="avater" style="width: 100%; height: 100%"/>
 				</mu-paper>
 				<mu-list-item :title="nickname" :describeText="username" @click="goUserInfo">
-					<mu-icon value="portrait" slot="right" color="#333"/>
+					<mu-icon value="portrait" slot="right" color="#666"/>
 				</mu-list-item>
 			</div>
 			<mu-list>
