@@ -26,8 +26,6 @@
 <script>
 
 	import MapStyle from './js/map-style.js'
-	import SockJS from '../../../static/utils/sockjs.js'
-	import Stomp from 'stompjs'
 	import { NoticeBar } from 'vant'
 	import { Toast } from 'vant'
 
@@ -59,8 +57,6 @@
 			}
 		},
 		created () {
-			let socket = new SockJS(this.$serverUrl + '/orh');
-			this.stompClient = Stomp.over(socket);
 			this.styleJson = MapStyle.style();
 			this.ls_triping = JSON.parse(window.localStorage.getItem('T1'))
 			this.center = this.ls_triping.departureLocation;
@@ -102,7 +98,7 @@
 			subscribeCarLocation (BMap, map) {
 				let _this = this;
 				_this.$socket.on('receiveCarLocation', function (carLocation) {
-					console.log('订阅车主位置：', carLocation);
+					console.log('接单后监听车主位置返回：', carLocation);
 					_this.driverPoint = {lng: carLocation.lng, lat: carLocation.lat};
 					_this.driverLocationSeen = true;
 					// map.getDistance(pointA,pointB)	// 测试当前位置和起点的距离
@@ -124,8 +120,8 @@
 					console.log('用时：', plan.getDuration(false), '秒')	// false返回数值，单位秒；true返回字符串
 					let distance = (plan.getDistance(false)/1000).toFixed(1);
 					let duration = (plan.getDuration(false)/60).toFixed(0);
-					// window.localStorage.setItem('TripDistance', distance);
-					// window.localStorage.setItem('TripDuration', duration);
+					window.localStorage.setItem('TripDistance', distance);
+					window.localStorage.setItem('TripDuration', duration);
 					_this.seen = true;		// 通知控件可看
 					_this.noticeContent = '车主到达大约需要' + plan.getDuration(true) + '，约' + plan.getDistance(true) + '。请您耐心等待！';
 					_this.timer = setTimeout(() => {
