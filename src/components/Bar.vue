@@ -12,7 +12,7 @@
 				</mu-list-item>
 			</div>
 			<mu-list>
-				<mu-list-item title="行程" rightIcon="keyboard_arrow_right" @click="goHistoryTrip">
+				<mu-list-item title="行程" @click="goHistoryTrip">
 					<mu-icon slot="left" value="local_taxi" />
 				</mu-list-item>
 				<mu-list-item title="钱包">
