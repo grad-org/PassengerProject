@@ -56,7 +56,8 @@
 	/**
 	 * 设置背景图片，参考：https://blog.csdn.net/woyidingshijingcheng/article/details/72903800
 	 */
-	import avater from '../../assets/image/avater.jpg'
+	// import avater from '../../assets/image/avater.jpg'
+	import passengerAvater from '../../assets/image/passengerdefault.png'
 	import { Toast } from 'vant'
 
 	export default {
@@ -85,7 +86,18 @@
 			let _this = this;
 			_this.ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'))
 			_this.nickname = _this.ls_userinfo.nickname;
-			_this.avater = this.$serverUrl + '/images/user/' + this.$store.state.userId + '.jpg';
+			// 获取用户头像
+			_this.$axios.get('/images/user/' + this.$store.state.userId + '.jpg').then(
+				(response) => {
+					_this.avater = this.$serverUrl + '/images/user/' + ls_userinfo.userId + '.jpg';
+				}
+			).catch((error) => {
+				_this.avater = passengerAvater;
+				// console.log(error);
+				if (error.status == 404) {
+					console.log('当前用户没有设置头像！');
+				}
+			});
 			// 根据是否存在driverId，判断是否已认证车主
 			if (_this.ls_userinfo.driverId == null || _this.ls_userinfo.driverId == '' || _this.ls_userinfo.driverId == undefined) {
 				_this.isDriverUnapply = true;
