@@ -22,9 +22,9 @@ dev: {
 	},
 	// Various Dev Server settings
 	// can be overwritten by process.env.HOST
-	// host: '192.168.31.213',
-	host: '172.20.10.3',
-	// host: 'localhost',
+	host: '192.168.31.213',
+	// host: '172.20.10.3',
+	// host: 'localhost',·
 	port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
 	autoOpenBrowser: false,
 	errorOverlay: true,
