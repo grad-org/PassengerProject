@@ -71,7 +71,7 @@
 					</div>
 				</div>
 			</van-cell-group>
-			
+			<!-- <van-loading type="spinner" color="black" /> -->
 			<!-- 初次领证选择器 -->
 			<mu-bottom-sheet :open="bottomSheet1" @close="closeBottomSheet1">
 				<!-- <van-picker :columns="initialLicenseDateColumns" show-toolbar @cancel="closeBottomSheet1" @confirm="onConfirmInitialLicenseDate" /> -->
@@ -85,7 +85,9 @@
 			<mu-bottom-sheet :open="bottomSheet3" @close="closeBottomSheet3">
 				<van-picker :columns="carBrandInfoColumns" show-toolbar @cancel="closeBottomSheet3" @change="onChange" @confirm="onConfirmCarBrandInfo" />
 			</mu-bottom-sheet>
+			
 		</div>
+		
 	</div>
 </template>
 
@@ -93,7 +95,6 @@
 
 	import CheckFormat from './js/CheckFormat.js'
 	import CarBrands from './js/CarBrands.js'
-	import carBrands from './js/CarBrands.js'
 	import { Toast } from 'vant'
 
 	export default {
@@ -189,8 +190,50 @@
 					defaultIndex: 0
 				}
 			];
-			// console.log(data1)
 			this.carBrandInfoColumns = data1;
+
+			let ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'));
+			let driverId1 = ls_userinfo.driverId;
+			if (driverId1 == '' || driverId1 == undefined || driverId1 == null) {
+				// 从来没用认证过
+			} else {
+				this.$axios.get('/api/driver/' + ls_userinfo.driverId).then(
+					(response) => {
+						console.log('获取车主资料返回数据：', response);
+						let data2 = response.data.data;
+						console.log(data2);
+						let status = response.data.data.driverStatus;	// 获取当前认证车主的状态
+						console.log('车主当前状态：', status);
+						// 车主信息
+						this.realName = data2.drivingLicense.driverName;
+						this.IDNumber = data2.drivingLicense.identification;
+						// 驾驶证资料
+						let tmp_date = data2.drivingLicense.issueDate;
+						this.initialLicenseDateStyle = {color: '#000'};
+						this.initialLicenseDate = tmp_date.slice(0, 4) + '年' + tmp_date.slice(5, 7) + '月' + tmp_date.slice(8, 10) + '日';
+						this.initialLicenseDate2 = tmp_date;
+						this.driverLicensePictureTips = '请重新上传清晰的驾驶证图片';
+						this.driverLicensePicture = this.$serverUrl + '/images/drivingLicense/' +  data2.driverId+ '.jpg';
+						// 车辆信息
+						this.carOwner = data2.vehicleLicense.owner;
+						this.carPlateNo = data2.car.plateNo;
+						let tmp_date2 = data2.vehicleLicense.registerDate;
+						this.carRegisterDateStyle = {color: '#000'};
+						this.carRegisterDate = tmp_date2.slice(0, 4) + '年' + tmp_date2.slice(5, 7) + '月' + tmp_date2.slice(8, 10) + '日';
+						this.carRegisterDate2 = tmp_date2;
+						this.carBrandInfoStyle = {color: '#000'};
+						this.carBrand = data2.car.brand;
+						this.carSeries = data2.car.series;
+						this.carColor = data2.car.color;
+						this.carInfoTips = data2.car.brand + data2.car.series + ' • ' + data2.car.color;
+						this.vehicleLicensePictureTips = '请重新上传清晰的行驶证图片';
+						this.vehicleLicensePicture = this.$serverUrl + '/images/vehicleLicense/' +  data2.driverId+ '.jpg';
+					}
+				).catch((error) => {
+						console.log('获取车主资料错误返回：', error);
+						alert('获取信息错误，请重新刷新');
+				});
+			}
 		},
 		mounted() {
 			this.FixedTop.marginTop = this.$refs.NavBar.$el.clientHeight + 'px';
@@ -209,6 +252,8 @@
 
 			// 上传认证资料
 			uploadAuthInfo () {
+				let ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'));
+				let tmp_d_id = ls_userinfo.driverId;
 				let tmp_u_id = this.$store.state.userId;
 				let tmp_r_n = this.realName;
 				let tmp_id_n = this.IDNumber;
@@ -225,49 +270,110 @@
 				if ( tmp_u_id == null || tmp_r_n == null || tmp_id_n == null || tmp_init_d == '请选择初次领证日期' || tmp_d_p == null || tmp_o == null || tmp_c_p == null || tmp_r_d == '请选择车辆注册日期' || tmp_c_b == null || tmp_c_s == null || tmp_c_c == null || tmp_v_p == null) {
 					Toast('请保证信息完整！');
 				} else {
-					this.$axios.post('/api/driver/certifyDriver',
-					{
-						userId: tmp_u_id,
-						drivingLicense: {
-							driverName: tmp_r_n,
-							identification: tmp_id_n,
-							issueDate: tmp_init_d,
-							drivingLicenseImage: tmp_d_p
-						},
-						vehicleLicense: {
-							owner: tmp_o,
-							registerDate: tmp_r_d,
-							vehicleLicenseImage: tmp_v_p
-						},
-						car: {
-							plateNo: tmp_c_p,
-							brand: tmp_c_b,
-							series: tmp_c_s,
-							color: tmp_c_c
-						}
-					}
-					).then((response) => {
-						console.log('申请车主认证返回：', response);
-						if (response.status == 200) {
-							// 提交申请成功，重新获取用户信息
-							this.$axios.get('/api/auth/user')
-							.then( (response) => {
-								console.log('获取用户信息返回数据：', response);
-								if (response.status == 200) {
-									window.localStorage.setItem('UserInfo' ,JSON.stringify(response.data.data));
-									this.$router.push({name: 'User'});
-								}
-							})
-							.catch ( (error) => {
-								console.log(error);
-							})
-						}
-					}).catch((error) => {
-						console.log(error);
-						if (error.state == 500) {
-							alert(error.message)
-						}
-					})
+					const toast = Toast.loading({
+						duration: 0,	// 持续展示 toast
+						forbidClick: true,	// 禁用背景点击
+						loadingType: 'spinner',
+						message: '上传中...'
+					});
+					if (ls_userinfo.driverId == null ){
+						// 第一次认证，没有driverId
+						this.$axios.post('/api/driver/certifyDriver',
+						{
+							userId: tmp_u_id,
+							drivingLicense: {
+								driverName: tmp_r_n,
+								identification: tmp_id_n,
+								issueDate: tmp_init_d,
+								drivingLicenseImage: tmp_d_p
+							},
+							vehicleLicense: {
+								owner: tmp_o,
+								registerDate: tmp_r_d,
+								vehicleLicenseImage: tmp_v_p
+							},
+							car: {
+								plateNo: tmp_c_p,
+								brand: tmp_c_b,
+								series: tmp_c_s,
+								color: tmp_c_c
+							}
+						}).then((response) => {
+							console.log('申请车主认证返回：', response);
+							if (response.status == 200) {
+								// 提交申请成功，重新获取用户信息
+								this.$axios.get('/api/auth/user')
+								.then( (response) => {
+									console.log('获取用户信息返回数据：', response);
+									if (response.status == 200) {
+										window.localStorage.setItem('UserInfo' ,JSON.stringify(response.data.data));
+										this.$router.push({name: 'User'});
+									}
+								})
+								.catch ( (error) => {
+									console.log(error);
+								});
+								Toast.clear();
+							}
+						}).catch((error) => {
+							console.log(error);
+							Toast.clear();
+							if (error.state == 500) {
+								alert(error.message)
+							}
+							
+						})
+					} else {
+						// 不是第一次认证，有driverId
+						this.$axios.post('/api/driver/certifyDriver',
+						{
+							driverId: tmp_d_id,
+							drivingLicense: {
+								driverName: tmp_r_n,
+								identification: tmp_id_n,
+								issueDate: tmp_init_d,
+								drivingLicenseImage: tmp_d_p
+							},
+							vehicleLicense: {
+								owner: tmp_o,
+								registerDate: tmp_r_d,
+								vehicleLicenseImage: tmp_v_p
+							},
+							car: {
+								plateNo: tmp_c_p,
+								brand: tmp_c_b,
+								series: tmp_c_s,
+								color: tmp_c_c
+							}
+						}).then((response) => {
+							console.log('申请车主认证返回：', response);
+							if (response.status == 200) {
+								// 提交申请成功，重新获取用户信息
+								this.$axios.get('/api/auth/user')
+								.then( (response) => {
+									console.log('获取用户信息返回数据：', response);
+									if (response.status == 200) {
+										window.localStorage.setItem('UserInfo' ,JSON.stringify(response.data.data));
+										this.$router.push({name: 'User'});
+									}
+								})
+								.catch ( (error) => {
+									console.log(error);
+								});
+								Toast.clear();
+							}
+						}).catch((error) => {
+							console.log(error);
+							Toast.clear();
+							if (error.state == 500) {
+								alert(error.message)
+							}
+							if (error.state == 400) {
+								console.log('错误信息：', error.message);
+								alert('请确保已上传驾驶证和行驶证！')
+							}
+						})
+					}	// else结束，有driverId的情况
 				}
 				
 			},
@@ -357,7 +463,7 @@
 				this.bottomSheet3 = false;
 			},
 			onConfirmInitialLicenseDate (val) {
-				this.carBrandInfoStyle = {color: '#000'};
+				this.initialLicenseDateStyle = {color: '#000'};
 				this.initialLicenseDate = val.getFullYear() + '年' + (val.getMonth()+1) + '月' + val.getDate() + '日 ';
 				let date = new Date(val).toISOString().slice(0, 10);
 				this.initialLicenseDate2 = date + ' 00:00:00';
@@ -392,6 +498,7 @@
 			},
 			onConfirmCarBrandInfo (picker, values) {
 				console.log('选择车辆信息，未完善！');
+				this.carBrandInfoStyle = {color: '#000'};
 				this.carBrand = '宝马';
 				this.carSeries = 'S级';
 				this.carColor = '白色';
