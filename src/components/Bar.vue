@@ -44,7 +44,8 @@
 	 * 设置背景图片，参考：https://blog.csdn.net/woyidingshijingcheng/article/details/72903800
 	 */
 	import { Toast } from 'vant'
-	import avater from '../assets/image/avater.jpg'
+	// import avater from '../assets/image/avater.jpg'
+	import passengerAvater from '../assets/image/passengerdefault.png'
 
 	export default {
 		data() {
@@ -73,7 +74,17 @@
 			let ls_userinfo = null;
 			if (typeof window.localStorage.getItem('UserInfo') === 'string') {
 				ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'));
-				this.avater = this.$serverUrl + '/images/user/' + ls_userinfo.userId + '.jpg';
+				_this.$axios.get('/images/user/' + this.$store.state.userId + '.jpg').then(
+					(response) => {
+						_this.avater = this.$serverUrl + '/images/user/' + ls_userinfo.userId + '.jpg';
+					}
+				).catch((error) => {
+					_this.avater = passengerAvater;
+					// console.log(error);
+					if (error.status == 404) {
+						console.log('当前用户没有设置头像！');
+					}
+				});
 			} else {
 				ls_userinfo = window.localStorage.getItem('UserInfo');
 			}
