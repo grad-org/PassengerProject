@@ -5,7 +5,7 @@ import router from './router'
 import Vue from 'vue'
 
 // axios 配置
-axios.defaults.timeout = 2500	// 覆写库的超时默认值。在超时前，所有请求都会等待 2.5 秒
+axios.defaults.timeout = 60000	// 覆写库的超时默认值。在超时前，所有请求都会等待 2.5 秒
 axios.defaults.baseURL = 'http://forcar.vip:8080/'
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8'
 
