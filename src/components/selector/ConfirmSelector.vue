@@ -19,8 +19,8 @@
 				<div style="background: #fff; padding: 16px"  @click="closeBottomSheet">
 					<span class="span-rule">计费规则</span>
 					<span class="span-rule-header">起步范围：</span>
-					ーーー起步价：{{initialPrice}} 公里<br>
-					ーーー起步里程：{{initialMileage}} 元
+					ーーー起步价：{{initialPrice}} 元<br>
+					ーーー起步里程：{{initialMileage}} 公里
 					<hr>
 					<span class="span-rule-header">超出起步范围，按照计价规则收取：</span>
 					ーーー总费用 = 起步价 + 里程费 + 时长费<br>
@@ -155,7 +155,7 @@
 					"passengerId": _this.ls_userinfo.passengerId
 				}).then((response) => {
 					// 成功返回
-					console.log(response);
+					console.log('发布行程返回数据：', response);
 					let trip = response.data.data;
 					window.localStorage.setItem('TripDetail', JSON.stringify(trip));
 					window.localStorage.removeItem('Outset');	// 删除起点
@@ -179,7 +179,7 @@
 				this.bottomSheet = true;
 				this.$axios.get('/api/fareRule/' + this.$store.state.predictFare.fareRuleId)
 				.then((response) => {
-					// console.log(response);
+					console.log('计费规则返回：', response);
 					this.initialPrice = response.data.data.initialPrice;
 					this.initialMileage = response.data.data.initialMileage;
 					this.setupTime = response.data.data.selectTime;
