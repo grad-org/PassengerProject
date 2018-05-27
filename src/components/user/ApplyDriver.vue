@@ -318,7 +318,7 @@
 						}).catch((error) => {
 							console.log(error);
 							Toast.clear();
-							if (error.state == 500) {
+							if (error.status == 500) {
 								alert(error.message)
 							}
 							
@@ -365,10 +365,10 @@
 						}).catch((error) => {
 							console.log(error);
 							Toast.clear();
-							if (error.state == 500) {
+							if (error.status == 500) {
 								alert(error.message)
 							}
-							if (error.state == 400) {
+							if (error.status == 400) {
 								console.log('错误信息：', error.message);
 								alert('请确保已上传驾驶证和行驶证！')
 							}
