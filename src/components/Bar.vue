@@ -74,26 +74,25 @@
 			let ls_userinfo = null;
 			if (typeof window.localStorage.getItem('UserInfo') === 'string') {
 				ls_userinfo = JSON.parse(window.localStorage.getItem('UserInfo'));
-				_this.$axios.get('/images/user/' + this.$store.state.userId + '.jpg').then(
-					(response) => {
-						_this.avater = this.$serverUrl + '/images/user/' + ls_userinfo.userId + '.jpg';
-					}
-				).catch((error) => {
-					_this.avater = passengerAvater;
-					// console.log(error);
-					if (error.status == 404) {
-						console.log('当前用户没有设置头像！');
-					}
-				});
 			} else {
 				ls_userinfo = window.localStorage.getItem('UserInfo');
 			}
+			_this.$axios.get('/images/user/' + this.$store.state.userId + '.jpg').then(
+				(response) => {
+					_this.avater = this.$serverUrl + '/images/user/' + ls_userinfo.userId + '.jpg';
+				}
+			).catch((error) => {
+				_this.avater = passengerAvater;
+				// console.log(error);
+				if (error.status == 404) {
+					console.log('当前用户没有设置头像！');
+				}
+			});
 			if (ls_userinfo == null || ls_userinfo == undefined || ls_userinfo == '') {
 				// 本地没有数据时发起get请求，获取数据
 				_this.$axios.get('/api/auth/user')
 				.then( (response) => {
 					console.log(response);
-					console.log('执行到哪33333')
 					if (response.status == 200) {
 						_this.$store.dispatch('userId', response.data.data.userId);
 						_this.nickname = response.data.data.nickname;
