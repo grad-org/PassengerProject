@@ -112,18 +112,18 @@
 		},
 		watch: {
 		// 如果 fullHeight 发生改变，这个函数就会运行
-		fullHeight (val) {
-			if(!this.timer) {
-				this.fullHeight = val
-				this.timer = true
-				let that = this
-				setTimeout(function () {
-					that.timer = false
-				}, 1000)
+			fullHeight (val) {
+				if(!this.timer) {
+					this.fullHeight = val
+					this.timer = true
+					let that = this
+					setTimeout(function () {
+						that.timer = false
+					}, 1000)
+				}
+				// console.log("触发watch的fullHeight")
 			}
-			// console.log("触发watch的fullHeight")
 		}
-	}
 	}
 </script>
 

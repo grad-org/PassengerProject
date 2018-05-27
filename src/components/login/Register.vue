@@ -162,7 +162,7 @@
 				this.$nextTick (() => {
 					this.fullHeight = document.documentElement.clientHeight + 'px';
 				})
-			},
+			}
 		},
 		watch: {
 			fullHeight (val) {

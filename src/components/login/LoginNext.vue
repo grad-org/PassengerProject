@@ -142,7 +142,7 @@
 				this.$nextTick (() => {
 					this.fullHeight = document.documentElement.clientHeight + 'px';
 				})
-			},
+			}
 		},
 		watch: {
 			// 如果 fullHeight 发生改变，这个函数就会运行
