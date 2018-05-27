@@ -91,7 +91,7 @@
 					window.localStorage.setItem('TripDuration', duration);
 					_this.$axios.get('/api/fare/predictFare?lengthOfMileage=' + distance + '&lengthOfTime=' + duration)
 					.then((response) => {
-						// console.log(response)
+						console.log('预估车费返回：', response)
 						// window.localStorage.setItem('TripPredictFare', JSON.stringify(response.data.data.totalCost));
 						let d1 = response.data.data;
 						_this.$store.dispatch('predictFare', {fareRuleId: d1.fareRuleDTO.fareRuleId, mileage: d1.lengthOfMileage, duration: d1.lengthOfTime, totalCost: d1.totalCost})
