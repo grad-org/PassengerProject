@@ -40,7 +40,9 @@
 					<div class="van-cell__title">
 						<i class="van-icon van-icon-shop"></i>
 						<span class="van-cell__text">车主认证</span>
-						<span class="van-tag van-hairline--surround van-tag--danger">认证车主，享更多优惠</span>
+						<!-- <span class="van-tag van-hairline--surround van-tag--danger">认证车主，享更多优惠</span> -->
+						<!-- <span class="van-tag van-hairline--surround van-tag--danger">在闲暇时间，做兼职司机</span> -->
+						<span class="van-tag van-hairline--surround van-tag--danger">{{verifyTips}}</span>
 						<i class="van-icon van-cell__right-icon van-icon-arrow icon-cover"></i>
 					</div>
 					<div class="van-cell__value van-cell__value--link link-color-cover" v-show="isDriverUnapply">
@@ -73,6 +75,7 @@
 				isDriverUnapproved: false,	// 车主认证未通过
 				isVerified: false,	// 是否已实名认证
 				driverStatus: 'unapply',	// 用于判断是否能否前往认证车主
+				verifyTips: '闲暇时间，做兼职司机',
 
 				// 组件高度控制
 				fullHeight: document.documentElement.clientHeight,
@@ -89,11 +92,11 @@
 			// 获取用户头像
 			_this.$axios.get('/images/user/' + this.$store.state.userId + '.jpg').then(
 				(response) => {
-					_this.avater = this.$serverUrl + '/images/user/' + ls_userinfo.userId + '.jpg';
+					_this.avater = this.$serverUrl + '/images/user/' + _this.ls_userinfo.userId + '.jpg';
 				}
 			).catch((error) => {
 				_this.avater = passengerAvater;
-				// console.log(error);
+				console.log(error);
 				if (error.status == 404) {
 					console.log('当前用户没有设置头像！');
 				}
@@ -108,18 +111,21 @@
 						console.log('获取车主资料返回数据：', response);
 						let status = response.data.data.driverStatus;	// 获取当前认证车主的状态
 						if (status == 'PENDING_REVIEW') {
+							_this.verifyTips = '通过认证后，就能做兼职司机了';
 							_this.isDriverUnapply = false;
 							_this.isDriverApproved = false;
 							_this.isDriverPendingReview = true;		// 认证审核中
 							_this.isDriverUnapproved = false;
 							_this.driverStatus = 'pendingReview';
 						} else if (status == 'UNAPPROVED') {
+							_this.verifyTips = '可以再次提交申请哦！'
 							_this.isDriverUnapply = false;
 							_this.isDriverApproved = false;
 							_this.isDriverPendingReview = false;
 							_this.isDriverUnapproved = true;		// 认证未通过
 							_this.driverStatus = 'unapproved';
 						} else {
+							_this.verifyTips = '若有空，可以去赚兼职了'
 							_this.isDriverUnapply = false;
 							_this.isDriverApproved = true;		// 认证通过
 							_this.isDriverPendingReview = false;
