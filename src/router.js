@@ -18,6 +18,7 @@ import Confirm from '@/components/Confirm'
 import Waiting from '@/components/trip/Waiting'
 import HistoryTrip from '@/components/trip/HistoryTrip'
 import TripDetail from '@/components/trip/TripDetail'
+import EvaluateTrip from '@/components/trip/EvaluateTrip'
 import Settings from '@/components/Settings'
 import Progressing from '@/components/trip/Progressing'
 import CarDriving from '@/components/trip/CarDriving'
@@ -136,6 +137,14 @@ const routes = [
 			requireAuth: true
 		},
 		component: TripDetail
+	},
+	{
+		path: '/trip/evaluate',
+		name: 'EvaluateTrip',
+		meta: {
+			requireAuth: true
+		},
+		component: EvaluateTrip
 	},
 	{
 		path: '/settings',
