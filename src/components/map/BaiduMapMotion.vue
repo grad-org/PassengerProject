@@ -17,7 +17,7 @@
 			</van-notice-bar>
 		</bm-control>
 		<bm-marker :position="driverPoint"
-			:icon="{url: require('../../svg/driverlocation.svg'), size: {width: 18, height: 18}}" v-if="driverLocationSeen">
+			:icon="{url: require('../../svg/carmoving.svg'), size: {width: 52, height: 26}}" v-if="driverLocationSeen">
 		</bm-marker>
 	</baidu-map>
 	
@@ -116,8 +116,8 @@
 				var searchComplete = function (results) {
 					console.log('驾车路线返回', results)
 					let plan = results.getPlan(0);
-					console.log('里程：', plan.getDistance(false), '米')	// false返回数值，单位米；true返回字符串
-					console.log('用时：', plan.getDuration(false), '秒')	// false返回数值，单位秒；true返回字符串
+					// console.log('里程：', plan.getDistance(false), '米')	// false返回数值，单位米；true返回字符串
+					// console.log('用时：', plan.getDuration(false), '秒')	// false返回数值，单位秒；true返回字符串
 					let distance = (plan.getDistance(false)/1000).toFixed(1);
 					let duration = (plan.getDuration(false)/60).toFixed(0);
 					window.localStorage.setItem('TripDistance', distance);
