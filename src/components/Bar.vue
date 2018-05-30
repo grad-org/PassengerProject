@@ -15,9 +15,9 @@
 				<mu-list-item title="行程" @click="goHistoryTrip">
 					<mu-icon slot="left" value="local_taxi" />
 				</mu-list-item>
-				<mu-list-item title="钱包">
+				<!-- <mu-list-item title="钱包">
 					<mu-icon slot="left" value="account_balance_wallet" />
-				</mu-list-item>
+				</mu-list-item> -->
 				<mu-list-item title="设置" @click="goSettings">
 					<mu-icon slot="left" value="settings"/>
 				</mu-list-item>
@@ -33,7 +33,7 @@
 		<mu-appbar ref="barDiv" title="蔚蓝出行">
 			<mu-icon-button icon="menu" slot="left" @click="toggle(true)"/>
 			<mu-flat-button color="#fff" :label="selectedCity" slot="right" @click="toCitySelector"/>
-			<mu-icon-button icon="notifications" slot="right">
+			<!-- <mu-icon-button icon="notifications" slot="right"> -->
 			</mu-icon-button>
 		</mu-appbar>
 	</div>
