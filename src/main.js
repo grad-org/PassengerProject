@@ -30,8 +30,9 @@ Vue.use(BaiduMap, {
 })
 Vue.use(VueJsonp)
 Vue.use(Vant)
-Vue.use(VueSocketio, 'http://forcar.vip:8081?token='+ store.state.token + '&role=role_passenger')
-
+if (store.state.token != null) {
+	Vue.use(VueSocketio, 'http://forcar.vip:8081?token='+ store.state.token + '&role=role_passenger')
+}
 /* eslint-disable no-new */
 new Vue({
 	el: '#app',
