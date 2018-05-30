@@ -1,14 +1,17 @@
 <template>
 	<div>
-		<mu-appbar ref="barDiv" title="设置" style="position: fixed; top: 0">
+		<mu-appbar ref="barDiv" title="设置" style="position: fixed; top: 0; text-align: center;">
 			<mu-icon-button icon="arrow_back" slot="left" @click="goBack"/>
+			<mu-flat-button slot="right" style="width: 48px" disabled/> 
 		</mu-appbar>
 		<div :style="listStyle" >	
-			<h2>内容</h2>
+			<div class="block_title">
+				个性化设置
+			</div>
 			<mu-tabs :value="theme" @change="changeTheme">
-				<mu-tab title="LIGHT (DEFAULT)" value="light"/>
-				<mu-tab title="CARBON" value="carbon"/>
-				<mu-tab title="TEAL" value="teal"/>
+				<mu-tab title="紫色" value="light"/>
+				<mu-tab title="炭黑" value="carbon"/>
+				<mu-tab title="水鸭蓝" value="teal"/>
 			</mu-tabs>
 		</div>
 	</div>
@@ -16,10 +19,6 @@
 
 <script>
 
-	// import light from '!raw!muse-ui/dist/theme-default.css'
-	// import dark from '!raw!muse-ui/dist/theme-dark.css'
-	// import carbon from '!raw!muse-ui/dist/theme-carbon.css'
-	// import teal from '!raw!muse-ui/dist/theme-teal.css'
 	import light from '!raw-loader!muse-ui/dist/theme-default.css'
 	import dark from '!raw-loader!muse-ui/dist/theme-dark.css'
 	import carbon from '!raw-loader!muse-ui/dist/theme-carbon.css'
@@ -31,7 +30,6 @@
 				theme: 'light',
 				themes: {
 					light,
-					dark,
 					carbon,
 					teal
 				},
@@ -74,5 +72,5 @@
 </script>
 
 <style scoped>
-	
+	@import './user/css/vant-style.css';
 </style>
