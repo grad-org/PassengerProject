@@ -69,47 +69,51 @@
 					// 取消监听整个行车过程
 					
 					// 暂时未做支付功能，先提示然后跳转到首页
-					const toast1 = Toast.loading({
-						duration: 0,
-						forbidClick: true,
-						message: '已到达'
-					});
-					let second = 2;
-					const time1 = setInterval(() => {
-						second--;
-						if (second) {
-							toast1.message = '返回首页...';
-						} else {
-							clearInterval(time1);
-							Toast.clear();
-							// this.$router.push({name: 'Home'})
-						}
-					}, 1000);
+					// const toast1 = Toast.loading({
+					// 	duration: 0,
+					// 	forbidClick: true,
+					// 	message: '已到达'
+					// });
+					// let second = 2;
+					// const time1 = setInterval(() => {
+					// 	second--;
+					// 	if (second) {
+					// 		toast1.message = '返回首页...';
+					// 	} else {
+					// 		clearInterval(time1);
+					// 		Toast.clear();
+					// 		// this.$router.push({name: 'Home'})
+					// 	}
+					// }, 1000);
 				});
 			};
 		},
 		methods: {
 			payButton () {
-				this.$axios.post('/api/payment/alipay/pay',
-				{
-					tripOrderId: this.id1,
-					totalAmount: this.amount1
+				if (this.amount1 == '' || this.amount1 == null) {
+					Toast('需等待车主确认到达！')
+				} else {
+					this.$axios.post('/api/payment/alipay/pay',
+					{
+						tripOrderId: this.id1,
+						totalAmount: this.amount1
+					}
+					).then((response) => {
+						console.log(response);
+						console.log(response.data);
+						window.localStorage.removeItem('ProcessingTrip');
+						const div = document.createElement('div');	// 创建div
+						div.innerHTML = response.data;				// 将返回的form 放入div
+						document.body.appendChild(div);
+						document.forms[0].submit();
+					}).catch((error) => {
+						console.log(error);
+						// if (error.status == 400) {
+						// 	alert(error.data.message)
+						// 	// this.$router.push({name: 'Home'});	// 调试用
+						// }
+					})
 				}
-				).then((response) => {
-					console.log(response);
-					console.log(response.data);
-					window.localStorage.removeItem('ProcessingTrip');
-					const div = document.createElement('div');	// 创建div
-					div.innerHTML = response.data;				// 将返回的form 放入div
-					document.body.appendChild(div);
-					document.forms[0].submit();
-				}).catch((error) => {
-					console.log(error);
-					// if (error.status == 400) {
-					// 	alert(error.data.message)
-					// 	// this.$router.push({name: 'Home'});	// 调试用
-					// }
-				})
 			}
 		},
 		destroyed () {
