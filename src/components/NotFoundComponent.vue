@@ -16,6 +16,7 @@
 		created () {
 			this.initHeight();
 			this.setMapHeight();
+			this.$router.push({name: 'Home'});
 		},
 		methods: {
 			goHome () {
