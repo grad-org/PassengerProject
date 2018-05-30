@@ -16,6 +16,7 @@
 					<van-datetime-picker
 						v-model = "currentDate"
 						type = "datetime"
+						:visible-item-count = "visible_item_count"
 						:min-date = "minDate"
 						:max-date = "maxDate"
 						@confirm = "confirmSelect"
@@ -54,8 +55,9 @@
 
 				// TimePicker选择器属性值
 				minDate: new Date(),	// 可选最小日期
-				maxDate: new Date(2019, 10, 1),		// 可选最大日期
+				maxDate: new Date(2018, 5, 4, 23, 59),		// 可选最大日期
 				currentDate: new Date(),	// 当前时间
+				visible_item_count: 3,		// 可见选项树
 
 				isActiveN: true,	// 选择即时出行，用来控制样式
 				isActiveR: false,	// 选择预约出行，同样是用来控制样式
