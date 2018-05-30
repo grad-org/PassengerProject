@@ -43,7 +43,7 @@ export default {
 	},
 	methods: {
 		initHeight () {
-			let _this = this
+			let _this = this;
 			// 注：window.onresize只能在项目内触发1次
 			// 通过捕获系统的onresize事件触发我们需要执行的事件
 			// 参考：https://blog.csdn.net/bai_riqiang/article/details/78749667
