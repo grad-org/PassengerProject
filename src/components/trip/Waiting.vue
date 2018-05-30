@@ -28,9 +28,10 @@
 				let redirect = decodeURIComponent(this.$route.query.redirect || '/');
 				this.$router.push({path: redirect});
 			}
+			this.checkOrder();
 		},
 		mounted () {
-			this.checkOrder();
+			// this.checkOrder();
 		},
 		destotyed () {
 			window.localStorage.removeItem('TripDetail');	// 删除发布行程返回的数据
@@ -80,26 +81,28 @@
 			},
 			checkOrder () {
 				let _this = this;
+				console.log('有执行吗？');
 				_this.$socket.on('acceptTrip', function (tripOrder) {
 					console.log('车主接单返回：', tripOrder);
 					window.localStorage.removeItem('TripDetail');
 					window.localStorage.setItem('T1', JSON.stringify(tripOrder));
-					const toast2 = Toast.loading({
-						duration: 0,
-						forbidClick: true,
-						message: '司机已接单…'
-					});
-					let second = 2;
-					const time2 = setInterval(() => {
-						second--;
-						if (second == 1) {
-							toast2.message = '司机已接单…';
-						} else {
-							clearInterval(time2);
-							Toast.clear();
-							_this.$router.push({name: 'Progressing'});
-						}
-					}, 1000);
+					_this.$router.push({name: 'Progressing'});
+					// const toast2 = Toast.loading({
+					// 	duration: 0,
+					// 	forbidClick: true,
+					// 	message: '司机已接单…'
+					// });
+					// let second = 2;
+					// const time2 = setInterval(() => {
+					// 	second--;
+					// 	if (second == 1) {
+					// 		toast2.message = '司机已接单…';
+					// 	} else {
+					// 		clearInterval(time2);
+					// 		Toast.clear();
+					// 		_this.$router.push({name: 'Progressing'});
+					// 	}
+					// }, 1000);
 				})
 			}
 		},
