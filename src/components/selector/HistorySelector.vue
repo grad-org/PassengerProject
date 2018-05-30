@@ -39,7 +39,8 @@
 				</div>
 			</div>
 			<div style="text-align: center">
-				<mu-raised-button label="评价本次服务" class="raised-button" :backgroundColor="backgroundColor" :rippleOpacity="rippleOpacity" @click="evaluateTrip"/>
+				<mu-raised-button label="评价本次服务" class="raised-button" :backgroundColor="backgroundColor" :rippleOpacity="rippleOpacity" @click="evaluateTrip" v-if="notEvalute"/>
+				<mu-raised-button label="查看本次服务评价" class="raised-button" :backgroundColor="backgroundColor" :rippleOpacity="rippleOpacity" @click="watchEvaluate" v-else/>
 			</div>
 			<!-- 车费详情 -->
 			<mu-bottom-sheet :open="bottomSheet1" @close="closebottomSheet1">
@@ -55,7 +56,8 @@
 					<hr>
 					<span class="span-rule-header">实际支付：</span>
 					ーーー支付方式：支付宝<br>
-					ーーー支付费用：{{totalCost}} 元（含起步价10元）
+					ーーー支付费用：{{totalCost}} 元（含起步价）
+					<!-- ーーー支付费用：{{totalCost}} 元（含起步价10元） -->
 				</div>
 			</mu-bottom-sheet>
 			<!-- 计费规则 -->
@@ -63,8 +65,8 @@
 				<div style="background: #fff; padding: 16px"  @click="closeBottomSheet2">
 					<span class="span-rule">计费规则</span>
 					<span class="span-rule-header">起步范围：</span>
-					ーーー起步价：{{initialPrice}} 公里<br>
-					ーーー起步里程：{{initialMileage}} 元
+					ーーー起步价：{{initialPrice}} 元<br>
+					ーーー起步里程：{{initialMileage}} 公里
 					<hr>
 					<span class="span-rule-header">超出起步范围，按照计价规则收取：</span>
 					ーーー总费用 = 起步价 + 里程费 + 时长费<br>
@@ -74,6 +76,53 @@
 					<span class="span-rule-header">关于本次行程：</span>
 					ーーー总里程：{{tripMileage}} 公里<br>
 					ーーー总时长：{{tripDuration}} 分钟
+				</div>
+			</mu-bottom-sheet>
+			<!-- 查看服务评价 -->
+			<mu-bottom-sheet :open="bottomSheet3" @close="closeBottomSheet3">
+				<div style="padding: 16px 0;"  @click="closeBottomSheet3">
+					<span class="span-rule">服务评价</span>
+					<div class="block_title" style="padding: 10px 15px; font-weight: bold">
+						对车主评价：
+					</div>
+					<div class="van-cell van-cell__title van-hairline" >
+						<div class="van-cell__title">
+							<span class="van-cell__text">评分：</span>
+						</div>
+						<div class="van-cell__value" style="text-align: left;">
+							<driver-score style="margin-top: 3px"></driver-score>
+						</div>
+					</div>
+					<div class="van-cell van-cell__title van-hairline" >
+						<div class="van-cell__title">
+							<span class="van-cell__text">{{driverRatingContent}}</span>
+						</div>
+					</div>
+					<!-- 车主对你的评价 -->
+					<div class="block_title" style="padding: 10px 15px; font-weight: bold">
+						对您的评价：
+					</div>
+					<div v-if="notEvaluteDriver">
+						<div class="van-cell van-cell__title van-hairline" >
+							<div class="van-cell__title">车主还未进行评价！</div>
+						</div>
+					</div>
+					<!-- 当车主对您有了评价才能看到 -->
+					<div v-else>
+						<div class="van-cell van-cell__title van-hairline" >
+							<div class="van-cell__title">
+								<span class="van-cell__text">评分：</span>
+							</div>
+							<div class="van-cell__value" style="text-align: left;">
+								<passenger-score style="margin-top: 3px"></passenger-score>
+							</div>
+						</div>
+						<div class="van-cell van-cell__title van-hairline" >
+							<div class="van-cell__title">
+								<span class="van-cell__text">{{passengerRatingContent}}</span>
+							</div>
+						</div>
+					</div>
 				</div>
 			</mu-bottom-sheet>
 		</div>
@@ -88,14 +137,22 @@
 
 	import { Toast } from 'vant'
 	import avater from '../../assets/image/avater.jpg'
+	import DriverScore from './part/DriverScore'
+	import PassengerScore from './part/PassengerScore'
 
 	export default {
+		components: {
+			DriverScore, PassengerScore
+		},
 		data () {
 			return {
 				bottomSheet1: false,	// 车费详情BottomSheet
 				bottomSheet2: false,	// 计费规则BottomSheet
+				bottomSheet3: false,	// 服务评价BottomSheet
 				disable: false,
 				selectorHeight: '',
+				notEvalute: true,			// 是否已评价
+				notEvaluteDriver: true,			// 车主是否对你进行评价
 
 				backgroundColor: '#4a4d5b',	// 按钮波纹效果的颜色
 				rippleOpacity: 0.1,			// 按钮波纹效果的透明度
@@ -124,6 +181,12 @@
 				tripDuration: null,	// 行程的时长
 				tripMileageCost: null,	// 行程的里程费
 				tripDurationCost: null,	// 行程的时长费
+
+				// 评价内容
+				driverRatingScore: null,	// 车主对您的评分
+				driverRatingContent: null,	// 车主对你的评价内容
+				passengerRatingScore: null,	// 您对车主的评分
+				passengerRatingContent: null,	// 您对车主的评价内容
 			}
 		},
 		computed: {
@@ -139,6 +202,27 @@
 		created () {
 			let _this = this;
 			let ls_tripdetail = JSON.parse(window.localStorage.getItem('HistoryTripDetail'));
+
+			// 评价、查看服务
+			let ls_evaluate = ls_tripdetail.isDriverRated;
+			console.log(ls_evaluate)
+			if (ls_evaluate == false) {
+				_this.notEvalute = true;
+			} else if (ls_evaluate == true) {
+				_this.notEvalute = false;
+				// 再判断车主是否对你已评价
+				if (ls_tripdetail.isPassengerRated == false) {
+					_this.notEvaluteDriver = true;
+				} else if (ls_tripdetail.isPassengerRated == true) {
+					// 显示评价
+					_this.notEvaluteDriver = false;
+				} else {
+
+				}
+			} else {
+				
+			}
+			this.driverRatingContent = ls_tripdetail.driverRatingContent;
 			
 			// 车辆信息
 			_this.carBrand = ls_tripdetail.brand;
@@ -168,13 +252,36 @@
 			.catch((error) => {
 				console.log(error);
 			});
+			// 根据行程id获取信息
+			_this.$axios.get('/api/tripOrder/' + ls_tripdetail.tripOrderId).then((response) => {
+				console.log('根据行程订单id查询行程明细返回数据：', response);
+				if (response.status == 200) {
+					window.localStorage.setItem('HistoryTripDetail', JSON.stringify(response.data.data));
+					// notEvaluteDriver: true,			// 车主是否对你进行评价
+					// passengerRatingContent: '',		// 乘客获得的评价
+					let data = response.data.data;
+					if (data.isPassengerRated == false) {
+						_this.notEvaluteDriver = true;
+					} else if (data.isPassengerRated == true) {
+						_this.notEvaluteDriver = false;
+						_this.passengerRatingContent = data.passengerRatingContent;
+					}
+				}
+			}).catch((error) => {
+				console.log(error)
+			})
 		},
 		mounted () {
 			
 		},
 		methods: {
 			evaluateTrip () {
-				
+				console.log('去评价');
+				this.$router.push({name: 'EvaluateTrip'});
+			},
+			watchEvaluate () {
+				console.log('查看评价');
+				this.bottomSheet3 = true;	// 打开评价弹出框
 			},
 			openbottomSheet1 () {
 				this.bottomSheet1 = true;
@@ -187,6 +294,9 @@
 			},
 			closeBottomSheet2 () {
 				this.bottomSheet2 = false;
+			},
+			closeBottomSheet3 () {
+				this.bottomSheet3 = false;
 			}
 		}
 	}
